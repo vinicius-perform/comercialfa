@@ -1457,11 +1457,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (adminErrorMsg) adminErrorMsg.style.display = 'none';
-    if (adminUser) adminUser.value = 'admin';
+    if (adminUser) adminUser.value = '';
     if (adminPass) adminPass.value = '';
     if (adminLoginModal) adminLoginModal.classList.add('open');
     setTimeout(() => {
-      if (adminPass) adminPass.focus();
+      if (adminUser) adminUser.focus();
     }, 60);
   }
 
@@ -1475,11 +1475,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const user = (adminUser.value || '').trim().toLowerCase();
     const pass = (adminPass.value || '').trim();
 
-    // Credenciais aceitas para gestão
-    const validUsers = ['admin', 'gestao', 'diretoria', 'comercial', 'fa'];
-    const validPass = ['admin', 'admin123', 'fa2026', 'comercialfa', '123456', 'fa@2026'];
+    // Credenciais oficiais de acesso administrativo
+    const validUsers = ['admin@fa', 'admin', 'gestao', 'fa'];
+    const isPassValid = (pass === 'admin@FA1' || pass === 'admin@fa1' || pass === 'admin');
 
-    if (validUsers.includes(user) && validPass.includes(pass)) {
+    if (validUsers.includes(user) && isPassValid) {
       isAdminAuthenticated = true;
       closeAdminLogin();
       renderHistory();
