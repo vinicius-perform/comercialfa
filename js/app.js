@@ -67,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Botões de Ação
   const btnGeneratePdf = document.getElementById('btn-generate-pdf');
   const btnSaveLog = document.getElementById('btn-save-log');
-  const btnCopyWhatsapp = document.getElementById('btn-copy-whatsapp');
   const btnResetForm = document.getElementById('btn-reset-form');
 
   // Elementos do Modal de Histórico & Performance Consolidada
@@ -516,56 +515,6 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast(`Métricas de ${currentCloser} salvas com sucesso!`);
     }
     return true;
-  }
-
-  // --- COPIAR TEXTO FORMATADO PARA WHATSAPP ---
-  function copyWhatsAppSummary() {
-    if (!validateCloserSelected()) return;
-
-    const selectedDate = dateInput.value || formattedToday;
-    const leads = parseInt(inputLeads.value, 10) || 0;
-    const followups = parseInt(inputFollowups.value, 10) || 0;
-    const prospeccoes = parseInt(inputProspeccoes.value, 10) || 0;
-    const scheduled = parseInt(inputMeetingsScheduled.value, 10) || 0;
-    const held = parseInt(inputMeetingsHeld.value, 10) || 0;
-    const sales = parseInt(inputSales.value, 10) || 0;
-    const contractVal = formatMoneyString(inputContractVal.value);
-    const cashCollected = formatMoneyString(inputCashCollected.value);
-
-    const attendanceRate = scheduled > 0 ? Math.round((held / scheduled) * 100) : 0;
-    const conversionRate = held > 0 ? Math.round((sales / held) * 100) : 0;
-
-    let summary = `*FAZENDO ACONTECER™ | RELATÓRIO DIÁRIO*\n`;
-    summary += `👤 *Closer:* ${currentCloser}\n`;
-    summary += `📅 *Data:* ${formatDateBR(selectedDate)}\n`;
-    summary += `─────────────────────────\n`;
-    summary += `🎯 *MÉTRICA DE ESFORÇO & LEADS*\n`;
-    summary += `• Leads recebidos: *${leads}*\n`;
-    summary += `• Follow-ups realizados: *${followups}*\n`;
-    summary += `• Prospecções no dia: *${prospeccoes}*\n`;
-    summary += `─────────────────────────\n`;
-    summary += `💼 *PERFORMANCE COMERCIAL*\n`;
-    summary += `• Reuniões agendadas: *${scheduled}*\n`;
-    summary += `• Reuniões realizadas: *${held}* (${attendanceRate}% comparecimento)\n`;
-    summary += `• Vendas: *${sales}* (${conversionRate}% conversão)\n`;
-    if (contractVal !== 'R$ 0,00') summary += `• Valor Contrato: *${contractVal}*\n`;
-    if (cashCollected !== 'R$ 0,00') summary += `• Cash Coletado: *${cashCollected}*\n`;
-    summary += `─────────────────────────\n`;
-    summary += `⚡ _Gerado via Hub Comercial • Fazendo Acontecer™_`;
-
-    navigator.clipboard.writeText(summary).then(() => {
-      showToast('Relatório copiado para o WhatsApp!');
-    }).catch(err => {
-      console.error('Erro ao copiar', err);
-      // Fallback
-      const ta = document.createElement('textarea');
-      ta.value = summary;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      showToast('Relatório copiado para o WhatsApp!');
-    });
   }
 
   // --- LIMPAR FORMULÁRIO ---
@@ -1431,13 +1380,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (action) {
         action();
       }
-    });
-  }
-
-  // Botão Copiar WhatsApp
-  if (btnCopyWhatsapp) {
-    btnCopyWhatsapp.addEventListener('click', () => {
-      copyWhatsAppSummary();
     });
   }
 
