@@ -40,35 +40,16 @@
 
         <form id="daily-report-form" autocomplete="off">
 
-          <!-- ETAPA 1: SELEÇÃO DE PAPEL & NOME -->
+          <!-- ETAPA 1: SELEÇÃO DE NOME -->
           <div class="form-section">
             <div class="section-title-row">
               <span class="section-number">1</span>
               <span class="section-title">QUEM É VOCÊ?</span>
             </div>
 
-            <!-- Alternador de Função: Closer ou SDR -->
-            <div class="role-selector-segmented">
-              <button type="button" class="role-btn active" data-role="closer" id="btn-role-closer">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                </svg>
-                <span>Closer (Fechamento)</span>
-              </button>
-              <button type="button" class="role-btn" data-role="sdr" id="btn-role-sdr">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                </svg>
-                <span>SDR (Prospecção)</span>
-              </button>
-            </div>
-
-            <!-- Seleção de Nome: Closers -->
-            <div class="name-chips-container" id="closers-names-box">
-              <label class="input-sublabel">Selecione o seu nome:</label>
+            <!-- Seleção Unificada de Membro da Equipe -->
+            <div class="name-chips-container" id="team-names-box">
+              <label class="input-sublabel">Selecione o seu nome na equipe comercial:</label>
               <div class="chips-grid">
                 <button type="button" class="name-chip active" data-name="Tales">
                   <span class="chip-avatar">T</span>
@@ -82,41 +63,34 @@
                   <span class="chip-avatar">E</span>
                   <span>Elinaldo</span>
                 </button>
-              </div>
-            </div>
-
-            <!-- Seleção de Nome: SDRs -->
-            <div class="name-chips-container" id="sdrs-names-box" style="display: none;">
-              <label class="input-sublabel">Selecione o seu nome:</label>
-              <div class="chips-grid sdr-chips-grid">
-                <button type="button" class="name-chip active" data-name="SDR 1">
-                  <span class="chip-avatar sdr-avatar">1</span>
+                <button type="button" class="name-chip" data-name="SDR 1">
+                  <span class="chip-avatar">1</span>
                   <span>SDR 1</span>
                 </button>
                 <button type="button" class="name-chip" data-name="SDR 2">
-                  <span class="chip-avatar sdr-avatar">2</span>
+                  <span class="chip-avatar">2</span>
                   <span>SDR 2</span>
                 </button>
                 <button type="button" class="name-chip" data-name="SDR 3">
-                  <span class="chip-avatar sdr-avatar">3</span>
+                  <span class="chip-avatar">3</span>
                   <span>SDR 3</span>
                 </button>
                 <button type="button" class="name-chip" data-name="SDR 4">
-                  <span class="chip-avatar sdr-avatar">4</span>
+                  <span class="chip-avatar">4</span>
                   <span>SDR 4</span>
                 </button>
-                <button type="button" class="name-chip" data-name="outro" id="chip-sdr-custom">
-                  <span class="chip-avatar sdr-avatar">✎</span>
+                <button type="button" class="name-chip" data-name="outro" id="chip-custom-name">
+                  <span class="chip-avatar">✎</span>
                   <span>Outro Nome</span>
                 </button>
               </div>
-              <div class="custom-name-field" id="box-sdr-custom-name" style="display: none; margin-top: 10px;">
+              <div class="custom-name-field" id="box-custom-name" style="display: none; margin-top: 10px;">
                 <input type="text" id="input-custom-name" class="apple-input" placeholder="Digite seu nome completo...">
               </div>
             </div>
           </div>
 
-          <!-- SELEÇÃO DE CLIENTE / PROJETO (Opcional) -->
+          <!-- ETAPA 2: PROJETO OU CLIENTE (Opcional) -->
           <div class="form-section">
             <div class="section-title-row">
               <span class="section-number">2</span>
@@ -151,153 +125,115 @@
             <span class="field-hint" id="date-helper-text">Relatório referente ao dia selecionado.</span>
           </div>
 
-          <!-- ETAPA 3A: CAMPOS DO CLOSER (FECHAMENTO) -->
-          <div class="form-section dynamic-section" id="section-closer-fields">
+          <!-- ETAPA 4: MÉTRICAS DO DIA (CAMPOS GERAIS UNIFICADOS) -->
+          <div class="form-section" id="section-general-fields">
             <div class="section-title-row">
-              <span class="section-number">3</span>
-              <span class="section-title">MÉTRICAS DO CLOSER</span>
+              <span class="section-number">4</span>
+              <span class="section-title">MÉTRICAS DO DIA (GERAL)</span>
             </div>
+            <p style="font-size: 13px; color: var(--text-secondary); margin: -4px 0 10px 0;">Preencha os números e atividades do seu dia. Deixe como 0 o que não se aplicar.</p>
 
             <!-- Bloco 1: Prospecção & Contato -->
             <div class="fields-group-box">
-              <span class="group-title">ATIVIDADES & CONTATO</span>
+              <span class="group-title">ATIVIDADES DE CONTATO & PROSPECÇÃO</span>
               <div class="inputs-grid-3">
                 <div class="field-item">
-                  <label for="c-leads">Leads Abordados</label>
+                  <label for="rep-leads">Leads Abordados</label>
                   <div class="apple-input-box">
-                    <input type="number" id="c-leads" class="apple-input" min="0" value="0">
+                    <input type="number" id="rep-leads" class="apple-input" min="0" value="0">
                   </div>
                 </div>
                 <div class="field-item">
-                  <label for="c-followups">Follow-ups Feitos</label>
+                  <label for="rep-calls">Ligações Feitas</label>
                   <div class="apple-input-box">
-                    <input type="number" id="c-followups" class="apple-input" min="0" value="0">
+                    <input type="number" id="rep-calls" class="apple-input" min="0" value="0">
                   </div>
                 </div>
                 <div class="field-item">
-                  <label for="c-prospeccoes">Prospecções Ativas</label>
+                  <label for="rep-whatsapp">Mensagens WhatsApp</label>
                   <div class="apple-input-box">
-                    <input type="number" id="c-prospeccoes" class="apple-input" min="0" value="0">
+                    <input type="number" id="rep-whatsapp" class="apple-input" min="0" value="0">
+                  </div>
+                </div>
+                <div class="field-item">
+                  <label for="rep-contacts">Contatos Efetivos (Conexões)</label>
+                  <div class="apple-input-box highlight-border-green">
+                    <input type="number" id="rep-contacts" class="apple-input" min="0" value="0">
+                  </div>
+                </div>
+                <div class="field-item">
+                  <label for="rep-followups">Follow-ups Feitos</label>
+                  <div class="apple-input-box">
+                    <input type="number" id="rep-followups" class="apple-input" min="0" value="0">
+                  </div>
+                </div>
+                <div class="field-item">
+                  <label for="rep-prospeccoes">Prospecções Ativas</label>
+                  <div class="apple-input-box">
+                    <input type="number" id="rep-prospeccoes" class="apple-input" min="0" value="0">
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Bloco 2: Reuniões -->
+            <!-- Bloco 2: Reuniões & Qualificação -->
             <div class="fields-group-box">
-              <span class="group-title">REUNIÕES DO DIA</span>
+              <span class="group-title">REUNIÕES & QUALIFICAÇÃO</span>
               <div class="inputs-grid-2">
                 <div class="field-item">
-                  <label for="c-scheduled">Reuniões Agendadas</label>
+                  <label for="rep-scheduled">Reuniões Agendadas</label>
                   <div class="apple-input-box">
-                    <input type="number" id="c-scheduled" class="apple-input" min="0" value="0">
+                    <input type="number" id="rep-scheduled" class="apple-input" min="0" value="0">
                   </div>
                 </div>
                 <div class="field-item">
-                  <label for="c-held">Reuniões Realizadas (Held)</label>
+                  <label for="rep-held">Reuniões Realizadas (Held)</label>
                   <div class="apple-input-box highlight-border-green">
-                    <input type="number" id="c-held" class="apple-input" min="0" value="0">
+                    <input type="number" id="rep-held" class="apple-input" min="0" value="0">
+                  </div>
+                </div>
+                <div class="field-item">
+                  <label for="rep-qualified">Qualificadas no ICP</label>
+                  <div class="apple-input-box">
+                    <input type="number" id="rep-qualified" class="apple-input" min="0" value="0">
+                  </div>
+                </div>
+                <div class="field-item">
+                  <label for="rep-noshow">No-Shows (Faltas)</label>
+                  <div class="apple-input-box">
+                    <input type="number" id="rep-noshow" class="apple-input" min="0" value="0">
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Bloco 3: Fechamento & Receita -->
+            <!-- Bloco 3: Vendas & Fechamento Financeiro -->
             <div class="fields-group-box">
-              <span class="group-title">RESULTADOS FINANCEIROS</span>
-              <div class="inputs-grid-3">
-                <div class="field-item">
-                  <label for="c-sales">Vendas Fechadas (un)</label>
-                  <div class="apple-input-box highlight-border-green">
-                    <input type="number" id="c-sales" class="apple-input" min="0" value="0">
-                  </div>
-                </div>
-                <div class="field-item">
-                  <label for="c-contracts">Contratos Fechados</label>
-                  <div class="apple-input-box">
-                    <input type="text" id="c-contracts" class="apple-input font-numeric" value="R$ 0,00">
-                  </div>
-                </div>
-                <div class="field-item">
-                  <label for="c-cash">Cash Coletado (Entrada)</label>
-                  <div class="apple-input-box highlight-border-green">
-                    <input type="text" id="c-cash" class="apple-input font-numeric font-highlight" value="R$ 0,00">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ETAPA 3B: CAMPOS DO SDR (PROSPECÇÃO) -->
-          <div class="form-section dynamic-section" id="section-sdr-fields" style="display: none;">
-            <div class="section-title-row">
-              <span class="section-number">3</span>
-              <span class="section-title">MÉTRICAS DO SDR</span>
-            </div>
-
-            <!-- Bloco 1: Esforço & Volume -->
-            <div class="fields-group-box">
-              <span class="group-title">VOLUME DE ATIVIDADES</span>
+              <span class="group-title">VENDAS & RESULTADOS FINANCEIROS</span>
               <div class="inputs-grid-2">
                 <div class="field-item">
-                  <label for="s-leads">Leads Abordados</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="s-leads" class="apple-input" min="0" value="0">
-                  </div>
-                </div>
-                <div class="field-item">
-                  <label for="s-calls">Ligações Feitas</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="s-calls" class="apple-input" min="0" value="0">
-                  </div>
-                </div>
-                <div class="field-item">
-                  <label for="s-whatsapp">Mensagens WhatsApp</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="s-whatsapp" class="apple-input" min="0" value="0">
-                  </div>
-                </div>
-                <div class="field-item">
-                  <label for="s-contacts">Contatos Efetivos (Conexões)</label>
+                  <label for="rep-sales">Vendas Fechadas (un)</label>
                   <div class="apple-input-box highlight-border-green">
-                    <input type="number" id="s-contacts" class="apple-input" min="0" value="0">
+                    <input type="number" id="rep-sales" class="apple-input font-bold" min="0" value="0">
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <!-- Bloco 2: Agendamentos & ICP -->
-            <div class="fields-group-box">
-              <span class="group-title">QUALIFICAÇÃO & AGENDAMENTO</span>
-              <div class="inputs-grid-3">
                 <div class="field-item">
-                  <label for="s-scheduled">Reuniões Agendadas</label>
+                  <label for="rep-contracts">Valor em Contratos Fechados</label>
+                  <div class="apple-input-box">
+                    <input type="text" id="rep-contracts" class="apple-input font-numeric" value="R$ 0,00">
+                  </div>
+                </div>
+                <div class="field-item">
+                  <label for="rep-cash">Cash Coletado (Entrada)</label>
                   <div class="apple-input-box highlight-border-green">
-                    <input type="number" id="s-scheduled" class="apple-input" min="0" value="0">
+                    <input type="text" id="rep-cash" class="apple-input font-numeric font-highlight font-bold" value="R$ 0,00">
                   </div>
                 </div>
                 <div class="field-item">
-                  <label for="s-qualified">Qualificadas no ICP</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="s-qualified" class="apple-input" min="0" value="0">
+                  <label for="rep-pipeline">Pipeline Estimado / Em Negociação</label>
+                  <div class="apple-input-box highlight-border-green">
+                    <input type="text" id="rep-pipeline" class="apple-input font-numeric font-highlight" value="R$ 0,00">
                   </div>
-                </div>
-                <div class="field-item">
-                  <label for="s-noshow">No-Shows (Faltas)</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="s-noshow" class="apple-input" min="0" value="0">
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Bloco 3: Pipeline Gerado -->
-            <div class="fields-group-box">
-              <span class="group-title">PIPELINE GERADO</span>
-              <div class="field-item">
-                <label for="s-pipeline">Valor Estimado do Pipeline Gerado</label>
-                <div class="apple-input-box highlight-border-green">
-                  <input type="text" id="s-pipeline" class="apple-input font-numeric font-highlight" value="R$ 0,00">
                 </div>
               </div>
             </div>

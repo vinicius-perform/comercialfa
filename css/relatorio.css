@@ -261,17 +261,13 @@ body {
 
 .chips-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 8px;
 }
 
-.sdr-chips-grid {
-  grid-template-columns: repeat(5, 1fr);
-}
-
 @media (max-width: 600px) {
-  .sdr-chips-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .chips-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

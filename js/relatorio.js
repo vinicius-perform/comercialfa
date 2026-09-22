@@ -1,33 +1,29 @@
 /**
  * PORTAL DA EQUIPE • FAZENDO ACONTECER™
- * Lógica do Formulário, Máscaras Monetárias, Revisão e Exportação (PDF & Imagem PNG)
+ * Lógica do Formulário Geral Unificado, Máscaras Monetárias, Revisão e Exportação (PDF & Imagem PNG)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Chaves do LocalStorage (Sincronizadas com o Dashboard Executivo)
+  // Chaves do LocalStorage
   const STORAGE_CLOSER_REPORTS = 'closerReports_v2';
   const STORAGE_SDR_REPORTS = 'sdrReports_v2';
+  const STORAGE_TEAM_REPORTS = 'teamReports_v1';
 
-  // Elementos de Navegação e Estado
-  let currentRole = 'closer'; // 'closer' | 'sdr'
+  // Estado do Membro Ativo
   let currentName = 'Tales';
 
-  // Elementos do DOM
-  const btnRoleCloser = document.getElementById('btn-role-closer');
-  const btnRoleSdr = document.getElementById('btn-role-sdr');
-  const boxClosersNames = document.getElementById('closers-names-box');
-  const boxSdrsNames = document.getElementById('sdrs-names-box');
-  const sectionCloserFields = document.getElementById('section-closer-fields');
-  const sectionSdrFields = document.getElementById('section-sdr-fields');
-  const boxSdrCustomName = document.getElementById('box-sdr-custom-name');
+  // Elementos do DOM: Seleção de Nome
+  const teamNamesBox = document.getElementById('team-names-box');
+  const boxCustomName = document.getElementById('box-custom-name');
   const inputCustomName = document.getElementById('input-custom-name');
 
+  // Elementos de Data e Cliente
   const inputReportDate = document.getElementById('input-report-date');
   const btnSetToday = document.getElementById('btn-set-today');
   const displayTodayText = document.getElementById('display-today-text');
   const selectClientId = document.getElementById('report-client-id');
 
-  // Carrega clientes disponíveis no seletor
+  // Carrega clientes cadastrados no seletor
   if (selectClientId && typeof dbFetchClients === 'function') {
     dbFetchClients().then(clients => {
       if (Array.isArray(clients)) {
@@ -41,25 +37,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }).catch(err => console.warn('Erro ao buscar clientes no portal:', err));
   }
 
-  // Closer Inputs
-  const inputCLeads = document.getElementById('c-leads');
-  const inputCFollowups = document.getElementById('c-followups');
-  const inputCProspeccoes = document.getElementById('c-prospeccoes');
-  const inputCScheduled = document.getElementById('c-scheduled');
-  const inputCHeld = document.getElementById('c-held');
-  const inputCSales = document.getElementById('c-sales');
-  const inputCContracts = document.getElementById('c-contracts');
-  const inputCCash = document.getElementById('c-cash');
+  // Inputs das Métricas Gerais
+  const inputRepLeads = document.getElementById('rep-leads');
+  const inputRepCalls = document.getElementById('rep-calls');
+  const inputRepWhatsapp = document.getElementById('rep-whatsapp');
+  const inputRepContacts = document.getElementById('rep-contacts');
+  const inputRepFollowups = document.getElementById('rep-followups');
+  const inputRepProspeccoes = document.getElementById('rep-prospeccoes');
 
-  // SDR Inputs
-  const inputSLeads = document.getElementById('s-leads');
-  const inputSCalls = document.getElementById('s-calls');
-  const inputSWhatsapp = document.getElementById('s-whatsapp');
-  const inputSContacts = document.getElementById('s-contacts');
-  const inputSScheduled = document.getElementById('s-scheduled');
-  const inputSQualified = document.getElementById('s-qualified');
-  const inputSNoshow = document.getElementById('s-noshow');
-  const inputSPipeline = document.getElementById('s-pipeline');
+  const inputRepScheduled = document.getElementById('rep-scheduled');
+  const inputRepHeld = document.getElementById('rep-held');
+  const inputRepQualified = document.getElementById('rep-qualified');
+  const inputRepNoshow = document.getElementById('rep-noshow');
+
+  const inputRepSales = document.getElementById('rep-sales');
+  const inputRepContracts = document.getElementById('rep-contracts');
+  const inputRepCash = document.getElementById('rep-cash');
+  const inputRepPipeline = document.getElementById('rep-pipeline');
 
   // Modal de Revisão
   const btnOpenReview = document.getElementById('btn-open-review');
@@ -100,13 +94,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function formatDateBR(isoDate) {
     if (!isoDate) return '';
-    const [year, month, day] = isoDate.split('-');
+    const parts = isoDate.split('-');
+    if (parts.length !== 3) return isoDate;
+    const [year, month, day] = parts;
     return `${day}/${month}/${year}`;
   }
 
   function formatDateExtenso(isoDate) {
     if (!isoDate) return '';
-    const [year, month, day] = isoDate.split('-');
+    const parts = isoDate.split('-');
+    if (parts.length !== 3) return isoDate;
+    const [year, month, day] = parts;
     const dateObj = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
     return dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
   }
@@ -157,9 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  attachMoneyMask(inputCContracts);
-  attachMoneyMask(inputCCash);
-  attachMoneyMask(inputSPipeline);
+  attachMoneyMask(inputRepContracts);
+  attachMoneyMask(inputRepCash);
+  attachMoneyMask(inputRepPipeline);
 
   function formatMoneyString(rawStr) {
     if (!rawStr) return 'R$ 0,00';
@@ -172,233 +170,169 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
-  // ALTERNÂNCIA DE PAPEL (CLOSER VS SDR)
+  // SELEÇÃO UNIFICADA DE MEMBRO DA EQUIPE
   // ============================================================
-  function switchRole(role) {
-    currentRole = role;
-    if (role === 'closer') {
-      btnRoleCloser.classList.add('active');
-      btnRoleSdr.classList.remove('active');
-      boxClosersNames.style.display = 'block';
-      boxSdrsNames.style.display = 'none';
-      sectionCloserFields.style.display = 'block';
-      sectionSdrFields.style.display = 'none';
+  if (teamNamesBox) {
+    const chips = teamNamesBox.querySelectorAll('.name-chip');
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
 
-      // Restaurar seleção do Closer ativo
-      const activeCloserChip = boxClosersNames.querySelector('.name-chip.active');
-      currentName = activeCloserChip ? activeCloserChip.dataset.name : 'Tales';
-    } else {
-      btnRoleSdr.classList.add('active');
-      btnRoleCloser.classList.remove('active');
-      boxClosersNames.style.display = 'none';
-      boxSdrsNames.style.display = 'block';
-      sectionCloserFields.style.display = 'none';
-      sectionSdrFields.style.display = 'block';
-
-      // Restaurar seleção do SDR ativo
-      const activeSdrChip = boxSdrsNames.querySelector('.name-chip.active');
-      if (activeSdrChip) {
-        if (activeSdrChip.dataset.name === 'outro') {
-          boxSdrCustomName.style.display = 'block';
-          currentName = inputCustomName.value.trim() || 'SDR Convidado';
+        if (chip.dataset.name === 'outro') {
+          if (boxCustomName) boxCustomName.style.display = 'block';
+          if (inputCustomName) {
+            inputCustomName.focus();
+            currentName = inputCustomName.value.trim() || 'Membro Convidado';
+          }
         } else {
-          boxSdrCustomName.style.display = 'none';
-          currentName = activeSdrChip.dataset.name;
+          if (boxCustomName) boxCustomName.style.display = 'none';
+          currentName = chip.dataset.name;
         }
-      }
-    }
-  }
-
-  if (btnRoleCloser) {
-    btnRoleCloser.addEventListener('click', () => switchRole('closer'));
-  }
-  if (btnRoleSdr) {
-    btnRoleSdr.addEventListener('click', () => switchRole('sdr'));
-  }
-
-  // Seleção de Chips de Nome
-  const closerChips = boxClosersNames.querySelectorAll('.name-chip');
-  closerChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      closerChips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      currentName = chip.dataset.name;
+      });
     });
-  });
-
-  const sdrChips = boxSdrsNames.querySelectorAll('.name-chip');
-  sdrChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      sdrChips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      if (chip.dataset.name === 'outro') {
-        boxSdrCustomName.style.display = 'block';
-        inputCustomName.focus();
-        currentName = inputCustomName.value.trim() || 'SDR Convidado';
-      } else {
-        boxSdrCustomName.style.display = 'none';
-        currentName = chip.dataset.name;
-      }
-    });
-  });
+  }
 
   if (inputCustomName) {
     inputCustomName.addEventListener('input', (e) => {
-      currentName = e.target.value.trim() || 'SDR Convidado';
+      currentName = e.target.value.trim() || 'Membro Convidado';
     });
+  }
+
+  // ============================================================
+  // COLETA DE DADOS DO FORMULÁRIO GERAL
+  // ============================================================
+  let pendingReportData = null;
+
+  function gatherCurrentReportData() {
+    const selectedDate = inputReportDate ? (inputReportDate.value || getTodayIso()) : getTodayIso();
+    const effectiveName = currentName || 'Tales';
+    const selectedClientId = selectClientId ? selectClientId.value : null;
+
+    // Atividades de Contato & Prospecção
+    const leads = Math.max(0, parseInt(inputRepLeads ? inputRepLeads.value : 0, 10) || 0);
+    const calls = Math.max(0, parseInt(inputRepCalls ? inputRepCalls.value : 0, 10) || 0);
+    const whatsapp = Math.max(0, parseInt(inputRepWhatsapp ? inputRepWhatsapp.value : 0, 10) || 0);
+    const contacts = Math.max(0, parseInt(inputRepContacts ? inputRepContacts.value : 0, 10) || 0);
+    const followups = Math.max(0, parseInt(inputRepFollowups ? inputRepFollowups.value : 0, 10) || 0);
+    const prospeccoes = Math.max(0, parseInt(inputRepProspeccoes ? inputRepProspeccoes.value : 0, 10) || 0);
+
+    // Reuniões & Qualificação
+    const scheduled = Math.max(0, parseInt(inputRepScheduled ? inputRepScheduled.value : 0, 10) || 0);
+    const held = Math.max(0, parseInt(inputRepHeld ? inputRepHeld.value : 0, 10) || 0);
+    const qualified = Math.max(0, parseInt(inputRepQualified ? inputRepQualified.value : 0, 10) || 0);
+    const noshow = Math.max(0, parseInt(inputRepNoshow ? inputRepNoshow.value : 0, 10) || 0);
+
+    // Vendas & Resultados Financeiros
+    const sales = Math.max(0, parseInt(inputRepSales ? inputRepSales.value : 0, 10) || 0);
+    const contracts = formatMoneyString(inputRepContracts ? inputRepContracts.value : 0);
+    const cash = formatMoneyString(inputRepCash ? inputRepCash.value : 0);
+    const pipeline = formatMoneyString(inputRepPipeline ? inputRepPipeline.value : 0);
+
+    // Métricas Calculadas
+    const totalEffort = calls + whatsapp + followups + prospeccoes;
+    const attendanceRate = scheduled > 0 ? Math.min(100, Math.round((held / scheduled) * 100)) : (held > 0 ? 100 : 0);
+    const convRate = held > 0 ? Math.min(100, Math.round((sales / held) * 100)) : (sales > 0 ? 100 : 0);
+    const contactRate = leads > 0 ? Math.min(100, Math.round((contacts / leads) * 100)) : 0;
+
+    let clientLabel = '🌐 Geral / Fazendo Acontecer™';
+    if (selectClientId && selectClientId.selectedIndex >= 0) {
+      const opt = selectClientId.options[selectClientId.selectedIndex];
+      if (opt && opt.value) clientLabel = opt.textContent;
+    }
+
+    return {
+      name: effectiveName,
+      clientId: selectedClientId,
+      clientLabel: clientLabel,
+      date: selectedDate,
+      leads,
+      calls,
+      whatsapp,
+      contacts,
+      followups,
+      prospeccoes,
+      totalEffort,
+      contactRate,
+      scheduled,
+      held,
+      qualified,
+      noshow,
+      attendanceRate,
+      convRate,
+      sales,
+      contracts,
+      cash,
+      pipeline
+    };
   }
 
   // ============================================================
   // MODAL DE CONFERÊNCIA ("CONFIRMAR SE TÁ TUDO CORRETO")
   // ============================================================
-  let pendingReportData = null;
-
-  function gatherCurrentReportData() {
-    const selectedDate = inputReportDate.value || getTodayIso();
-    const effectiveName = currentName || (currentRole === 'closer' ? 'Tales' : 'SDR 1');
-
-    if (currentRole === 'closer') {
-      const leads = Math.max(0, parseInt(inputCLeads.value, 10) || 0);
-      const followups = Math.max(0, parseInt(inputCFollowups.value, 10) || 0);
-      const prospeccoes = Math.max(0, parseInt(inputCProspeccoes.value, 10) || 0);
-      const scheduled = Math.max(0, parseInt(inputCScheduled.value, 10) || 0);
-      const held = Math.max(0, parseInt(inputCHeld.value, 10) || 0);
-      const sales = Math.max(0, parseInt(inputCSales.value, 10) || 0);
-      const contracts = formatMoneyString(inputCContracts.value);
-      const cash = formatMoneyString(inputCCash.value);
-
-      const totalEffort = followups + prospeccoes;
-      const attendanceRate = scheduled > 0 ? Math.min(100, Math.round((held / scheduled) * 100)) : (held > 0 ? 100 : 0);
-      const convRate = held > 0 ? Math.min(100, Math.round((sales / held) * 100)) : (sales > 0 ? 100 : 0);
-      const selectedClientId = selectClientId ? selectClientId.value : null;
-
-      return {
-        role: 'closer',
-        name: effectiveName,
-        clientId: selectedClientId,
-        date: selectedDate,
-        leads,
-        followups,
-        prospeccoes,
-        totalEffort,
-        scheduled,
-        held,
-        sales,
-        contracts,
-        cash,
-        attendanceRate,
-        convRate
-      };
-    } else {
-      const leads = Math.max(0, parseInt(inputSLeads.value, 10) || 0);
-      const calls = Math.max(0, parseInt(inputSCalls.value, 10) || 0);
-      const whatsapp = Math.max(0, parseInt(inputSWhatsapp.value, 10) || 0);
-      const contacts = Math.max(0, parseInt(inputSContacts.value, 10) || 0);
-      const scheduled = Math.max(0, parseInt(inputSScheduled.value, 10) || 0);
-      const qualified = Math.max(0, parseInt(inputSQualified.value, 10) || 0);
-      const noshow = Math.max(0, parseInt(inputSNoshow.value, 10) || 0);
-      const pipeline = formatMoneyString(inputSPipeline.value);
-      const selectedClientId = selectClientId ? selectClientId.value : null;
-
-      const contactRate = leads > 0 ? Math.min(100, Math.round((contacts / leads) * 100)) : 0;
-      const scheduleRate = contacts > 0 ? Math.min(100, Math.round((scheduled / contacts) * 100)) : 0;
-
-      return {
-        role: 'sdr',
-        name: effectiveName,
-        clientId: selectedClientId,
-        date: selectedDate,
-        leads,
-        calls,
-        whatsapp,
-        contacts,
-        scheduled,
-        qualified,
-        noshow,
-        pipeline,
-        contactRate,
-        scheduleRate
-      };
-    }
-  }
-
   function openReviewModal() {
     pendingReportData = gatherCurrentReportData();
-    const isCloser = pendingReportData.role === 'closer';
 
     let html = `
       <div class="review-info-badge">
         <div>
-          <span style="color:var(--text-muted); font-size:10px; text-transform:uppercase;">MEMBRO:</span>
+          <span style="color:var(--text-muted); font-size:10px; text-transform:uppercase;">MEMBRO DA EQUIPE:</span>
           <strong style="color:var(--text-white); margin-left:4px;">${pendingReportData.name}</strong>
-          <span style="margin-left:6px; font-size:10px; padding:2px 6px; border-radius:6px; background:${isCloser ? 'var(--accent-lime-subtle)' : 'var(--accent-cyan-subtle)'}; color:${isCloser ? 'var(--accent-lime)' : 'var(--accent-cyan)'}; font-weight:700;">${isCloser ? 'CLOSER' : 'SDR'}</span>
+          <span style="margin-left:6px; font-size:10px; padding:2px 8px; border-radius:6px; background:var(--accent-lime-subtle); color:var(--accent-lime); font-weight:700;">EQUIPE</span>
         </div>
         <div>
           <span style="color:var(--text-muted); font-size:10px; text-transform:uppercase;">DATA:</span>
           <strong style="color:var(--text-white); margin-left:4px;">${formatDateBR(pendingReportData.date)}</strong>
         </div>
       </div>
-    `;
 
-    if (isCloser) {
-      html += `
-        <div class="review-grid">
-          <div class="review-stat-item">
-            <span class="review-stat-label">VENDAS FECHADAS</span>
-            <span class="review-stat-val highlight-green">${pendingReportData.sales} un</span>
-          </div>
-          <div class="review-stat-item">
-            <span class="review-stat-label">CASH COLETADO</span>
-            <span class="review-stat-val highlight-green">${pendingReportData.cash}</span>
-          </div>
-          <div class="review-stat-item">
-            <span class="review-stat-label">VALOR EM CONTRATOS</span>
-            <span class="review-stat-val">${pendingReportData.contracts}</span>
-          </div>
-          <div class="review-stat-item">
-            <span class="review-stat-label">REUNIÕES (HELD / AGEND)</span>
-            <span class="review-stat-val">${pendingReportData.held} / ${pendingReportData.scheduled}</span>
-          </div>
-          <div class="review-stat-item">
-            <span class="review-stat-label">TAXA DE CONVERSÃO</span>
-            <span class="review-stat-val">${pendingReportData.convRate}%</span>
-          </div>
-          <div class="review-stat-item">
-            <span class="review-stat-label">ESFORÇO ATIVO</span>
-            <span class="review-stat-val">${pendingReportData.totalEffort} contatos</span>
-          </div>
+      <div style="font-size:12px; color:var(--text-secondary); margin-bottom:14px; background:rgba(255,255,255,0.03); padding:8px 12px; border-radius:8px; border:1px solid var(--border-light);">
+        <span style="color:var(--text-muted);">PROJETO OU CLIENTE:</span> <strong style="color:var(--text-white); margin-left:4px;">${pendingReportData.clientLabel}</strong>
+      </div>
+
+      <div class="review-grid">
+        <div class="review-stat-item">
+          <span class="review-stat-label">CASH COLETADO</span>
+          <span class="review-stat-val highlight-green">${pendingReportData.cash}</span>
         </div>
-      `;
-    } else {
-      html += `
-        <div class="review-grid">
-          <div class="review-stat-item">
-            <span class="review-stat-label">REUNIÕES AGENDADAS</span>
-            <span class="review-stat-val highlight-green">${pendingReportData.scheduled} agend.</span>
-          </div>
-          <div class="review-stat-item">
-            <span class="review-stat-label">PIPELINE GERADO</span>
-            <span class="review-stat-val highlight-green">${pendingReportData.pipeline}</span>
-          </div>
-          <div class="review-stat-item">
-            <span class="review-stat-label">CONTATOS EFETIVOS</span>
-            <span class="review-stat-val">${pendingReportData.contacts}</span>
-          </div>
-          <div class="review-stat-item">
-            <span class="review-stat-label">QUALIFICADAS NO ICP</span>
-            <span class="review-stat-val">${pendingReportData.qualified}</span>
-          </div>
-          <div class="review-stat-item">
-            <span class="review-stat-label">LEADS ABORDADOS</span>
-            <span class="review-stat-val">${pendingReportData.leads}</span>
-          </div>
-          <div class="review-stat-item">
-            <span class="review-stat-label">NO-SHOWS (FALTAS)</span>
-            <span class="review-stat-val" style="color:#f87171;">${pendingReportData.noshow}</span>
-          </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">VENDAS FECHADAS</span>
+          <span class="review-stat-val highlight-green">${pendingReportData.sales} un</span>
         </div>
-      `;
-    }
+        <div class="review-stat-item">
+          <span class="review-stat-label">PIPELINE GERADO</span>
+          <span class="review-stat-val highlight-green">${pendingReportData.pipeline}</span>
+        </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">VALOR CONTRATOS</span>
+          <span class="review-stat-val">${pendingReportData.contracts}</span>
+        </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">REUNIÕES REALIZADAS</span>
+          <span class="review-stat-val">${pendingReportData.held} de ${pendingReportData.scheduled} agend.</span>
+        </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">CONVERSÃO (V/R)</span>
+          <span class="review-stat-val">${pendingReportData.convRate}%</span>
+        </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">CONTATOS EFETIVOS</span>
+          <span class="review-stat-val">${pendingReportData.contacts} (de ${pendingReportData.leads} leads)</span>
+        </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">QUALIFICADAS NO ICP</span>
+          <span class="review-stat-val">${pendingReportData.qualified}</span>
+        </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">LIGAÇÕES & WHATSAPP</span>
+          <span class="review-stat-val">${pendingReportData.calls} lig / ${pendingReportData.whatsapp} wpp</span>
+        </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">FOLLOW-UPS / PROSP.</span>
+          <span class="review-stat-val">${pendingReportData.followups + pendingReportData.prospeccoes}</span>
+        </div>
+      </div>
+    `;
 
     reviewSummaryBody.innerHTML = html;
     modalReview.classList.add('open');
@@ -415,22 +349,69 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
-  // CONFIRMAR & SALVAR NO LOCALSTORAGE
+  // CONFIRMAR & SALVAR NOS STORAGES E NA NUVEM
   // ============================================================
   function saveReportToStorage(data) {
     if (!data) return;
 
-    if (data.role === 'closer') {
-      let reports = [];
-      try {
-        const raw = localStorage.getItem('closerReports_v2') || localStorage.getItem('fa_closers_uifry_reports_v1');
-        reports = raw ? JSON.parse(raw) : [];
-      } catch (err) {
-        reports = [];
-      }
+    const reportId = `${data.name}_${data.date}`;
+    const updatedAt = new Date().toISOString();
 
-      const reportId = `${data.name}_${data.date}`;
-      const record = {
+    // 1. Registro Geral da Equipe
+    const unifiedRecord = {
+      id: reportId,
+      member: data.name,
+      closer: data.name,
+      sdr: data.name,
+      clientId: data.clientId || null,
+      date: data.date,
+      // Atividades
+      leads: data.leads,
+      calls: data.calls,
+      whatsapp: data.whatsapp,
+      contacts: data.contacts,
+      followups: data.followups,
+      prospeccoes: data.prospeccoes,
+      // Reuniões
+      meetingsScheduled: data.scheduled,
+      meetingsHeld: data.held,
+      scheduled: data.scheduled,
+      qualified: data.qualified,
+      noshow: data.noshow,
+      // Financeiro
+      sales: data.sales,
+      contractVal: data.contracts,
+      contracts: data.contracts,
+      cashCollected: data.cash,
+      cash: data.cash,
+      pipeline: data.pipeline,
+      pipelineVal: data.pipeline,
+      updatedAt: updatedAt
+    };
+
+    // Salva na coleção geral da equipe
+    try {
+      let teamReports = [];
+      const rawTeam = localStorage.getItem(STORAGE_TEAM_REPORTS);
+      teamReports = rawTeam ? JSON.parse(rawTeam) : [];
+      const idxT = teamReports.findIndex(r => r.id === reportId);
+      if (idxT >= 0) teamReports[idxT] = unifiedRecord;
+      else teamReports.unshift(unifiedRecord);
+      localStorage.setItem(STORAGE_TEAM_REPORTS, JSON.stringify(teamReports));
+
+      if (typeof dbSyncTeamReport === 'function') {
+        dbSyncTeamReport(unifiedRecord);
+      }
+    } catch (e) {
+      console.warn('Erro ao salvar teamReports:', e);
+    }
+
+    // 2. Sincroniza com closerReports_v2 (Alimenta métricas de receita, vendas e reuniões no Dashboard)
+    try {
+      let closerReports = [];
+      const rawC = localStorage.getItem(STORAGE_CLOSER_REPORTS) || localStorage.getItem('fa_closers_uifry_reports_v1');
+      closerReports = rawC ? JSON.parse(rawC) : [];
+      const closerRecord = {
         id: reportId,
         closer: data.name,
         clientId: data.clientId || null,
@@ -443,37 +424,29 @@ document.addEventListener('DOMContentLoaded', () => {
         sales: data.sales,
         contractVal: data.contracts,
         cashCollected: data.cash,
-        updatedAt: new Date().toISOString()
+        updatedAt: updatedAt
       };
+      const idxC = closerReports.findIndex(r => r.id === reportId);
+      if (idxC >= 0) closerReports[idxC] = closerRecord;
+      else closerReports.unshift(closerRecord);
+      localStorage.setItem(STORAGE_CLOSER_REPORTS, JSON.stringify(closerReports));
+      localStorage.setItem('fa_closers_uifry_reports_v1', JSON.stringify(closerReports));
 
-      const existingIndex = reports.findIndex(r => r.id === reportId);
-      if (existingIndex >= 0) {
-        reports[existingIndex] = record;
-      } else {
-        reports.unshift(record);
-      }
-      localStorage.setItem('closerReports_v2', JSON.stringify(reports));
-      localStorage.setItem('fa_closers_uifry_reports_v1', JSON.stringify(reports));
-
-      // Sincronização em nuvem via Supabase
       if (typeof dbSyncCloserReport === 'function') {
-        dbSyncCloserReport(record);
+        dbSyncCloserReport(closerRecord);
       }
+    } catch (e) {
+      console.warn('Erro ao sincronizar com closerReports:', e);
+    }
 
-    } else {
-      let reports = [];
-      try {
-        const raw = localStorage.getItem('sdrReports_v2') || localStorage.getItem('fa_sdr_reports_v1');
-        reports = raw ? JSON.parse(raw) : [];
-      } catch (err) {
-        reports = [];
-      }
-
+    // 3. Sincroniza com sdrReports_v2 (Alimenta métricas de pipeline, contatos e reuniões agendadas)
+    try {
+      let sdrReports = [];
+      const rawS = localStorage.getItem(STORAGE_SDR_REPORTS) || localStorage.getItem('fa_sdr_reports_v1');
+      sdrReports = rawS ? JSON.parse(rawS) : [];
       const sdrKey = data.name.startsWith('SDR') ? data.name : 'SDR 1';
       const customName = data.name.startsWith('SDR') ? '' : data.name;
-      const reportId = `${data.name}_${data.date}`;
-
-      const record = {
+      const sdrRecord = {
         id: reportId,
         sdr: sdrKey,
         clientId: data.clientId || null,
@@ -488,94 +461,78 @@ document.addEventListener('DOMContentLoaded', () => {
         noshow: data.noshow,
         pipeline: data.pipeline,
         pipelineVal: data.pipeline,
-        updatedAt: new Date().toISOString()
+        updatedAt: updatedAt
       };
+      const idxS = sdrReports.findIndex(r => r.id === reportId);
+      if (idxS >= 0) sdrReports[idxS] = sdrRecord;
+      else sdrReports.unshift(sdrRecord);
+      localStorage.setItem(STORAGE_SDR_REPORTS, JSON.stringify(sdrReports));
+      localStorage.setItem('fa_sdr_reports_v1', JSON.stringify(sdrReports));
 
-      const existingIndex = reports.findIndex(r => r.id === reportId);
-      if (existingIndex >= 0) {
-        reports[existingIndex] = record;
-      } else {
-        reports.unshift(record);
-      }
-      localStorage.setItem('sdrReports_v2', JSON.stringify(reports));
-      localStorage.setItem('fa_sdr_reports_v1', JSON.stringify(reports));
-
-      // Sincronização em nuvem via Supabase
       if (typeof dbSyncSdrReport === 'function') {
-        dbSyncSdrReport(record);
+        dbSyncSdrReport(sdrRecord);
       }
+    } catch (e) {
+      console.warn('Erro ao sincronizar com sdrReports:', e);
     }
   }
 
-  // Preencher Card Oficial de Exportação
+  // ============================================================
+  // PREENCHER CARD OFICIAL DE EXPORTAÇÃO
+  // ============================================================
   function populateExportCard(data) {
     if (!data) return;
-    const isCloser = data.role === 'closer';
 
-    cardMetaRole.textContent = isCloser ? 'CLOSER' : 'SDR';
-    cardMetaRole.style.background = isCloser ? 'var(--accent-lime)' : 'var(--accent-cyan)';
+    cardMetaRole.textContent = 'RELATÓRIO COMERCIAL';
+    cardMetaRole.style.background = 'var(--accent-lime)';
+    cardMetaRole.style.color = '#0f1115';
     cardMetaDate.textContent = formatDateBR(data.date);
     cardMemberName.textContent = data.name.toUpperCase();
-    cardMemberRoleBadge.textContent = isCloser ? 'EQUIPE DE FECHAMENTO' : 'EQUIPE DE PROSPECÇÃO';
-    cardTimestamp.textContent = `Salvo em ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+    cardMemberRoleBadge.textContent = 'EQUIPE COMERCIAL';
+    cardTimestamp.textContent = `Salvo às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
 
-    let metricsHtml = '';
-
-    if (isCloser) {
-      metricsHtml = `
-        <div class="card-metric-box">
-          <span class="metric-box-label">VENDAS FECHADAS</span>
-          <span class="metric-box-val lime-val">${data.sales} un</span>
-        </div>
-        <div class="card-metric-box">
-          <span class="metric-box-label">CASH COLETADO</span>
-          <span class="metric-box-val lime-val">${data.cash}</span>
-        </div>
-        <div class="card-metric-box">
-          <span class="metric-box-label">VALOR CONTRATOS</span>
-          <span class="metric-box-val">${data.contracts}</span>
-        </div>
-        <div class="card-metric-box">
-          <span class="metric-box-label">REUNIÕES REALIZADAS</span>
-          <span class="metric-box-val">${data.held} / ${data.scheduled}</span>
-        </div>
-        <div class="card-metric-box">
-          <span class="metric-box-label">TAXA DE CONVERSÃO</span>
-          <span class="metric-box-val lime-val">${data.convRate}%</span>
-        </div>
-        <div class="card-metric-box">
-          <span class="metric-box-label">ESFORÇO ATIVO</span>
-          <span class="metric-box-val">${data.totalEffort} contatos</span>
-        </div>
-      `;
-    } else {
-      metricsHtml = `
-        <div class="card-metric-box">
-          <span class="metric-box-label">REUNIÕES AGENDADAS</span>
-          <span class="metric-box-val lime-val">${data.scheduled}</span>
-        </div>
-        <div class="card-metric-box">
-          <span class="metric-box-label">PIPELINE GERADO</span>
-          <span class="metric-box-val cyan-val">${data.pipeline}</span>
-        </div>
-        <div class="card-metric-box">
-          <span class="metric-box-label">CONTATOS EFETIVOS</span>
-          <span class="metric-box-val">${data.contacts}</span>
-        </div>
-        <div class="card-metric-box">
-          <span class="metric-box-label">QUALIFICADAS ICP</span>
-          <span class="metric-box-val">${data.qualified}</span>
-        </div>
-        <div class="card-metric-box">
-          <span class="metric-box-label">LEADS ABORDADOS</span>
-          <span class="metric-box-val">${data.leads}</span>
-        </div>
-        <div class="card-metric-box">
-          <span class="metric-box-label">NO-SHOWS (FALTAS)</span>
-          <span class="metric-box-val" style="color:#f87171;">${data.noshow}</span>
-        </div>
-      `;
-    }
+    let metricsHtml = `
+      <div class="card-metric-box">
+        <span class="metric-box-label">CASH COLETADO</span>
+        <span class="metric-box-val lime-val">${data.cash}</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">VENDAS FECHADAS</span>
+        <span class="metric-box-val lime-val">${data.sales} un</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">PIPELINE GERADO</span>
+        <span class="metric-box-val lime-val">${data.pipeline}</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">VALOR CONTRATOS</span>
+        <span class="metric-box-val">${data.contracts}</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">REUNIÕES REALIZADAS</span>
+        <span class="metric-box-val">${data.held} / ${data.scheduled} agend.</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">CONVERSÃO (V/R)</span>
+        <span class="metric-box-val lime-val">${data.convRate}%</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">CONTATOS EFETIVOS</span>
+        <span class="metric-box-val">${data.contacts}</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">QUALIFICADAS ICP</span>
+        <span class="metric-box-val">${data.qualified}</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">LEADS ABORDADOS</span>
+        <span class="metric-box-val">${data.leads}</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">LIGAÇÕES & WPP</span>
+        <span class="metric-box-val">${data.calls + data.whatsapp}</span>
+      </div>
+    `;
 
     cardMetricsContainer.innerHTML = metricsHtml;
   }
@@ -644,28 +601,23 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnCopyWhatsapp) {
     btnCopyWhatsapp.addEventListener('click', () => {
       if (!pendingReportData) return;
-      const isCloser = pendingReportData.role === 'closer';
 
       let text = `*FAZENDO ACONTECER™ • RELATÓRIO DO DIA*\n`;
       text += `📅 *Data:* ${formatDateBR(pendingReportData.date)}\n`;
-      text += `👤 *Responsável:* ${pendingReportData.name} (${isCloser ? 'Closer' : 'SDR'})\n`;
-      text += `━━━━━━━━━━━━━━━━━━━━━\n`;
-
-      if (isCloser) {
-        text += `💰 *Cash Coletado:* ${pendingReportData.cash}\n`;
-        text += `📄 *Valor em Contratos:* ${pendingReportData.contracts}\n`;
-        text += `🎯 *Vendas Fechadas:* ${pendingReportData.sales} un\n`;
-        text += `🤝 *Reuniões Realizadas:* ${pendingReportData.held} de ${pendingReportData.scheduled} agendadas\n`;
-        text += `📈 *Taxa de Conversão:* ${pendingReportData.convRate}%\n`;
-        text += `📞 *Esforço Ativo:* ${pendingReportData.totalEffort} follow-ups/prospecções\n`;
-      } else {
-        text += `📅 *Reuniões Agendadas:* ${pendingReportData.scheduled}\n`;
-        text += `💎 *Pipeline Gerado:* ${pendingReportData.pipeline}\n`;
-        text += `⭐ *Qualificadas no ICP:* ${pendingReportData.qualified}\n`;
-        text += `📞 *Contatos Efetivos:* ${pendingReportData.contacts}\n`;
-        text += `👥 *Leads Abordados:* ${pendingReportData.leads}\n`;
-        text += `❌ *No-Shows (Faltas):* ${pendingReportData.noshow}\n`;
+      text += `👤 *Responsável:* ${pendingReportData.name}\n`;
+      if (pendingReportData.clientLabel && !pendingReportData.clientLabel.includes('Geral')) {
+        text += `🏢 *Projeto:* ${pendingReportData.clientLabel}\n`;
       }
+      text += `━━━━━━━━━━━━━━━━━━━━━\n`;
+      text += `💰 *Cash Coletado:* ${pendingReportData.cash}\n`;
+      text += `🎯 *Vendas Fechadas:* ${pendingReportData.sales} un\n`;
+      text += `📄 *Valor em Contratos:* ${pendingReportData.contracts}\n`;
+      text += `💎 *Pipeline Gerado:* ${pendingReportData.pipeline}\n`;
+      text += `🤝 *Reuniões Realizadas:* ${pendingReportData.held} de ${pendingReportData.scheduled} agendadas\n`;
+      text += `📈 *Taxa de Conversão:* ${pendingReportData.convRate}%\n`;
+      text += `⭐ *Qualificadas no ICP:* ${pendingReportData.qualified}\n`;
+      text += `📞 *Contatos Efetivos:* ${pendingReportData.contacts} (de ${pendingReportData.leads} leads)\n`;
+      text += `📱 *Atividades:* ${pendingReportData.calls} lig / ${pendingReportData.whatsapp} wpp / ${pendingReportData.followups} follow-ups\n`;
       text += `━━━━━━━━━━━━━━━━━━━━━\n`;
       text += `_Gerado via Portal Comercial • Fazendo Acontecer™_`;
 
@@ -701,23 +653,22 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnNewReport) {
     btnNewReport.addEventListener('click', () => {
       // Resetar formulário
-      inputCLeads.value = 0;
-      inputCFollowups.value = 0;
-      inputCProspeccoes.value = 0;
-      inputCScheduled.value = 0;
-      inputCHeld.value = 0;
-      inputCSales.value = 0;
-      inputCContracts.value = 'R$ 0,00';
-      inputCCash.value = 'R$ 0,00';
+      if (inputRepLeads) inputRepLeads.value = 0;
+      if (inputRepCalls) inputRepCalls.value = 0;
+      if (inputRepWhatsapp) inputRepWhatsapp.value = 0;
+      if (inputRepContacts) inputRepContacts.value = 0;
+      if (inputRepFollowups) inputRepFollowups.value = 0;
+      if (inputRepProspeccoes) inputRepProspeccoes.value = 0;
 
-      inputSLeads.value = 0;
-      inputSCalls.value = 0;
-      inputSWhatsapp.value = 0;
-      inputSContacts.value = 0;
-      inputSScheduled.value = 0;
-      inputSQualified.value = 0;
-      inputSNoshow.value = 0;
-      inputSPipeline.value = 'R$ 0,00';
+      if (inputRepScheduled) inputRepScheduled.value = 0;
+      if (inputRepHeld) inputRepHeld.value = 0;
+      if (inputRepQualified) inputRepQualified.value = 0;
+      if (inputRepNoshow) inputRepNoshow.value = 0;
+
+      if (inputRepSales) inputRepSales.value = 0;
+      if (inputRepContracts) inputRepContracts.value = 'R$ 0,00';
+      if (inputRepCash) inputRepCash.value = 'R$ 0,00';
+      if (inputRepPipeline) inputRepPipeline.value = 'R$ 0,00';
 
       successScreen.style.display = 'none';
       formContainer.style.display = 'block';

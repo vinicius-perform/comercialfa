@@ -336,6 +336,36 @@ async function dbSyncSdrReport(report) {
   }
 }
 
+async function dbSyncTeamReport(report) {
+  if (!supabaseClient) return;
+  try {
+    const cloudRecord = {
+      id: report.id,
+      member_name: report.member || report.name,
+      client_id: report.clientId || null,
+      date: report.date,
+      leads: report.leads || 0,
+      calls: report.calls || 0,
+      whatsapp: report.whatsapp || 0,
+      contacts: report.contacts || 0,
+      followups: report.followups || 0,
+      prospeccoes: report.prospeccoes || 0,
+      meetings_scheduled: report.meetingsScheduled || report.scheduled || 0,
+      meetings_held: report.meetingsHeld || report.held || 0,
+      meetings_qualified: report.meetingsQualified || report.qualified || 0,
+      noshow: report.noshow || 0,
+      sales: report.sales || 0,
+      contract_val: report.contractVal || report.contracts || 'R$ 0,00',
+      cash_collected: report.cashCollected || report.cash || 'R$ 0,00',
+      pipeline_val: report.pipelineVal || report.pipeline || 'R$ 0,00',
+      updated_at: new Date().toISOString()
+    };
+    await supabaseClient.from('team_reports').upsert([cloudRecord]);
+  } catch (e) {
+    console.warn('[Supabase] Erro ao enviar team_report para nuvem:', e);
+  }
+}
+
 // Exportações Globais
 window.dbFetchClients = dbFetchClients;
 window.dbSaveClient = dbSaveClient;
@@ -344,5 +374,7 @@ window.dbFetchPlannings = dbFetchPlannings;
 window.dbSavePlanning = dbSavePlanning;
 window.dbSyncCloserReport = dbSyncCloserReport;
 window.dbSyncSdrReport = dbSyncSdrReport;
+window.dbSyncTeamReport = dbSyncTeamReport;
 window.checkSupabaseHealth = checkSupabaseHealth;
 window.supabaseClient = supabaseClient;
+

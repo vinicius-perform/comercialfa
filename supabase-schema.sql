@@ -65,7 +65,30 @@ CREATE TABLE IF NOT EXISTS public.sdr_reports (
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 5. TABELA DE CONFIGURAÇÕES GERAIS DO DASHBOARD
+-- 5. TABELA UNIFICADA DE RELATÓRIOS DA EQUIPE COMERCIAL
+CREATE TABLE IF NOT EXISTS public.team_reports (
+  id TEXT PRIMARY KEY, -- formato: {membro}_{date} ou UUID
+  member_name TEXT NOT NULL,
+  client_id TEXT REFERENCES public.clients(id) ON DELETE SET NULL,
+  date DATE NOT NULL,
+  leads INTEGER DEFAULT 0,
+  calls INTEGER DEFAULT 0,
+  whatsapp INTEGER DEFAULT 0,
+  contacts INTEGER DEFAULT 0,
+  followups INTEGER DEFAULT 0,
+  prospeccoes INTEGER DEFAULT 0,
+  meetings_scheduled INTEGER DEFAULT 0,
+  meetings_held INTEGER DEFAULT 0,
+  meetings_qualified INTEGER DEFAULT 0,
+  noshow INTEGER DEFAULT 0,
+  sales INTEGER DEFAULT 0,
+  contract_val TEXT DEFAULT 'R$ 0,00',
+  cash_collected TEXT DEFAULT 'R$ 0,00',
+  pipeline_val TEXT DEFAULT 'R$ 0,00',
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 6. TABELA DE CONFIGURAÇÕES GERAIS DO DASHBOARD
 CREATE TABLE IF NOT EXISTS public.system_settings (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL,
@@ -81,7 +104,14 @@ ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.client_planning ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.closer_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sdr_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.team_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.system_settings ENABLE ROW LEVEL SECURITY;
+
+-- Políticas para public.team_reports
+CREATE POLICY "Permitir leitura pública team_reports" ON public.team_reports FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "Permitir inserção pública team_reports" ON public.team_reports FOR INSERT TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "Permitir atualização pública team_reports" ON public.team_reports FOR UPDATE TO anon, authenticated USING (true);
+CREATE POLICY "Permitir exclusão pública team_reports" ON public.team_reports FOR DELETE TO anon, authenticated USING (true);
 
 -- Políticas para public.clients
 CREATE POLICY "Permitir leitura pública clients" ON public.clients FOR SELECT TO anon, authenticated USING (true);
