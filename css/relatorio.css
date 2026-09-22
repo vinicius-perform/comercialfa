@@ -1031,6 +1031,18 @@ input[type=number] {
   color: var(--accent-cyan);
 }
 
+.card-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 540px) {
+  .card-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .card-report-footer {
   display: flex;
   align-items: center;

@@ -288,22 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       <div class="review-grid">
         <div class="review-stat-item">
-          <span class="review-stat-label">CASH COLETADO</span>
-          <span class="review-stat-val highlight-green">${pendingReportData.cash}</span>
-        </div>
-        <div class="review-stat-item">
-          <span class="review-stat-label">TOTAL VENDAS</span>
-          <span class="review-stat-val highlight-green">${pendingReportData.sales} un</span>
-        </div>
-        <div class="review-stat-item">
-          <span class="review-stat-label">VALOR CONTRATO</span>
-          <span class="review-stat-val">${pendingReportData.contracts}</span>
-        </div>
-        <div class="review-stat-item">
-          <span class="review-stat-label">ESFORÇO ATIVO</span>
-          <span class="review-stat-val highlight-green">${pendingReportData.totalEffort}</span>
-        </div>
-        <div class="review-stat-item">
           <span class="review-stat-label">LEAD RECEBIDOS</span>
           <span class="review-stat-val">${pendingReportData.leads}</span>
         </div>
@@ -326,6 +310,28 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="review-stat-item">
           <span class="review-stat-label">CONVERSÃO (V/R)</span>
           <span class="review-stat-val">${pendingReportData.convRate}%</span>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border-light);">
+        <span style="font-size:10px; font-weight:700; color:var(--text-muted); letter-spacing:0.06em; text-transform:uppercase;">RESULTADO FINAL / RESUMO</span>
+        <div class="review-grid" style="margin-top:10px;">
+          <div class="review-stat-item">
+            <span class="review-stat-label">TOTAL VENDAS</span>
+            <span class="review-stat-val highlight-green">${pendingReportData.sales} un</span>
+          </div>
+          <div class="review-stat-item">
+            <span class="review-stat-label">VALOR CONTRATO</span>
+            <span class="review-stat-val">${pendingReportData.contracts}</span>
+          </div>
+          <div class="review-stat-item" style="border: 1px solid rgba(163,230,53,0.3); background: rgba(30,41,25,0.4);">
+            <span class="review-stat-label" style="color:var(--accent-lime); font-weight:800;">CASH COLETADO</span>
+            <span class="review-stat-val highlight-green" style="color:var(--accent-lime);">${pendingReportData.cash}</span>
+          </div>
+          <div class="review-stat-item">
+            <span class="review-stat-label">ESFORÇO ATIVO</span>
+            <span class="review-stat-val highlight-green">${pendingReportData.totalEffort}</span>
+          </div>
         </div>
       </div>
     `;
@@ -488,22 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cardTimestamp.textContent = `Salvo às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
 
     let metricsHtml = `
-      <div class="card-metric-box">
-        <span class="metric-box-label">CASH COLETADO</span>
-        <span class="metric-box-val lime-val">${data.cash}</span>
-      </div>
-      <div class="card-metric-box">
-        <span class="metric-box-label">TOTAL VENDAS</span>
-        <span class="metric-box-val lime-val">${data.sales} un</span>
-      </div>
-      <div class="card-metric-box">
-        <span class="metric-box-label">VALOR CONTRATO</span>
-        <span class="metric-box-val">${data.contracts}</span>
-      </div>
-      <div class="card-metric-box">
-        <span class="metric-box-label">ESFORÇO ATIVO</span>
-        <span class="metric-box-val lime-val">${data.totalEffort}</span>
-      </div>
+      <!-- Métricas Operacionais (Esforço & Reuniões) -->
       <div class="card-metric-box">
         <span class="metric-box-label">LEAD RECEBIDOS</span>
         <span class="metric-box-val">${data.leads}</span>
@@ -517,12 +508,45 @@ document.addEventListener('DOMContentLoaded', () => {
         <span class="metric-box-val">${data.prospeccoes}</span>
       </div>
       <div class="card-metric-box">
-        <span class="metric-box-label">REUNIÕES REALIZADAS</span>
-        <span class="metric-box-val">${data.held} de ${data.scheduled} agend.</span>
+        <span class="metric-box-label">REUNIÃO AGENDADA</span>
+        <span class="metric-box-val">${data.scheduled}</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">REUNIÃO REALIZADA</span>
+        <span class="metric-box-val">${data.held}</span>
       </div>
       <div class="card-metric-box">
         <span class="metric-box-label">CONVERSÃO (V/R)</span>
         <span class="metric-box-val lime-val">${data.convRate}%</span>
+      </div>
+
+      <!-- RESULTADO FINAL / RESUMO NO FINAL DO RELATÓRIO -->
+      <div style="grid-column: 1 / -1; margin-top: 6px; padding-top: 10px; border-top: 1px solid #1e283d;">
+        <span style="font-size: 9px; font-weight: 700; color: #8da2bd; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 8px;">
+          RESULTADO FINAL / RESUMO
+        </span>
+        <div class="card-summary-grid">
+          <div class="card-metric-box">
+            <span class="metric-box-label">TOTAL VENDAS</span>
+            <span class="metric-box-val">${data.sales}</span>
+            <span style="font-size: 8.5px; color: #8da2bd; margin-top: 2px;">${data.sales} nova(s)</span>
+          </div>
+          <div class="card-metric-box">
+            <span class="metric-box-label">VALOR CONTRATO</span>
+            <span class="metric-box-val">${data.contracts}</span>
+            <span style="font-size: 8.5px; color: #8da2bd; margin-top: 2px;">Contratos enviados</span>
+          </div>
+          <div class="card-metric-box" style="background: rgba(30, 41, 25, 0.6); border: 1px solid rgba(163, 230, 53, 0.35);">
+            <span class="metric-box-label" style="color: #a3e635; font-weight: 800;">CASH COLETADO</span>
+            <span class="metric-box-val lime-val">${data.cash}</span>
+            <span style="font-size: 8.5px; color: #a3e635; opacity: 0.85; margin-top: 2px;">Receita recebida</span>
+          </div>
+          <div class="card-metric-box">
+            <span class="metric-box-label">ESFORÇO ATIVO</span>
+            <span class="metric-box-val">${data.totalEffort}</span>
+            <span style="font-size: 8.5px; color: #8da2bd; margin-top: 2px;">Follow-ups + Prospecções</span>
+          </div>
+        </div>
       </div>
     `;
 
@@ -602,17 +626,18 @@ document.addEventListener('DOMContentLoaded', () => {
         text += `🏢 *Projeto:* ${pendingReportData.clientLabel}\n`;
       }
       text += `━━━━━━━━━━━━━━━━━━━━━\n`;
-      text += `💵 *CASH COLETADO:* ${pendingReportData.cash}\n`;
+      text += `📥 *Leads Recebidos:* ${pendingReportData.leads}\n`;
+      text += `🔄 *Follow-ups Feitos:* ${pendingReportData.followups}\n`;
+      text += `🚀 *Prospecções no Dia:* ${pendingReportData.prospeccoes}\n`;
+      text += `📅 *Reuniões Agendadas:* ${pendingReportData.scheduled}\n`;
+      text += `🤝 *Reuniões Realizadas:* ${pendingReportData.held}\n`;
+      text += `📈 *Conversão (V/R):* ${pendingReportData.convRate}%\n`;
+      text += `━━━━━━━━━━━━━━━━━━━━━\n`;
+      text += `🏁 *RESULTADO FINAL / RESUMO:*\n`;
       text += `🎯 *TOTAL VENDAS:* ${pendingReportData.sales} un\n`;
       text += `📄 *VALOR CONTRATO:* ${pendingReportData.contracts}\n`;
-      text += `⚡ *ESFORÇO ATIVO:* ${pendingReportData.totalEffort} (Follow-ups + Prospeções)\n`;
-      text += `━━━━━━━━━━━━━━━━━━━━━\n`;
-      text += `📥 *Lead Recebidos:* ${pendingReportData.leads}\n`;
-      text += `🔄 *Follow-up Feitos:* ${pendingReportData.followups}\n`;
-      text += `🚀 *Quantas Prospecção no Dia:* ${pendingReportData.prospeccoes}\n`;
-      text += `📅 *Reunião Agendada:* ${pendingReportData.scheduled}\n`;
-      text += `🤝 *Reunião Realizada:* ${pendingReportData.held}\n`;
-      text += `📈 *Conversão (V/R):* ${pendingReportData.convRate}%\n`;
+      text += `💵 *CASH COLETADO:* ${pendingReportData.cash}\n`;
+      text += `⚡ *ESFORÇO ATIVO:* ${pendingReportData.totalEffort} (Follow-ups + Prospecções)\n`;
       text += `━━━━━━━━━━━━━━━━━━━━━\n`;
       text += `_Gerado via Portal Comercial • Fazendo Acontecer™_`;
 
