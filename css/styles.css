@@ -2476,6 +2476,88 @@ input[type=number] {
   font-variant-numeric: tabular-nums;
 }
 
+/* Barra de Busca & Filtros Rápidos de Clientes */
+.projects-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.projects-search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: 9px 14px;
+  flex: 1;
+  min-width: 260px;
+  max-width: 440px;
+  box-shadow: var(--shadow-card);
+  transition: var(--transition);
+}
+
+.projects-search-box:focus-within {
+  border-color: var(--accent-lime);
+  box-shadow: 0 0 0 3px rgba(91, 227, 54, 0.15);
+}
+
+.projects-search-box svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.projects-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.projects-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.projects-status-tabs {
+  display: flex;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 4px;
+  border-radius: var(--radius-md);
+}
+
+.p-tab-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.p-tab-btn:hover {
+  color: var(--text-dark);
+}
+
+.p-tab-btn.active {
+  background: #ffffff;
+  color: var(--text-dark);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
 .projects-clients-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));

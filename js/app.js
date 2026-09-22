@@ -202,6 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const dashFilterMonth = document.getElementById('dash-filter-month');
   const supabaseCloudStatus = document.getElementById('supabase-cloud-status');
   const supabaseCloudText = document.getElementById('supabase-cloud-text');
+  const closerClientSelect = document.getElementById('closer-client-select');
+  const sdrClientSelect = document.getElementById('sdr-client-select');
 
   // --- ELEMENTOS DA ABA PROJETOS & CLIENTES ---
   const btnOpenCreateClient = document.getElementById('btn-open-create-client');
@@ -211,6 +213,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const pStatPlannedRev = document.getElementById('p-stat-planned-rev');
   const pStatActualRev = document.getElementById('p-stat-actual-rev');
   const pStatAchievement = document.getElementById('p-stat-achievement');
+  const projectsSearchInput = document.getElementById('projects-search-input');
+  const projectsStatusTabs = document.getElementById('projects-status-tabs');
+
+  let projectsSearchQuery = '';
+  let projectsStatusFilter = 'all';
 
   // Modal de Cliente
   const modalClient = document.getElementById('modal-client');
@@ -230,11 +237,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const planningClientName = document.getElementById('planning-client-name');
   const planningClientTag = document.getElementById('planning-client-tag');
   const planningMonthPicker = document.getElementById('planning-month-picker');
+  const btnCopyPrevPlan = document.getElementById('btn-copy-prev-plan');
   const planRevenueGoal = document.getElementById('plan-revenue-goal');
   const planSalesGoal = document.getElementById('plan-sales-goal');
   const planMeetingsGoal = document.getElementById('plan-meetings-goal');
   const planMoneyTable = document.getElementById('plan-money-table');
   const planNotes = document.getElementById('plan-notes');
+  const planPreviewTicket = document.getElementById('plan-preview-ticket');
+  const planPreviewConv = document.getElementById('plan-preview-conv');
   const planningHistoryTableBody = document.getElementById('planning-history-table-body');
   const btnClosePlanning = document.getElementById('btn-close-planning');
   const btnCancelPlanning = document.getElementById('btn-cancel-planning');
@@ -1077,6 +1087,7 @@ document.addEventListener('DOMContentLoaded', () => {
       inputSdrNoshow.value = entry.noshow ?? 0;
       inputSdrPipeline.value = formatMoneyString(entry.pipeline);
       if (inputSdrNameCustom) inputSdrNameCustom.value = entry.customName || '';
+      if (sdrClientSelect) sdrClientSelect.value = entry.clientId || '';
     } else {
       inputSdrLeads.value = 0;
       inputSdrCalls.value = 0;
@@ -1087,6 +1098,7 @@ document.addEventListener('DOMContentLoaded', () => {
       inputSdrNoshow.value = 0;
       inputSdrPipeline.value = 'R$ 0,00';
       if (inputSdrNameCustom) inputSdrNameCustom.value = '';
+      if (sdrClientSelect) sdrClientSelect.value = '';
     }
 
     updateSdrDashboard();
@@ -1099,6 +1111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const newRecord = {
       id: `${currentSdr}_${selectedDate}`,
       sdr: currentSdr,
+      clientId: sdrClientSelect ? sdrClientSelect.value || null : null,
       customName: customName,
       date: selectedDate,
       leads: parseInt(inputSdrLeads.value, 10) || 0,
@@ -1394,6 +1407,7 @@ document.addEventListener('DOMContentLoaded', () => {
       inputSales.value = entry.sales ?? 0;
       inputContractVal.value = formatMoneyString(entry.contractVal);
       inputCashCollected.value = formatMoneyString(entry.cashCollected);
+      if (closerClientSelect) closerClientSelect.value = entry.clientId || '';
     } else {
       inputLeads.value = 0;
       inputFollowups.value = 0;
@@ -1403,6 +1417,7 @@ document.addEventListener('DOMContentLoaded', () => {
       inputSales.value = 0;
       inputContractVal.value = 'R$ 0,00';
       inputCashCollected.value = 'R$ 0,00';
+      if (closerClientSelect) closerClientSelect.value = '';
     }
 
     updateCloserDashboard();
@@ -1414,6 +1429,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const newRecord = {
       id: `${currentCloser}_${selectedDate}`,
       closer: currentCloser,
+      clientId: closerClientSelect ? closerClientSelect.value || null : null,
       date: selectedDate,
       leads: parseInt(inputLeads.value, 10) || 0,
       followups: parseInt(inputFollowups.value, 10) || 0,
@@ -1684,24 +1700,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // POVOAMENTO DE FILTROS DA TOPBAR (CLIENTES & MESES)
   // ============================================================
   async function populateTopBarFilters() {
-    if (!dashFilterClient) return;
-
     const clients = await dbFetchClients();
-    const currentVal = dashFilterClient.value || 'all';
 
-    dashFilterClient.innerHTML = '<option value="all">🌐 Visão Consolidada (Todos os Clientes)</option>';
-    clients.forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = c.id;
-      opt.textContent = `${c.name} (${c.segment || 'Geral'})`;
-      dashFilterClient.appendChild(opt);
+    [dashFilterClient, closerClientSelect, sdrClientSelect].forEach(selectElem => {
+      if (!selectElem) return;
+      const isDash = (selectElem === dashFilterClient);
+      const currentVal = selectElem.value || (isDash ? 'all' : '');
+
+      selectElem.innerHTML = isDash
+        ? '<option value="all">🌐 Visão Consolidada (Todos os Clientes)</option>'
+        : '<option value="">🌐 Geral / Todos os Projetos</option>';
+
+      clients.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.name} (${c.segment || 'Geral'})`;
+        selectElem.appendChild(opt);
+      });
+
+      if (Array.from(selectElem.options).some(o => o.value === currentVal)) {
+        selectElem.value = currentVal;
+      } else {
+        selectElem.value = isDash ? 'all' : '';
+      }
     });
-
-    if (Array.from(dashFilterClient.options).some(o => o.value === currentVal)) {
-      dashFilterClient.value = currentVal;
-    } else {
-      dashFilterClient.value = 'all';
-    }
   }
 
   function populateMonthFilter() {
@@ -1856,6 +1878,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pStatAchievement) pStatAchievement.textContent = `${globalPct}%`;
     if (projectsActiveCount) projectsActiveCount.textContent = `${clients.length} cliente(s) cadastrado(s)`;
 
+    // Filtra lista de clientes por busca e por status
+    let filteredClients = [...clients];
+    if (projectsStatusFilter && projectsStatusFilter !== 'all') {
+      filteredClients = filteredClients.filter(c => (c.status || 'active') === projectsStatusFilter);
+    }
+    if (projectsSearchQuery && projectsSearchQuery.trim()) {
+      const q = projectsSearchQuery.trim().toLowerCase();
+      filteredClients = filteredClients.filter(c => 
+        (c.name && c.name.toLowerCase().includes(q)) || 
+        (c.segment && c.segment.toLowerCase().includes(q)) ||
+        (c.responsible && c.responsible.toLowerCase().includes(q))
+      );
+    }
+
+    if (projectsActiveCount) {
+      if (filteredClients.length !== clients.length) {
+        projectsActiveCount.textContent = `${filteredClients.length} de ${clients.length} cliente(s)`;
+      } else {
+        projectsActiveCount.textContent = `${clients.length} cliente(s) cadastrado(s)`;
+      }
+    }
+
     // Renderiza Cards
     projectsClientsContainer.innerHTML = '';
     if (clients.length === 0) {
@@ -1870,7 +1914,31 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    clients.forEach(c => {
+    if (filteredClients.length === 0) {
+      projectsClientsContainer.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #fff; border: 1px dashed var(--border-card); border-radius: var(--radius-lg);">
+          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">Nenhum cliente encontrado para os filtros selecionados.</p>
+          <button type="button" class="btn-apple-secondary" id="btn-clear-project-filter" style="font-size: 12px; padding: 6px 14px;">Limpar Filtros</button>
+        </div>
+      `;
+      const btnClear = document.getElementById('btn-clear-project-filter');
+      if (btnClear) {
+        btnClear.addEventListener('click', () => {
+          projectsSearchQuery = '';
+          projectsStatusFilter = 'all';
+          if (projectsSearchInput) projectsSearchInput.value = '';
+          if (projectsStatusTabs) {
+            projectsStatusTabs.querySelectorAll('.p-tab-btn').forEach(b => {
+              b.classList.toggle('active', b.getAttribute('data-status') === 'all');
+            });
+          }
+          renderProjectsView();
+        });
+      }
+      return;
+    }
+
+    filteredClients.forEach(c => {
       const stats = clientStatsMap[c.id] || {
         plannedRev: 0,
         plannedSales: 0,
@@ -1934,8 +2002,11 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="project-card-footer">
           <span class="project-responsible-tag">Closer: <strong>${c.responsible || 'Geral'}</strong></span>
           <div class="project-card-actions">
+            <button type="button" class="btn-apple-secondary btn-client-dash" data-id="${c.id}" style="padding: 5px 10px; font-size: 11px;" title="Ver métricas deste cliente no Dashboard">
+              📊 Dashboard
+            </button>
             <button type="button" class="btn-apple-secondary btn-client-plan" data-id="${c.id}" style="padding: 5px 10px; font-size: 11px;" title="Configurar Planejamento Mensal">
-              📅 Planejamento
+              📅 Metas
             </button>
             <button type="button" class="btn-apple-secondary btn-client-edit" data-id="${c.id}" style="padding: 5px 8px; font-size: 11px;" title="Editar cliente">
               ✏️
@@ -1951,6 +2022,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Eventos dos botões dos cards
+    projectsClientsContainer.querySelectorAll('.btn-client-dash').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cId = btn.getAttribute('data-id');
+        if (dashFilterClient) {
+          dashFilterClient.value = cId;
+        }
+        showView('view-dashboard');
+        updateExecDashboard();
+        const targetCli = clients.find(c => c.id === cId);
+        showToast(`Exibindo métricas de "${targetCli ? targetCli.name : 'Cliente'}" no Dashboard.`);
+      });
+    });
+
     projectsClientsContainer.querySelectorAll('.btn-client-plan').forEach(btn => {
       btn.addEventListener('click', () => {
         const cId = btn.getAttribute('data-id');
@@ -2043,6 +2127,56 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // --- FILTROS & BUSCA DE PROJETOS ---
+  if (projectsSearchInput) {
+    projectsSearchInput.addEventListener('input', (e) => {
+      projectsSearchQuery = e.target.value;
+      renderProjectsView();
+    });
+  }
+
+  if (projectsStatusTabs) {
+    projectsStatusTabs.querySelectorAll('.p-tab-btn').forEach(tabBtn => {
+      tabBtn.addEventListener('click', () => {
+        projectsStatusTabs.querySelectorAll('.p-tab-btn').forEach(b => b.classList.remove('active'));
+        tabBtn.classList.add('active');
+        projectsStatusFilter = tabBtn.getAttribute('data-status') || 'all';
+        renderProjectsView();
+      });
+    });
+  }
+
+  // Helper para retroceder 1 mês no formato YYYY-MM
+  function getPreviousYearMonth(ym) {
+    if (!ym || !ym.includes('-')) return '';
+    const [yStr, mStr] = ym.split('-');
+    let y = parseInt(yStr, 10);
+    let m = parseInt(mStr, 10);
+    m -= 1;
+    if (m < 1) {
+      m = 12;
+      y -= 1;
+    }
+    return `${y}-${String(m).padStart(2, '0')}`;
+  }
+
+  // Atualiza preview de ticket médio e taxa de conversão no modal de metas
+  function updatePlanningKpiPreview() {
+    const rev = parseMoneyToNumber(planRevenueGoal ? planRevenueGoal.value : 0);
+    const sales = parseInt(planSalesGoal ? planSalesGoal.value : 0, 10) || 0;
+    const meetings = parseInt(planMeetingsGoal ? planMeetingsGoal.value : 0, 10) || 0;
+
+    const ticket = sales > 0 ? rev / sales : 0;
+    const conv = meetings > 0 ? Math.round((sales / meetings) * 100) : 0;
+
+    if (planPreviewTicket) {
+      planPreviewTicket.textContent = formatNumberToMoney(ticket);
+    }
+    if (planPreviewConv) {
+      planPreviewConv.textContent = `${conv}%`;
+    }
+  }
+
   // --- MODAL DE PLANEJAMENTO MENSAL ---
   function openPlanningModal(client) {
     if (!modalPlanning || !client) return;
@@ -2085,6 +2219,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (planMoneyTable) planMoneyTable.value = 'R$ 25.000,00';
       if (planNotes) planNotes.value = '';
     }
+
+    updatePlanningKpiPreview();
   }
 
   function renderPlanningHistoryTable(clientId) {
@@ -2185,6 +2321,35 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnClosePlanning) btnClosePlanning.addEventListener('click', closePlanningModal);
   if (btnCancelPlanning) btnCancelPlanning.addEventListener('click', closePlanningModal);
   if (btnSavePlanning) btnSavePlanning.addEventListener('click', savePlanningModalData);
+
+  // Recálculo dinâmico ao digitar nas metas
+  if (planRevenueGoal) planRevenueGoal.addEventListener('input', updatePlanningKpiPreview);
+  if (planSalesGoal) planSalesGoal.addEventListener('input', updatePlanningKpiPreview);
+  if (planMeetingsGoal) planMeetingsGoal.addEventListener('input', updatePlanningKpiPreview);
+
+  // Copiar metas do mês anterior
+  if (btnCopyPrevPlan) {
+    btnCopyPrevPlan.addEventListener('click', () => {
+      const clientId = planningClientId ? planningClientId.value : (activePlanningClient ? activePlanningClient.id : null);
+      if (!clientId) return;
+      const currentMonth = planningMonthPicker ? planningMonthPicker.value : currentMonthKey;
+      const prevMonth = getPreviousYearMonth(currentMonth);
+      const plannings = JSON.parse(localStorage.getItem('projects_planning_v2') || '[]');
+      const prevPlan = plannings.find(p => p.client_id === clientId && p.year_month === prevMonth);
+
+      if (prevPlan) {
+        if (planRevenueGoal) planRevenueGoal.value = formatNumberToMoney(Number(prevPlan.revenue_goal) || 0);
+        if (planSalesGoal) planSalesGoal.value = prevPlan.sales_goal ?? 5;
+        if (planMeetingsGoal) planMeetingsGoal.value = prevPlan.meetings_goal ?? 15;
+        if (planMoneyTable) planMoneyTable.value = formatNumberToMoney(Number(prevPlan.money_on_table) || 0);
+        if (planNotes && prevPlan.notes) planNotes.value = prevPlan.notes;
+        updatePlanningKpiPreview();
+        showToast(`Metas de ${prevMonth} copiadas com sucesso!`);
+      } else {
+        showToast(`Nenhum planejamento encontrado para o mês anterior (${prevMonth}).`, true);
+      }
+    });
+  }
 
   if (modalPlanning) {
     modalPlanning.addEventListener('click', (e) => {

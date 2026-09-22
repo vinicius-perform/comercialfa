@@ -559,6 +559,24 @@
           </div>
         </div>
 
+        <!-- Barra de Busca & Filtros Rápidos de Clientes -->
+        <div class="projects-toolbar">
+          <div class="projects-search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="projects-search-input" class="projects-search-input" placeholder="Buscar cliente por nome ou segmento...">
+          </div>
+
+          <div class="projects-status-tabs" id="projects-status-tabs">
+            <button type="button" class="p-tab-btn active" data-status="all">Todos</button>
+            <button type="button" class="p-tab-btn" data-status="active">🟢 Ativos</button>
+            <button type="button" class="p-tab-btn" data-status="onboarding">🟡 Onboarding</button>
+            <button type="button" class="p-tab-btn" data-status="paused">⚪ Pausados</button>
+          </div>
+        </div>
+
         <!-- Grid de Cards dos Clientes -->
         <div class="projects-clients-grid" id="projects-clients-container">
           <!-- Injetado dinamicamente via app.js -->
@@ -588,6 +606,15 @@
                 <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
               <input type="date" id="sdr-report-date" class="date-pill-input">
+            </div>
+
+            <div class="topbar-filter-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <select id="sdr-client-select" class="topbar-filter-select">
+                <option value="">🌐 Geral / Todos os Projetos</option>
+              </select>
             </div>
 
             <button type="button" class="btn-top-cta btn-cta-closer" id="btn-sdr-to-dashboard">
@@ -914,6 +941,15 @@
                 <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
               <input type="date" id="report-date" class="date-pill-input">
+            </div>
+
+            <div class="topbar-filter-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <select id="closer-client-select" class="topbar-filter-select">
+                <option value="">🌐 Geral / Todos os Projetos</option>
+              </select>
             </div>
 
             <button type="button" class="btn-top-cta btn-cta-sdr" id="btn-closer-to-dashboard">
@@ -1454,8 +1490,11 @@
         
         <!-- Seleção de Mês do Planejamento -->
         <div class="planning-month-bar">
-          <label class="field-label">MÊS DE REFERÊNCIA:</label>
+          <label class="field-label" style="margin: 0;">MÊS DE REFERÊNCIA:</label>
           <input type="month" id="planning-month-picker" class="planning-month-input" value="2026-09">
+          <button type="button" class="btn-apple-secondary" id="btn-copy-prev-plan" style="margin-left: auto; font-size: 11px; padding: 5px 10px;" title="Copiar metas do mês anterior deste cliente">
+            📋 Copiar do Mês Anterior
+          </button>
         </div>
 
         <!-- Grade de Metas do Mês -->
@@ -1493,6 +1532,13 @@
             </div>
             <span class="modal-hint">Pipeline estimado em negociação.</span>
           </div>
+        </div>
+
+        <!-- Preview de Métricas Derivadas -->
+        <div class="planning-kpi-preview" style="display: flex; gap: 14px; margin-top: 10px; background: #f8f9fa; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; color: var(--text-secondary); flex-wrap: wrap;">
+          <span>Ticket Médio Projetado: <strong id="plan-preview-ticket" style="color: var(--text-dark); font-weight: 700;">R$ 10.000,00</strong></span>
+          <span>•</span>
+          <span>Conversão Reunião ➔ Venda: <strong id="plan-preview-conv" style="color: var(--text-dark); font-weight: 700;">33%</strong></span>
         </div>
 
         <div class="modal-field" style="margin-top: 14px;">
