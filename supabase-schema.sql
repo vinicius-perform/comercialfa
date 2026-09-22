@@ -143,23 +143,8 @@ CREATE POLICY "Permitir inserção pública settings" ON public.system_settings 
 CREATE POLICY "Permitir atualização pública settings" ON public.system_settings FOR UPDATE TO anon, authenticated USING (true);
 
 -- ==============================================================================
--- DADOS INICIAIS (SEED) PARA DEMONSTRAÇÃO IMEDIATA
+-- CONFIGURAÇÕES PADRÃO DO SISTEMA
 -- ==============================================================================
-
-INSERT INTO public.clients (id, name, segment, responsible, status)
-VALUES 
-  ('cli_fazendo_acontecer', 'Projeto Interno • Fazendo Acontecer™', 'Comercial B2B', 'Tales', 'active'),
-  ('cli_alpha_group', 'Grupo Alpha Consultoria', 'Consultoria Empresarial', 'José', 'active'),
-  ('cli_nexustech', 'Nexus Tech Soluções', 'SaaS / Tecnologia', 'Elinaldo', 'active')
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO public.client_planning (id, client_id, year_month, revenue_goal, sales_goal, meetings_goal, money_on_table, notes)
-VALUES
-  ('cli_fazendo_acontecer_2026-09', 'cli_fazendo_acontecer', '2026-09', 100000, 10, 25, 45000, 'Meta principal do mês de Setembro • Foco em fechamento acelerado'),
-  ('cli_alpha_group_2026-09', 'cli_alpha_group', '2026-09', 60000, 6, 18, 30000, 'Expansão de contas enterprise'),
-  ('cli_alpha_group_2026-08', 'cli_alpha_group', '2026-08', 50000, 5, 15, 0, 'Mês encerrado • Superavit atingido'),
-  ('cli_nexustech_2026-09', 'cli_nexustech', '2026-09', 40000, 4, 12, 20000, 'Prospecção ativa ICP TI e Software')
-ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.system_settings (key, value)
 VALUES 
@@ -167,3 +152,4 @@ VALUES
   ('money_on_table', '45000'),
   ('win_rate', '40')
 ON CONFLICT (key) DO NOTHING;
+

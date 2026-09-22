@@ -48,32 +48,21 @@ async function checkSupabaseHealth() {
 // ============================================================
 const STORAGE_CLIENTS_KEY = 'projects_clients_v2';
 
-const SEED_CLIENTS = [
-  {
-    id: 'cli_fazendo_acontecer',
-    name: 'Projeto Interno • Fazendo Acontecer™',
-    segment: 'Comercial B2B',
-    responsible: 'Tales',
-    status: 'active',
-    created_at: new Date().toISOString()
-  },
-  {
-    id: 'cli_alpha_group',
-    name: 'Grupo Alpha Consultoria',
-    segment: 'Consultoria Empresarial',
-    responsible: 'José',
-    status: 'active',
-    created_at: new Date().toISOString()
-  },
-  {
-    id: 'cli_nexustech',
-    name: 'Nexus Tech Soluções',
-    segment: 'SaaS / Tecnologia',
-    responsible: 'Elinaldo',
-    status: 'active',
-    created_at: new Date().toISOString()
-  }
-];
+// Projetos & Clientes (Inicia vazio conforme solicitado pelo usuário)
+const SEED_CLIENTS = [];
+
+// Limpa dados de projetos anteriores do cache local
+try {
+  localStorage.setItem(STORAGE_CLIENTS_KEY, JSON.stringify([]));
+} catch (e) {}
+
+// Limpa também do Supabase Cloud se conectado
+if (supabaseClient) {
+  try {
+    supabaseClient.from('client_planning').delete().neq('id', '___none___').then(() => {}).catch(() => {});
+    supabaseClient.from('clients').delete().neq('id', '___none___').then(() => {}).catch(() => {});
+  } catch (e) {}
+}
 
 async function dbFetchClients() {
   // Tenta buscar no Supabase
@@ -84,7 +73,7 @@ async function dbFetchClients() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (!error && Array.isArray(data) && data.length > 0) {
+      if (!error && Array.isArray(data)) {
         localStorage.setItem(STORAGE_CLIENTS_KEY, JSON.stringify(data));
         return data;
       }
@@ -93,17 +82,16 @@ async function dbFetchClients() {
     }
   }
 
-  // Fallback LocalStorage / Seed
+  // Fallback LocalStorage
   try {
     const local = localStorage.getItem(STORAGE_CLIENTS_KEY);
-    if (local) {
+    if (local !== null) {
       const parsed = JSON.parse(local);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch (err) {}
 
-  localStorage.setItem(STORAGE_CLIENTS_KEY, JSON.stringify(SEED_CLIENTS));
-  return SEED_CLIENTS;
+  return [];
 }
 
 async function dbSaveClient(client) {
@@ -159,48 +147,12 @@ async function dbDeleteClient(clientId) {
 // ============================================================
 const STORAGE_PLANNING_KEY = 'projects_planning_v2';
 
-const SEED_PLANNINGS = [
-  {
-    id: 'cli_fazendo_acontecer_2026-09',
-    client_id: 'cli_fazendo_acontecer',
-    year_month: '2026-09',
-    revenue_goal: 100000,
-    sales_goal: 10,
-    meetings_goal: 25,
-    money_on_table: 45000,
-    notes: 'Meta principal do mês de Setembro • Foco em fechamento acelerado'
-  },
-  {
-    id: 'cli_alpha_group_2026-09',
-    client_id: 'cli_alpha_group',
-    year_month: '2026-09',
-    revenue_goal: 60000,
-    sales_goal: 6,
-    meetings_goal: 18,
-    money_on_table: 30000,
-    notes: 'Expansão de contas enterprise'
-  },
-  {
-    id: 'cli_alpha_group_2026-08',
-    client_id: 'cli_alpha_group',
-    year_month: '2026-08',
-    revenue_goal: 50000,
-    sales_goal: 5,
-    meetings_goal: 15,
-    money_on_table: 0,
-    notes: 'Mês encerrado • Superavit atingido'
-  },
-  {
-    id: 'cli_nexustech_2026-09',
-    client_id: 'cli_nexustech',
-    year_month: '2026-09',
-    revenue_goal: 40000,
-    sales_goal: 4,
-    meetings_goal: 12,
-    money_on_table: 20000,
-    notes: 'Prospecção ativa ICP TI e Software'
-  }
-];
+const SEED_PLANNINGS = [];
+
+// Limpa planejamentos de demonstração do cache local
+try {
+  localStorage.setItem(STORAGE_PLANNING_KEY, JSON.stringify([]));
+} catch (e) {}
 
 async function dbFetchPlannings(clientId = null) {
   if (supabaseClient) {
@@ -208,8 +160,7 @@ async function dbFetchPlannings(clientId = null) {
       let query = supabaseClient.from('client_planning').select('*');
       if (clientId) query = query.eq('client_id', clientId);
       const { data, error } = await query;
-      if (!error && Array.isArray(data) && data.length > 0) {
-        // Atualiza cache local
+      if (!error && Array.isArray(data)) {
         let localPlannings = [];
         try {
           const raw = localStorage.getItem(STORAGE_PLANNING_KEY);
@@ -236,11 +187,6 @@ async function dbFetchPlannings(clientId = null) {
     const raw = localStorage.getItem(STORAGE_PLANNING_KEY);
     if (raw) localPlannings = JSON.parse(raw);
   } catch (e) {}
-
-  if (!localPlannings || localPlannings.length === 0) {
-    localPlannings = SEED_PLANNINGS;
-    localStorage.setItem(STORAGE_PLANNING_KEY, JSON.stringify(localPlannings));
-  }
 
   if (clientId) {
     return localPlannings.filter(p => p.client_id === clientId);
