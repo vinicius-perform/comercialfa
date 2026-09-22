@@ -1,6 +1,6 @@
 /**
  * Fazendo Acontecer™ - Hub Closers Gestão
- * Lógica Interativa Minimalista e Sincronização em Tempo Real com Máscara de Moeda
+ * Modern uifry Dashboard Logic, Live Currency Mask & Real-time Visual Synchronizer
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -19,28 +19,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const dateInput = document.getElementById('report-date');
   if (dateInput) dateInput.value = formattedToday;
 
-  const mainCloserTag = document.getElementById('main-closer-tag');
-  const navCloserOverview = document.getElementById('nav-closer-overview');
-  const btnPdfLabel = document.getElementById('btn-pdf-label');
-
-  // Widget Lateral
-  const widgetCloserName = document.getElementById('widget-closer-name');
-  const widgetSales = document.getElementById('widget-sales');
-  const widgetContract = document.getElementById('widget-contract');
-  const widgetCash = document.getElementById('widget-cash');
-
-  // Print Header
+  // Header & Sidebar Tags
+  const headerCloserName = document.getElementById('header-closer-name');
+  const sidebarUserName = document.getElementById('sidebar-user-name');
+  const sidebarUserAvatar = document.getElementById('sidebar-user-avatar');
   const printCloserName = document.getElementById('print-closer-name');
   const printReportDate = document.getElementById('print-report-date');
+  const btnPdfLabel = document.getElementById('btn-pdf-label');
 
-  // 4 KPIs Superiores
+  // 3 KPIs Superiores (Estilo uifry)
   const kpiSalesNum = document.getElementById('kpi-sales-num');
   const kpiSalesSub = document.getElementById('kpi-sales-sub');
   const kpiContractNum = document.getElementById('kpi-contract-num');
   const kpiCashNum = document.getElementById('kpi-cash-num');
-  const kpiEffortNum = document.getElementById('kpi-effort-num');
 
-  // Inputs
+  // Inputs do Formulário
   const inputLeads = document.getElementById('input-leads');
   const inputFollowups = document.getElementById('input-followups');
   const inputProspeccoes = document.getElementById('input-prospeccoes');
@@ -61,29 +54,36 @@ document.addEventListener('DOMContentLoaded', () => {
     inputCashCollected
   ];
 
-  // Botões de Seleção de Closer
-  const closerButtons = document.querySelectorAll('.closer-btn');
+  // Elementos Visuais Dinâmicos
+  const overviewTooltipText = document.getElementById('overview-tooltip-text');
+  const bubbleConversionRate = document.getElementById('bubble-conversion-rate');
+  const bubbleAttendanceRate = document.getElementById('bubble-attendance-rate');
+  const bubbleEffortTotal = document.getElementById('bubble-effort-total');
+  const compBarSales = document.getElementById('comp-bar-sales');
+  const compBarMeetings = document.getElementById('comp-bar-meetings');
+
+  // Seletores de Closer (Sidebar Chips & Segmented no Card)
+  const closerChips = document.querySelectorAll('.closer-chip');
+  const segmentedBtns = document.querySelectorAll('.segmented-btn');
 
   // Botões de Ação
   const btnGeneratePdf = document.getElementById('btn-generate-pdf');
-  const btnSaveLog = document.getElementById('btn-save-log');
+  const navBtnPdf = document.getElementById('nav-btn-pdf');
   const btnCopyWhatsapp = document.getElementById('btn-copy-whatsapp');
+  const btnSaveLog = document.getElementById('btn-save-log');
   const btnResetForm = document.getElementById('btn-reset-form');
+  const btnToggleTheme = document.getElementById('btn-toggle-theme');
 
-  // Elementos do Modal de Histórico
-  const historyModal = document.getElementById('history-modal');
-  const btnOpenHistory = document.getElementById('btn-open-history');
-  const btnCloseModal = document.getElementById('btn-close-modal');
+  // Tabela de Histórico
   const historyTableBody = document.getElementById('history-table-body');
-  const historyTotalCount = document.getElementById('history-total-count');
   const btnExportCsv = document.getElementById('btn-export-csv');
   const btnClearHistory = document.getElementById('btn-clear-history');
 
-  // Container de Toast
+  // Toast Container
   const toastContainer = document.getElementById('toast-container');
 
   // --- LOCAL STORAGE ---
-  const STORAGE_KEY = 'fa_closers_minimalist_reports_v1';
+  const STORAGE_KEY = 'fa_closers_uifry_reports_v1';
 
   function getStoredReports() {
     try {
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${d}/${m}/${y}`;
   }
 
-  // --- FORMATAÇÃO & MÁSCARA AUTOMÁTICA DE MOEDA (AO DIGITAR) ---
+  // --- MÁSCARA AUTOMÁTICA DE MOEDA (AO DIGITAR) ---
   function formatMoneyString(raw) {
     if (raw === undefined || raw === null) return 'R$ 0,00';
     const digits = String(raw).replace(/\D/g, '');
@@ -144,10 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function setupCurrencyInput(input) {
     if (!input) return;
 
-    // Inicializa formatado
     input.value = formatMoneyString(input.value);
 
-    // Formatação em tempo real a cada caractere digitado
     input.addEventListener('input', () => {
       input.value = formatMoneyString(input.value);
       setTimeout(() => {
@@ -156,7 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
       updateDashboard();
     });
 
-    // Tratamento de Backspace e Delete para exclusão de dígitos
     input.addEventListener('keydown', (e) => {
       const isAllSelected = (input.selectionStart === 0 && input.selectionEnd === input.value.length);
       if ((e.key === 'Backspace' || e.key === 'Delete') && isAllSelected) {
@@ -176,13 +173,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Tratamento inteligente ao colar valor (Paste)
     input.addEventListener('paste', (e) => {
       e.preventDefault();
       const text = (e.clipboardData || window.clipboardData).getData('text') || '';
       let digits = text.replace(/\D/g, '');
       if (!digits) return;
-      // Se colou número inteiro pequeno sem pontuação (ex: 5000), adiciona centavos
       if (!text.includes(',') && !text.includes('.') && parseInt(digits, 10) < 100000) {
         digits = digits + '00';
       }
@@ -191,14 +186,12 @@ document.addEventListener('DOMContentLoaded', () => {
       updateDashboard();
     });
 
-    // Ao focar, posiciona o cursor no fim
     input.addEventListener('focus', () => {
       setTimeout(() => {
         input.setSelectionRange(input.value.length, input.value.length);
       }, 0);
     });
 
-    // Ao sair do campo, garante formato correto
     input.addEventListener('blur', () => {
       input.value = formatMoneyString(input.value);
       updateDashboard();
@@ -212,7 +205,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function selectCloser(closerName) {
     currentCloser = closerName;
 
-    closerButtons.forEach(btn => {
+    // Atualiza chips da sidebar
+    closerChips.forEach(chip => {
+      if (chip.dataset.closer === closerName) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+
+    // Atualiza segmented buttons no card
+    segmentedBtns.forEach(btn => {
       if (btn.dataset.closer === closerName) {
         btn.classList.add('active');
       } else {
@@ -220,16 +223,17 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    if (mainCloserTag) mainCloserTag.textContent = `Closer: ${closerName}`;
-    if (navCloserOverview) navCloserOverview.textContent = `Visão Geral • ${closerName}`;
-    if (widgetCloserName) widgetCloserName.textContent = `MÉTRICAS DE ${closerName.toUpperCase()}`;
+    // Atualiza labels de UI
+    if (headerCloserName) headerCloserName.textContent = closerName;
+    if (sidebarUserName) sidebarUserName.textContent = `${closerName} Closer`;
+    if (sidebarUserAvatar) sidebarUserAvatar.textContent = closerName.charAt(0).toUpperCase();
     if (btnPdfLabel) btnPdfLabel.textContent = `GERAR RELATÓRIO DE ${closerName.toUpperCase()} (PDF)`;
     if (printCloserName) printCloserName.innerHTML = `Closer: <strong>${closerName.toUpperCase()}</strong>`;
 
     loadDayData();
   }
 
-  // --- ATUALIZAÇÃO DOS KPIS E SINCRONIZAÇÃO ---
+  // --- ATUALIZAÇÃO DOS KPIS E ELEMENTOS VISUAIS EM TEMPO REAL ---
   function updateDashboard() {
     const leads = Math.max(0, parseInt(inputLeads.value, 10) || 0);
     const followups = Math.max(0, parseInt(inputFollowups.value, 10) || 0);
@@ -242,23 +246,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const formattedCash = formatMoneyString(inputCashCollected.value);
     const totalEffort = followups + prospeccoes;
 
-    // Atualiza os 4 Cards Superiores com formatação de moeda perfeita
-    if (kpiSalesNum) kpiSalesNum.textContent = sales;
+    // 1. Atualiza os 3 Cards Superiores
+    if (kpiSalesNum) kpiSalesNum.textContent = `${sales} un`;
     if (kpiSalesSub) kpiSalesSub.textContent = `${sales} nova(s)`;
     if (kpiContractNum) kpiContractNum.textContent = formattedContract;
     if (kpiCashNum) kpiCashNum.textContent = formattedCash;
-    if (kpiEffortNum) kpiEffortNum.textContent = totalEffort;
 
-    // Atualiza o Widget Lateral
-    if (widgetSales) widgetSales.textContent = `${sales} un`;
-    if (widgetContract) widgetContract.textContent = formattedContract;
-    if (widgetCash) widgetCash.textContent = formattedCash;
+    // 2. Atualiza Tooltip Flutuante do Gráfico de Overview (Estilo uifry "from 766 $")
+    if (overviewTooltipText) {
+      if (formattedCash !== 'R$ 0,00') {
+        overviewTooltipText.textContent = `from ${formattedCash} $`;
+      } else if (formattedContract !== 'R$ 0,00') {
+        overviewTooltipText.textContent = `from ${formattedContract} $`;
+      } else {
+        overviewTooltipText.textContent = `from R$ 766 $`;
+      }
+    }
 
-    // Atualiza Cabeçalho do Print
+    // 3. Atualiza os Círculos Sobrepostos do Card Activity
+    const attendanceRate = scheduled > 0 ? Math.min(100, Math.round((held / scheduled) * 100)) : (held > 0 ? 100 : 0);
+    const conversionRate = held > 0 ? Math.min(100, Math.round((sales / held) * 100)) : (sales > 0 ? 100 : 0);
+
+    if (bubbleConversionRate) bubbleConversionRate.textContent = `${conversionRate}%`;
+    if (bubbleAttendanceRate) bubbleAttendanceRate.textContent = `${attendanceRate}%`;
+    if (bubbleEffortTotal) bubbleEffortTotal.textContent = totalEffort;
+
+    // 4. Atualiza Barras de Metas (Comparison)
+    if (compBarSales) {
+      const salesPct = Math.min(100, sales > 0 ? Math.max(25, sales * 33) : 10);
+      compBarSales.style.width = `${salesPct}%`;
+    }
+    if (compBarMeetings) {
+      const meetPct = scheduled > 0 ? Math.min(100, Math.max(20, (held / scheduled) * 100)) : 15;
+      compBarMeetings.style.width = `${meetPct}%`;
+    }
+
+    // 5. Atualiza Cabeçalho de Impressão
     const selectedDate = dateInput.value || formattedToday;
     if (printReportDate) printReportDate.innerHTML = `Data: <strong>${formatDateBR(selectedDate)}</strong>`;
 
-    // Garante que atributos value estejam no DOM para impressão exata
+    // Sincroniza atributos value para impressão exata
     allInputs.forEach(input => {
       if (input) input.setAttribute('value', input.value);
     });
@@ -291,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateDashboard();
+    renderHistory();
   }
 
   // --- SALVAR REGISTRO ---
@@ -322,13 +350,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     saveStoredReports(reports);
+    renderHistory();
 
     if (showFeedback) {
-      showToast(`Métricas de ${currentCloser} salvas com sucesso!`);
+      showToast(`Métricas de ${currentCloser} salvas no histórico!`);
     }
   }
 
-  // --- COPIAR TEXTO FORMATADO PARA WHATSAPP ---
+  // --- COPIAR WHATSAPP ---
   function copyWhatsAppSummary() {
     const selectedDate = dateInput.value || formattedToday;
     const leads = parseInt(inputLeads.value, 10) || 0;
@@ -359,13 +388,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (contractVal !== 'R$ 0,00') summary += `• Valor Contrato: *${contractVal}*\n`;
     if (cashCollected !== 'R$ 0,00') summary += `• Cash Coletado: *${cashCollected}*\n`;
     summary += `─────────────────────────\n`;
-    summary += `⚡ _Gerado via Hub Closers Gestão_`;
+    summary += `⚡ _Gerado via Dashboard uifry • Hub Closers_`;
 
     navigator.clipboard.writeText(summary).then(() => {
       showToast('Relatório copiado para o WhatsApp!');
     }).catch(err => {
       console.error('Erro ao copiar', err);
-      // Fallback
       const ta = document.createElement('textarea');
       ta.value = summary;
       document.body.appendChild(ta);
@@ -376,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- LIMPAR FORMULÁRIO ---
+  // --- LIMPAR VALORES ---
   function resetFormValues() {
     inputLeads.value = 0;
     inputFollowups.value = 0;
@@ -387,22 +415,20 @@ document.addEventListener('DOMContentLoaded', () => {
     inputContractVal.value = 'R$ 0,00';
     inputCashCollected.value = 'R$ 0,00';
     updateDashboard();
-    showToast('Valores limpos.');
+    showToast('Campos resetados para zero.');
   }
 
-  // --- MODAL DE HISTÓRICO ---
+  // --- RENDERIZAR TABELA DE HISTÓRICO (Transaction History) ---
   function renderHistory() {
-    const reports = getStoredReports();
-    if (historyTotalCount) historyTotalCount.textContent = `Total: ${reports.length} registros`;
-
     if (!historyTableBody) return;
+    const reports = getStoredReports();
     historyTableBody.innerHTML = '';
 
     if (reports.length === 0) {
       historyTableBody.innerHTML = `
         <tr>
-          <td colspan="9" style="text-align:center; padding: 24px; color: var(--text-muted);">
-            Nenhum relatório salvo no histórico ainda.
+          <td colspan="11" style="text-align:center; padding: 28px; color: var(--text-secondary);">
+            Nenhum relatório salvo no histórico ainda. Preencha e clique em "Salvar".
           </td>
         </tr>
       `;
@@ -412,29 +438,31 @@ document.addEventListener('DOMContentLoaded', () => {
     reports.forEach(report => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${formatDateBR(report.date)}</td>
-        <td style="font-weight:700; color:var(--text-primary);">${report.closer}</td>
+        <td><strong>${formatDateBR(report.date)}</strong></td>
+        <td><span style="font-weight:700; color:var(--text-dark);">${report.closer}</span></td>
         <td>${report.leads}</td>
         <td>${report.followups}</td>
         <td>${report.prospeccoes}</td>
         <td>${report.meetingsScheduled}</td>
         <td>${report.meetingsHeld}</td>
-        <td style="color:var(--accent-lime); font-weight:700;">${report.sales}</td>
+        <td><span style="font-weight:800; color:#10b981;">${report.sales}</span></td>
+        <td>${report.contractVal}</td>
+        <td><strong style="color:var(--text-dark);">${report.cashCollected}</strong></td>
         <td>
-          <button class="btn-sec btn-load-entry" data-closer="${report.closer}" data-date="${report.date}" style="padding: 4px 8px; font-size: 11px;">Carregar</button>
+          <button type="button" class="btn-uifry-sec btn-load-entry" data-closer="${report.closer}" data-date="${report.date}" style="padding: 4px 8px; font-size: 11px;">
+            Carregar
+          </button>
         </td>
       `;
       historyTableBody.appendChild(tr);
     });
 
-    // Eventos de carregar do histórico
     document.querySelectorAll('.btn-load-entry').forEach(btn => {
       btn.addEventListener('click', () => {
         const c = btn.dataset.closer;
         const d = btn.dataset.date;
         dateInput.value = d;
         selectCloser(c);
-        historyModal.classList.remove('open');
         showToast(`Registro de ${c} (${formatDateBR(d)}) carregado!`);
       });
     });
@@ -455,9 +483,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `relatorios_closers_fa_${formattedToday}.csv`;
+    link.download = `historico_closers_${formattedToday}.csv`;
     link.click();
-    showToast('Histórico exportado com sucesso!');
+    showToast('Histórico exportado com sucesso em CSV!');
   }
 
   function clearAllHistory() {
@@ -470,14 +498,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- EVENT LISTENERS ---
 
-  // Troca de Closer
-  closerButtons.forEach(btn => {
+  // Seleção de closer via Chips da Sidebar
+  closerChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      selectCloser(chip.dataset.closer);
+    });
+  });
+
+  // Seleção de closer via Segmented Buttons do Card
+  segmentedBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       selectCloser(btn.dataset.closer);
     });
   });
 
-  // Troca de Data
+  // Mudança de Data
   if (dateInput) {
     dateInput.addEventListener('change', () => {
       loadDayData();
@@ -493,7 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Botão Gerar Relatório PDF
+  // Botões Gerar Relatório PDF
   if (btnGeneratePdf) {
     btnGeneratePdf.addEventListener('click', () => {
       saveCurrentReport(false);
@@ -501,11 +536,12 @@ document.addEventListener('DOMContentLoaded', () => {
       window.print();
     });
   }
-
-  // Botão Salvar Registro
-  if (btnSaveLog) {
-    btnSaveLog.addEventListener('click', () => {
-      saveCurrentReport(true);
+  if (navBtnPdf) {
+    navBtnPdf.addEventListener('click', (e) => {
+      e.preventDefault();
+      saveCurrentReport(false);
+      updateDashboard();
+      window.print();
     });
   }
 
@@ -516,41 +552,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Botão Limpar Valores
+  // Botão Salvar Registro
+  if (btnSaveLog) {
+    btnSaveLog.addEventListener('click', () => {
+      saveCurrentReport(true);
+    });
+  }
+
+  // Botão Limpar Formulário
   if (btnResetForm) {
     btnResetForm.addEventListener('click', () => {
       resetFormValues();
     });
   }
 
-  // Abertura / Fechamento do Modal de Histórico
-  if (btnOpenHistory) {
-    btnOpenHistory.addEventListener('click', () => {
-      renderHistory();
-      historyModal.classList.add('open');
-    });
-  }
-
-  if (btnCloseModal) {
-    btnCloseModal.addEventListener('click', () => {
-      historyModal.classList.remove('open');
-    });
-  }
-
-  if (historyModal) {
-    historyModal.addEventListener('click', (e) => {
-      if (e.target === historyModal) {
-        historyModal.classList.remove('open');
-      }
-    });
-  }
-
+  // Exportar / Limpar Histórico
   if (btnExportCsv) {
     btnExportCsv.addEventListener('click', exportCSV);
   }
-
   if (btnClearHistory) {
     btnClearHistory.addEventListener('click', clearAllHistory);
+  }
+
+  // Botão Tema (Informa que o dashboard usa a estética híbrida uifry)
+  if (btnToggleTheme) {
+    btnToggleTheme.addEventListener('click', (e) => {
+      e.preventDefault();
+      showToast('Estilo uifry ativado: Dark Sidebar + Clean Canvas');
+    });
   }
 
   // --- INICIALIZAÇÃO ---

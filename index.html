@@ -3,143 +3,145 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relatório Closers | FA</title>
+  <title>Dashboard Closers • Fazendo Acontecer™</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <div class="app-container">
+  <div class="app-layout">
     <!-- ============================================================
-         SIDEBAR (Idêntica ao modelo original da imagem)
+         SIDEBAR (Estilo uifry: Escura fosca #1a1d1f com ícones elegantes)
          ============================================================ -->
     <aside class="sidebar">
-      <!-- Logo Oficial -->
-      <div class="brand-container">
-        <img src="assets/logo.png" alt="FAZENDO ACONTECER™" class="brand-logo-img">
-        <span class="brand-subtitle">HUB CLOSERS • GESTÃO</span>
-      </div>
-
-      <!-- Menu Principal: Closers em Grid 2x2 -->
-      <div class="nav-section">
-        <div class="nav-header">
-          <span class="nav-title">MENU PRINCIPAL</span>
-          <span class="nav-badge">CLOSERS</span>
-        </div>
-
-        <!-- 4 Closers solicitados: Tales, José, Muller, Elinaldo -->
-        <div class="closers-grid">
-          <button type="button" class="closer-btn" data-closer="Tales">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span>Tales</span>
-          </button>
-
-          <button type="button" class="closer-btn" data-closer="José">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span>José</span>
-          </button>
-
-          <button type="button" class="closer-btn active" data-closer="Muller">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span>Muller</span>
-          </button>
-
-          <button type="button" class="closer-btn" data-closer="Elinaldo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span>Elinaldo</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Navegação Dashboard -->
-      <nav class="nav-menu">
-        <div class="nav-item dashboard-btn">
-          <div class="nav-item-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-            <span>Dashboard</span>
-          </div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;">
-            <polyline points="6 9 12 15 18 9"></polyline>
+      <!-- Brand Logo -->
+      <div class="sidebar-brand">
+        <div class="brand-badge-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15.5v-7l6 3.5-6 3.5z"/>
           </svg>
         </div>
-
-        <div class="nav-subitem active">
-          <span class="status-dot"></span>
-          <span id="nav-closer-overview">Visão Geral • Muller</span>
-        </div>
-
-        <button type="button" class="nav-item nav-item-history" id="btn-open-history">
-          <div class="nav-item-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            <span>Histórico da Equipe</span>
-          </div>
-        </button>
-      </nav>
-
-      <!-- Widget Lateral: Métricas do Closer Ativo -->
-      <div class="closer-stats-card">
-        <div class="stats-card-header">
-          <span class="stats-card-title" id="widget-closer-name">MÉTRICAS DE MULLER</span>
-          <span class="status-pill">
-            <span class="status-dot-sm"></span>
-            Ativo
-          </span>
-        </div>
-
-        <div class="stats-row">
-          <span class="stats-label">Total Vendas:</span>
-          <span class="stats-value" id="widget-sales">0 un</span>
-        </div>
-
-        <div class="stats-row">
-          <span class="stats-label">Valor Contrato:</span>
-          <span class="stats-value" id="widget-contract">R$ 0,00</span>
-        </div>
-
-        <div class="stats-row">
-          <span class="stats-label">Cash Coletado:</span>
-          <span class="stats-value highlight-lime" id="widget-cash">R$ 0,00</span>
+        <div class="brand-text">
+          <span class="brand-title">uifry<span class="brand-trademark">™</span></span>
+          <span class="brand-tagline">FA CLOSERS HUB</span>
         </div>
       </div>
 
-      <!-- Rodapé Sidebar -->
-      <div class="sidebar-footer">
-        <div class="footer-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
-        </div>
-        <div class="footer-text">
-          <span class="footer-title">Painel do Closer</span>
-          <span class="footer-sub">AMBIENTE SEGURO</span>
+      <!-- Navegação MANAGE -->
+      <div class="sidebar-group">
+        <span class="sidebar-group-title">MANAGE</span>
+        <nav class="sidebar-nav">
+          <a href="#" class="nav-link active" id="nav-dashboard">
+            <span class="nav-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+              </svg>
+            </span>
+            <span class="nav-label">Dashboard</span>
+          </a>
+
+          <!-- Seletor de Closers integrado na Sidebar -->
+          <div class="sidebar-closers-sub">
+            <span class="sub-section-title">CLOSERS DA EQUIPE</span>
+            <div class="closers-chips-list">
+              <button type="button" class="closer-chip" data-closer="Tales">
+                <span class="chip-avatar">T</span>
+                <span>Tales</span>
+              </button>
+              <button type="button" class="closer-chip" data-closer="José">
+                <span class="chip-avatar">J</span>
+                <span>José</span>
+              </button>
+              <button type="button" class="closer-chip active" data-closer="Muller">
+                <span class="chip-avatar">M</span>
+                <span>Muller</span>
+              </button>
+              <button type="button" class="closer-chip" data-closer="Elinaldo">
+                <span class="chip-avatar">E</span>
+                <span>Elinaldo</span>
+              </button>
+            </div>
+          </div>
+
+          <a href="#section-metrics" class="nav-link">
+            <span class="nav-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+            </span>
+            <span class="nav-label">Lançar Métricas</span>
+          </a>
+
+          <a href="#section-history" class="nav-link">
+            <span class="nav-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </span>
+            <span class="nav-label">Histórico</span>
+          </a>
+
+          <a href="#" class="nav-link" id="nav-btn-pdf">
+            <span class="nav-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-2"></path>
+              </svg>
+            </span>
+            <span class="nav-label">Gerar PDF</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Navegação PREFERENCES -->
+      <div class="sidebar-group">
+        <span class="sidebar-group-title">PREFERENCES</span>
+        <nav class="sidebar-nav">
+          <a href="#" class="nav-link" id="btn-toggle-theme">
+            <span class="nav-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+              </svg>
+            </span>
+            <span class="nav-label">Tema</span>
+          </a>
+
+          <div class="nav-link security-badge">
+            <span class="nav-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </span>
+            <span class="nav-label">Ambiente Seguro</span>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Footer do Usuário na Sidebar -->
+      <div class="sidebar-user-footer">
+        <div class="user-avatar-circle" id="sidebar-user-avatar">M</div>
+        <div class="user-info">
+          <span class="user-name" id="sidebar-user-name">Muller Closer</span>
+          <span class="user-role">Closer Ativo</span>
         </div>
       </div>
     </aside>
 
     <!-- ============================================================
-         CONTEÚDO PRINCIPAL (Limpo, Minimalista, Idêntico ao Modelo)
+         CANVAS PRINCIPAL (Estilo uifry: Claro #f4f5f6 com cards elegantes)
          ============================================================ -->
-    <main class="main-content">
+    <main class="main-canvas">
 
       <!-- Cabeçalho Exclusivo para Impressão / PDF A4 -->
       <div class="print-header">
@@ -152,262 +154,437 @@
           <div class="print-details">
             <span id="print-closer-name">Closer: <strong>MULLER</strong></span>
             <span class="print-separator">•</span>
-            <span id="print-report-date">Data: <strong>15/09/2026</strong></span>
+            <span id="print-report-date">Data: <strong>22/09/2026</strong></span>
           </div>
         </div>
       </div>
 
-      <!-- Cabeçalho Superior Interativo -->
-      <div class="top-header">
-        <div class="header-left">
-          <span class="closer-tag" id="main-closer-tag">Closer: Muller</span>
-          <h1 class="main-title">Preenchimento de Métricas</h1>
-          <p class="main-subtitle">Informe as métricas de esforço e a performance comercial do dia.</p>
+      <!-- Top Bar Interativa -->
+      <header class="top-bar">
+        <div class="top-bar-left">
+          <h1 class="page-title">Dashboard</h1>
+          <span class="closer-active-pill" id="header-closer-pill">
+            <span class="pulse-dot"></span>
+            <span id="header-closer-name">Muller</span>
+          </span>
         </div>
 
-        <div class="header-right">
-          <div class="date-picker-box">
+        <div class="top-bar-right">
+          <!-- Seletor de Data Estilizado -->
+          <div class="date-pill-widget">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="16" y1="2" x2="16" y2="6"></line>
               <line x1="8" y1="2" x2="8" y2="6"></line>
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
-            <input type="date" id="report-date" class="date-input">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;">
+            <input type="date" id="report-date" class="date-pill-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;color:#808191;">
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </div>
-        </div>
-      </div>
 
-      <!-- 4 Cards Superiores de KPI (Minimalistas, Limpos, Idênticos ao Modelo) -->
-      <div class="kpi-row">
-        <div class="kpi-box">
-          <span class="kpi-title">TOTAL VENDAS</span>
-          <span class="kpi-number" id="kpi-sales-num">0</span>
-          <span class="kpi-sub" id="kpi-sales-sub">0 novas</span>
-        </div>
+          <!-- Botões Rápidos do Topo (Busca, Info, Mais opções) -->
+          <button type="button" class="btn-top-icon" title="Buscar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
 
-        <div class="kpi-box">
-          <span class="kpi-title">VALOR CONTRATO</span>
-          <span class="kpi-number" id="kpi-contract-num">R$ 0,00</span>
-          <span class="kpi-sub">Contratos fechados</span>
-        </div>
-
-        <div class="kpi-box">
-          <span class="kpi-title">CASH COLETADO</span>
-          <span class="kpi-number highlight-lime" id="kpi-cash-num">R$ 0,00</span>
-          <span class="kpi-sub">Receita recebida</span>
-        </div>
-
-        <div class="kpi-box">
-          <span class="kpi-title">ESFORÇO ATIVO</span>
-          <span class="kpi-number" id="kpi-effort-num">0</span>
-          <span class="kpi-sub">Follow-ups + Prospecções</span>
-        </div>
-      </div>
-
-      <!-- ============================================================
-           SEÇÃO 1: MÉTRICA DE ESFORÇO E VOLUME DE LEADS
-           ============================================================ -->
-      <div class="form-card">
-        <div class="form-card-header">
-          <div class="card-icon">
+          <button type="button" class="btn-top-icon" id="btn-quick-info" title="Informações">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
             </svg>
-          </div>
-          <div class="card-header-info">
-            <h2 class="card-title">MÉTRICA DE ESFORÇO E VOLUME DE LEADS</h2>
-            <p class="card-subtitle">Métricas de primeiro abordagem e novos orçamentos</p>
-          </div>
+          </button>
+
+          <button type="button" class="btn-top-icon" id="btn-top-menu" title="Opções">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="1"></circle>
+              <circle cx="19" cy="12" r="1"></circle>
+              <circle cx="5" cy="12" r="1"></circle>
+            </svg>
+          </button>
         </div>
-
-        <div class="inputs-grid">
-          <!-- Lead recebidos -->
-          <div class="field-item">
-            <label for="input-leads" class="field-label">LEAD RECEBIDOS</label>
-            <div class="input-wrap">
-              <span class="input-sym">#</span>
-              <input type="number" id="input-leads" class="dark-input" min="0" placeholder="0" value="0">
-            </div>
-          </div>
-
-          <!-- Quantidade de follow-up feitos -->
-          <div class="field-item">
-            <label for="input-followups" class="field-label">QUANTIDADE DE FOLLOW-UP FEITOS</label>
-            <div class="input-wrap">
-              <span class="input-sym">#</span>
-              <input type="number" id="input-followups" class="dark-input" min="0" placeholder="0" value="0">
-            </div>
-          </div>
-
-          <!-- Quantas prospecção no dia -->
-          <div class="field-item">
-            <label for="input-prospeccoes" class="field-label">QUANTAS PROSPECÇÃO NO DIA</label>
-            <div class="input-wrap">
-              <span class="input-sym">#</span>
-              <input type="number" id="input-prospeccoes" class="dark-input" min="0" placeholder="0" value="0">
-            </div>
-          </div>
-        </div>
-      </div>
+      </header>
 
       <!-- ============================================================
-           SEÇÃO 2: PERFORMANCE COMERCIAL
+           CARDS DE KPI SUPERIORES (Estilo exato uifry: 1 escuro + 2 brancos)
            ============================================================ -->
-      <div class="form-card">
-        <div class="form-card-header">
-          <div class="card-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="20" x2="18" y2="10"></line>
-              <line x1="12" y1="20" x2="12" y2="4"></line>
-              <line x1="6" y1="20" x2="6" y2="14"></line>
-            </svg>
-          </div>
-          <div class="card-header-info">
-            <h2 class="card-title">PERFORMANCE COMERCIAL</h2>
-            <p class="card-subtitle">Métricas de reuniões agendadas, reuniões realizadas e vendas</p>
-          </div>
-        </div>
-
-        <div class="inputs-grid">
-          <!-- Reunião agendada -->
-          <div class="field-item">
-            <label for="input-meetings-scheduled" class="field-label">REUNIÃO AGENDADA</label>
-            <div class="input-wrap">
-              <span class="input-sym">#</span>
-              <input type="number" id="input-meetings-scheduled" class="dark-input" min="0" placeholder="0" value="0">
-            </div>
-          </div>
-
-          <!-- Reunião realizada -->
-          <div class="field-item">
-            <label for="input-meetings-held" class="field-label">REUNIÃO REALIZADA</label>
-            <div class="input-wrap">
-              <span class="input-sym">#</span>
-              <input type="number" id="input-meetings-held" class="dark-input" min="0" placeholder="0" value="0">
-            </div>
-          </div>
-
-          <!-- Vendas -->
-          <div class="field-item">
-            <label for="input-sales" class="field-label">QUANTAS VENDAS</label>
-            <div class="input-wrap">
-              <span class="input-sym">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 14 14"></polyline>
-                </svg>
-              </span>
-              <input type="number" id="input-sales" class="dark-input" min="0" placeholder="0" value="0">
-            </div>
-          </div>
-        </div>
-
-        <!-- Linha de Valores Financeiros (Idêntico ao Modelo) -->
-        <div class="inputs-grid-2" style="margin-top: 14px;">
-          <!-- Valor de Contrato -->
-          <div class="field-item">
-            <label for="input-contract-val" class="field-label">VALOR DE CONTRATO</label>
-            <div class="input-wrap">
-              <span class="input-sym">$</span>
-              <input type="text" id="input-contract-val" class="dark-input" placeholder="R$ 0,00" value="R$ 0,00">
-            </div>
-          </div>
-
-          <!-- Cash Coletado (Borda Verde Lima) -->
-          <div class="field-item">
-            <label for="input-cash-collected" class="field-label highlight-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;">
+      <section class="kpi-three-grid">
+        <!-- Card 1: Escuro Hero (Total Vendas) -->
+        <div class="kpi-card card-dark-hero">
+          <div class="kpi-card-top">
+            <div class="kpi-badge-icon badge-lime">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                <line x1="2" y1="10" x2="22" y2="10"></line>
+                <path d="M12 12v.01"></path>
+                <path d="M17 12h.01"></path>
+                <path d="M7 12h.01"></path>
               </svg>
-              CASH COLETADO
-            </label>
-            <div class="input-wrap lime-border">
-              <span class="input-sym lime-sym">$</span>
-              <input type="text" id="input-cash-collected" class="dark-input" placeholder="R$ 0,00" value="R$ 0,00">
             </div>
+            <button type="button" class="kpi-dots-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </button>
+          </div>
+          <span class="kpi-card-subtitle">Total Vendas (Hoje)</span>
+          <div class="kpi-card-value-row">
+            <span class="kpi-card-big-value" id="kpi-sales-num">0</span>
+            <span class="kpi-card-badge-pill" id="kpi-sales-sub">0 nova(s)</span>
           </div>
         </div>
-      </div>
+
+        <!-- Card 2: Branco (Valor de Contrato) -->
+        <div class="kpi-card card-white">
+          <div class="kpi-card-top">
+            <div class="kpi-badge-icon badge-gray">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+            </div>
+            <button type="button" class="kpi-dots-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </button>
+          </div>
+          <span class="kpi-card-subtitle">Valor de Contrato</span>
+          <div class="kpi-card-value-row">
+            <span class="kpi-card-big-value dark-text" id="kpi-contract-num">R$ 0,00</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Branco (Cash Coletado) -->
+        <div class="kpi-card card-white">
+          <div class="kpi-card-top">
+            <div class="kpi-badge-icon badge-black">
+              <span class="badge-dollar-sym">$</span>
+            </div>
+            <button type="button" class="kpi-dots-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </button>
+          </div>
+          <span class="kpi-card-subtitle">Cash Coletado</span>
+          <div class="kpi-card-value-row">
+            <span class="kpi-card-big-value dark-text highlight-green" id="kpi-cash-num">R$ 0,00</span>
+          </div>
+        </div>
+      </section>
 
       <!-- ============================================================
-           BOTÃO PRINCIPAL & AÇÕES (Idêntico ao Modelo da Imagem)
+           GRID CENTRAL (Layout uifry: Esquerda ~65%, Direita ~35%)
            ============================================================ -->
-      <div class="action-footer-area">
-        <button type="button" class="btn-main-lime" id="btn-generate-pdf">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10 9 9 9 8 9"></polyline>
-          </svg>
-          <span id="btn-pdf-label">GERAR RELATÓRIO DE MULLER (PDF)</span>
-        </button>
+      <section class="dashboard-middle-grid">
 
-        <div class="secondary-actions">
-          <button type="button" class="btn-sec" id="btn-save-log">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-              <polyline points="17 21 17 13 7 13 7 21"></polyline>
-              <polyline points="7 3 7 8 15 8"></polyline>
-            </svg>
-            <span>Salvar Registro</span>
-          </button>
+        <!-- COLUNA ESQUERDA: Formulário de Métricas + Overview Chart -->
+        <div class="grid-col-left">
 
-          <button type="button" class="btn-sec" id="btn-copy-whatsapp">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-            </svg>
-            <span>Copiar WhatsApp</span>
-          </button>
+          <!-- Card de Preenchimento das Métricas (Estilo uifry Clean) -->
+          <div class="white-box-card" id="section-metrics">
+            <div class="box-card-header">
+              <div class="header-left-title">
+                <h2 class="box-card-title">Métricas de Performance</h2>
+                <p class="box-card-desc">Lançamento diário de esforço e conversão comercial</p>
+              </div>
 
-          <button type="button" class="btn-sec" id="btn-reset-form">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="1 4 1 10 7 10"></polyline>
-              <polyline points="23 20 23 14 17 14"></polyline>
-              <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
-            </svg>
-            <span>Limpar Valores</span>
-          </button>
+              <!-- Seletor Rápido de Closer no Card -->
+              <div class="closer-selector-segmented">
+                <button type="button" class="segmented-btn" data-closer="Tales">Tales</button>
+                <button type="button" class="segmented-btn" data-closer="José">José</button>
+                <button type="button" class="segmented-btn active" data-closer="Muller">Muller</button>
+                <button type="button" class="segmented-btn" data-closer="Elinaldo">Elinaldo</button>
+              </div>
+            </div>
+
+            <!-- SEÇÃO 1: MÉTRICA DE ESFORÇO E VOLUME DE LEADS -->
+            <div class="form-subsection">
+              <div class="subsection-header">
+                <span class="subsection-badge">01</span>
+                <span class="subsection-title">MÉTRICA DE ESFORÇO E VOLUME DE LEADS</span>
+              </div>
+
+              <div class="fields-row-3">
+                <div class="field-control">
+                  <label for="input-leads" class="field-label">LEAD RECEBIDOS</label>
+                  <div class="uifry-input-box">
+                    <span class="field-prefix">#</span>
+                    <input type="number" id="input-leads" class="uifry-input" min="0" placeholder="0" value="0">
+                  </div>
+                </div>
+
+                <div class="field-control">
+                  <label for="input-followups" class="field-label">QUANTIDADE DE FOLLOW-UP FEITOS</label>
+                  <div class="uifry-input-box">
+                    <span class="field-prefix">#</span>
+                    <input type="number" id="input-followups" class="uifry-input" min="0" placeholder="0" value="0">
+                  </div>
+                </div>
+
+                <div class="field-control">
+                  <label for="input-prospeccoes" class="field-label">QUANTAS PROSPECÇÃO NO DIA</label>
+                  <div class="uifry-input-box">
+                    <span class="field-prefix">#</span>
+                    <input type="number" id="input-prospeccoes" class="uifry-input" min="0" placeholder="0" value="0">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SEÇÃO 2: PERFORMANCE COMERCIAL -->
+            <div class="form-subsection">
+              <div class="subsection-header">
+                <span class="subsection-badge">02</span>
+                <span class="subsection-title">PERFORMANCE COMERCIAL</span>
+              </div>
+
+              <div class="fields-row-3">
+                <div class="field-control">
+                  <label for="input-meetings-scheduled" class="field-label">REUNIÃO AGENDADA</label>
+                  <div class="uifry-input-box">
+                    <span class="field-prefix">#</span>
+                    <input type="number" id="input-meetings-scheduled" class="uifry-input" min="0" placeholder="0" value="0">
+                  </div>
+                </div>
+
+                <div class="field-control">
+                  <label for="input-meetings-held" class="field-label">REUNIÃO REALIZADA</label>
+                  <div class="uifry-input-box">
+                    <span class="field-prefix">#</span>
+                    <input type="number" id="input-meetings-held" class="uifry-input" min="0" placeholder="0" value="0">
+                  </div>
+                </div>
+
+                <div class="field-control">
+                  <label for="input-sales" class="field-label">QUANTAS VENDAS</label>
+                  <div class="uifry-input-box">
+                    <span class="field-prefix">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 14 14"></polyline>
+                      </svg>
+                    </span>
+                    <input type="number" id="input-sales" class="uifry-input" min="0" placeholder="0" value="0">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Valores Financeiros com Máscara de Moeda -->
+              <div class="fields-row-2" style="margin-top: 14px;">
+                <div class="field-control">
+                  <label for="input-contract-val" class="field-label">VALOR DE CONTRATO</label>
+                  <div class="uifry-input-box">
+                    <span class="field-prefix">$</span>
+                    <input type="text" id="input-contract-val" class="uifry-input" placeholder="R$ 0,00" value="R$ 0,00">
+                  </div>
+                </div>
+
+                <div class="field-control">
+                  <label for="input-cash-collected" class="field-label highlight-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;">
+                      <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                      <line x1="2" y1="10" x2="22" y2="10"></line>
+                    </svg>
+                    CASH COLETADO
+                  </label>
+                  <div class="uifry-input-box lime-highlight-box">
+                    <span class="field-prefix lime-color">$</span>
+                    <input type="text" id="input-cash-collected" class="uifry-input font-bold" placeholder="R$ 0,00" value="R$ 0,00">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card de Overview (Gráfico de Barras idêntico ao uifry) -->
+          <div class="white-box-card">
+            <div class="box-card-header">
+              <div class="header-left-title">
+                <h2 class="box-card-title">Overview</h2>
+                <p class="box-card-desc">Atividade e evolução semanal da equipe</p>
+              </div>
+              <span class="kpi-mini-pill">Semanal</span>
+            </div>
+
+            <!-- Gráfico de Colunas Estilo uifry -->
+            <div class="uifry-barchart-container">
+              <!-- Barra 1: Jan -->
+              <div class="barchart-col">
+                <div class="bar-track"><div class="bar-fill" style="height: 35%;"></div></div>
+                <span class="bar-month">Jan</span>
+              </div>
+              <!-- Barra 2: Fev -->
+              <div class="barchart-col">
+                <div class="bar-track"><div class="bar-fill" style="height: 48%;"></div></div>
+                <span class="bar-month">Feb</span>
+              </div>
+              <!-- Barra 3: Mar -->
+              <div class="barchart-col">
+                <div class="bar-track"><div class="bar-fill" style="height: 60%;"></div></div>
+                <span class="bar-month">Mar</span>
+              </div>
+              <!-- Barra 4: Abr -->
+              <div class="barchart-col">
+                <div class="bar-track"><div class="bar-fill" style="height: 40%;"></div></div>
+                <span class="bar-month">Apr</span>
+              </div>
+              <!-- Barra 5: Mai -->
+              <div class="barchart-col">
+                <div class="bar-track"><div class="bar-fill" style="height: 52%;"></div></div>
+                <span class="bar-month">May</span>
+              </div>
+              <!-- Barra 6: Jun (Ativa com Tooltip Flutuante estilo uifry) -->
+              <div class="barchart-col active-col">
+                <div class="tooltip-lime-pill" id="overview-floating-tooltip">
+                  <span id="overview-tooltip-text">from R$ 5.999 $</span>
+                  <span class="tooltip-arrow"></span>
+                </div>
+                <div class="bar-track"><div class="bar-fill active-fill" style="height: 85%;"></div></div>
+                <span class="bar-month active-month">Jun</span>
+              </div>
+              <!-- Barra 7: Jul -->
+              <div class="barchart-col">
+                <div class="bar-track"><div class="bar-fill" style="height: 44%;"></div></div>
+                <span class="bar-month">Jul</span>
+              </div>
+              <!-- Barra 8: Ago -->
+              <div class="barchart-col">
+                <div class="bar-track"><div class="bar-fill" style="height: 30%;"></div></div>
+                <span class="bar-month">Aug</span>
+              </div>
+              <!-- Barra 9: Set -->
+              <div class="barchart-col">
+                <div class="bar-track"><div class="bar-fill" style="height: 65%;"></div></div>
+                <span class="bar-month">Sep</span>
+              </div>
+              <!-- Barra 10: Out -->
+              <div class="barchart-col">
+                <div class="bar-track"><div class="bar-fill" style="height: 75%;"></div></div>
+                <span class="bar-month">Oct</span>
+              </div>
+              <!-- Barra 11: Nov -->
+              <div class="barchart-col">
+                <div class="bar-track"><div class="bar-fill" style="height: 70%;"></div></div>
+                <span class="bar-month">Nov</span>
+              </div>
+              <!-- Barra 12: Dez -->
+              <div class="barchart-col">
+                <div class="bar-track"><div class="bar-fill" style="height: 55%;"></div></div>
+                <span class="bar-month">Dec</span>
+              </div>
+            </div>
+          </div>
+
         </div>
-      </div>
 
-    </main>
-  </div>
+        <!-- COLUNA DIREITA: Activity (Bubble Chart) + Comparison + Ações -->
+        <div class="grid-col-right">
 
-  <!-- Modal Histórico -->
-  <div class="modal-overlay" id="history-modal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div>
-          <h3 class="modal-title">Histórico de Relatórios</h3>
-          <p class="modal-subtitle">Registros salvos por closer e data</p>
+          <!-- Card Activity (Bubble Chart idêntico ao uifry) -->
+          <div class="white-box-card">
+            <h2 class="box-card-title">Activity</h2>
+
+            <div class="uifry-bubbles-stage">
+              <!-- Bolha Verde-Limão Principal -->
+              <div class="bubble-circle bubble-lime">
+                <span class="bubble-val" id="bubble-conversion-rate">50%</span>
+                <span class="bubble-sub">Conversão</span>
+              </div>
+
+              <!-- Bolha Branca Secundária Sobreposta -->
+              <div class="bubble-circle bubble-white">
+                <span class="bubble-val" id="bubble-attendance-rate">75%</span>
+                <span class="bubble-sub">Presença</span>
+              </div>
+
+              <!-- Bolha Escura Terciária Sobreposta -->
+              <div class="bubble-circle bubble-dark">
+                <span class="bubble-val" id="bubble-effort-total">0</span>
+                <span class="bubble-sub">Esforço</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Comparison (Month) -->
+          <div class="white-box-card">
+            <h2 class="box-card-title">Comparison (Month)</h2>
+            <div class="comparison-rows-list">
+              <div class="comp-row">
+                <span class="comp-label">Meta Vendas</span>
+                <div class="comp-bar-track">
+                  <div class="comp-bar-fill bar-lime-fill" id="comp-bar-sales" style="width: 65%;"></div>
+                </div>
+              </div>
+
+              <div class="comp-row">
+                <span class="comp-label">Meta Reuniões</span>
+                <div class="comp-bar-track">
+                  <div class="comp-bar-fill bar-dark-fill" id="comp-bar-meetings" style="width: 80%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card de Ações Executivas -->
+          <div class="white-box-card actions-box-card">
+            <button type="button" class="btn-uifry-lime" id="btn-generate-pdf">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span id="btn-pdf-label">GERAR RELATÓRIO DE MULLER (PDF)</span>
+            </button>
+
+            <div class="actions-secondary-row">
+              <button type="button" class="btn-uifry-sec" id="btn-copy-whatsapp">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+                <span>WhatsApp</span>
+              </button>
+
+              <button type="button" class="btn-uifry-sec" id="btn-save-log">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                </svg>
+                <span>Salvar</span>
+              </button>
+
+              <button type="button" class="btn-uifry-sec" id="btn-reset-form">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <polyline points="23 20 23 14 17 14"></polyline>
+                  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                </svg>
+                <span>Limpar</span>
+              </button>
+            </div>
+          </div>
+
         </div>
-        <button type="button" class="modal-close-btn" id="btn-close-modal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
 
-      <div class="modal-body">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 13px; color: var(--text-secondary);" id="history-total-count">Total: 0</span>
+      </section>
+
+      <!-- ============================================================
+           SEÇÃO INFERIOR: Transaction History (Histórico de Registros)
+           ============================================================ -->
+      <section class="white-box-card" id="section-history" style="margin-top: 18px;">
+        <div class="box-card-header">
+          <div class="header-left-title">
+            <h2 class="box-card-title">Transaction History</h2>
+            <p class="box-card-desc">Histórico completo de relatórios lançados pelos Closers</p>
+          </div>
           <div style="display: flex; gap: 8px;">
-            <button type="button" class="btn-sec" id="btn-export-csv" style="padding: 6px 12px; font-size: 11px;">Exportar CSV</button>
-            <button type="button" class="btn-sec" id="btn-clear-history" style="padding: 6px 12px; font-size: 11px; color:#f87171;">Limpar Tudo</button>
+            <button type="button" class="btn-uifry-sec" id="btn-export-csv" style="padding: 6px 12px; font-size: 11.5px;">Exportar CSV</button>
+            <button type="button" class="btn-uifry-sec" id="btn-clear-history" style="padding: 6px 12px; font-size: 11.5px; color:#e04848;">Limpar Histórico</button>
           </div>
         </div>
 
-        <div class="table-wrapper">
-          <table class="history-table">
+        <div class="table-responsive-box">
+          <table class="uifry-table">
             <thead>
               <tr>
                 <th>Data</th>
@@ -418,14 +595,19 @@
                 <th>Reuniões Ag.</th>
                 <th>Reuniões Real.</th>
                 <th>Vendas</th>
+                <th>Valor Contrato</th>
+                <th>Cash Coletado</th>
                 <th>Ações</th>
               </tr>
             </thead>
-            <tbody id="history-table-body"></tbody>
+            <tbody id="history-table-body">
+              <!-- Inserido dinamicamente via app.js -->
+            </tbody>
           </table>
         </div>
-      </div>
-    </div>
+      </section>
+
+    </main>
   </div>
 
   <div class="toast-container" id="toast-container"></div>
