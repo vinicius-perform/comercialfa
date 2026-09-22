@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Closers • Fazendo Acontecer™</title>
+  <title>Painel Comercial Executivo • Fazendo Acontecer™</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" type="image/png" href="assets/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +17,7 @@
          SIDEBAR (Estilo uifry: Escura fosca #1a1d1f com ícones elegantes)
          ============================================================ -->
     <aside class="sidebar">
-      <!-- Brand Logo -->
+      <!-- Brand Logo Oficial -->
       <div class="sidebar-brand">
         <div class="brand-badge-icon">
           <svg viewBox="0 0 24 24" fill="currentColor">
@@ -25,16 +25,16 @@
           </svg>
         </div>
         <div class="brand-text">
-          <span class="brand-title">uifry<span class="brand-trademark">™</span></span>
-          <span class="brand-tagline">FA CLOSERS HUB</span>
+          <span class="brand-title">FAZENDO ACONTECER<span class="brand-trademark">™</span></span>
+          <span class="brand-tagline">PAINEL COMERCIAL & GESTÃO</span>
         </div>
       </div>
 
-      <!-- Navegação MANAGE -->
+      <!-- SEÇÃO 1: VISÃO EXECUTIVA -->
       <div class="sidebar-group">
-        <span class="sidebar-group-title">MANAGE</span>
+        <span class="sidebar-group-title">VISÃO EXECUTIVA</span>
         <nav class="sidebar-nav">
-          <a href="#" class="nav-link active" id="nav-dashboard">
+          <a href="#dashboard" class="nav-link active" data-view="view-dashboard" id="nav-dashboard">
             <span class="nav-icon-box">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
@@ -43,10 +43,41 @@
                 <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
               </svg>
             </span>
-            <span class="nav-label">Dashboard</span>
+            <span class="nav-label">Dashboard Geral</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- SEÇÃO 2: RELATÓRIOS DA EQUIPE -->
+      <div class="sidebar-group">
+        <span class="sidebar-group-title">RELATÓRIOS DA EQUIPE</span>
+        <nav class="sidebar-nav">
+          <!-- Hub SDRs (NOVO LINK DE DESTAQUE) -->
+          <a href="#sdrs" class="nav-link" data-view="view-sdrs" id="nav-sdrs">
+            <span class="nav-icon-box sdr-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </span>
+            <span class="nav-label">Hub SDRs</span>
+            <span class="nav-badge-pill">Relatórios</span>
           </a>
 
-          <!-- Seletor de Closers integrado na Sidebar -->
+          <!-- Hub Closers -->
+          <a href="#closers" class="nav-link" data-view="view-closers" id="nav-closers">
+            <span class="nav-icon-box closer-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </span>
+            <span class="nav-label">Hub Closers</span>
+          </a>
+
+          <!-- Sub-seletor rápido de Closers -->
           <div class="sidebar-closers-sub">
             <span class="sub-section-title">CLOSERS DA EQUIPE</span>
             <div class="closers-chips-list">
@@ -68,72 +99,41 @@
               </button>
             </div>
           </div>
+        </nav>
+      </div>
 
-          <a href="#section-metrics" class="nav-link">
-            <span class="nav-icon-box">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-              </svg>
-            </span>
-            <span class="nav-label">Lançar Métricas</span>
-          </a>
-
-          <a href="#section-history" class="nav-link">
+      <!-- SEÇÃO 3: HISTÓRICO & DADOS -->
+      <div class="sidebar-group">
+        <span class="sidebar-group-title">DADOS & HISTÓRICO</span>
+        <nav class="sidebar-nav">
+          <a href="#history" class="nav-link" data-view="view-history" id="nav-history">
             <span class="nav-icon-box">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
             </span>
-            <span class="nav-label">Histórico</span>
+            <span class="nav-label">Histórico Consolidado</span>
           </a>
 
-          <a href="#" class="nav-link" id="nav-btn-pdf">
+          <a href="#" class="nav-link" id="nav-btn-quick-config">
             <span class="nav-icon-box">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-                <path d="M6 18H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-2"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
               </svg>
             </span>
-            <span class="nav-label">Gerar PDF</span>
+            <span class="nav-label">Metas & Pipeline</span>
           </a>
-        </nav>
-      </div>
-
-      <!-- Navegação PREFERENCES -->
-      <div class="sidebar-group">
-        <span class="sidebar-group-title">PREFERENCES</span>
-        <nav class="sidebar-nav">
-          <a href="#" class="nav-link" id="btn-toggle-theme">
-            <span class="nav-icon-box">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="5"></circle>
-                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
-              </svg>
-            </span>
-            <span class="nav-label">Tema</span>
-          </a>
-
-          <div class="nav-link security-badge">
-            <span class="nav-icon-box">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              </svg>
-            </span>
-            <span class="nav-label">Ambiente Seguro</span>
-          </div>
         </nav>
       </div>
 
       <!-- Footer do Usuário na Sidebar -->
       <div class="sidebar-user-footer">
-        <div class="user-avatar-circle" id="sidebar-user-avatar">M</div>
+        <div class="user-avatar-circle" id="sidebar-user-avatar">FA</div>
         <div class="user-info">
-          <span class="user-name" id="sidebar-user-name">Muller Closer</span>
-          <span class="user-role">Closer Ativo</span>
+          <span class="user-name" id="sidebar-user-name">Diretoria Comercial</span>
+          <span class="user-role">Fazendo Acontecer™</span>
         </div>
       </div>
     </aside>
@@ -143,471 +143,1191 @@
          ============================================================ -->
     <main class="main-canvas">
 
-      <!-- Cabeçalho Exclusivo para Impressão / PDF A4 -->
-      <div class="print-header">
-        <div class="print-brand">
-          <img src="assets/logo.png" alt="FAZENDO ACONTECER™" class="print-logo-img">
-          <span class="print-brand-sub">HUB COMERCIAL • FAZENDO ACONTECER</span>
-        </div>
-        <div class="print-meta">
-          <span class="print-title">RELATÓRIO DIÁRIO DE PERFORMANCE</span>
-          <div class="print-details">
-            <span id="print-closer-name">Nome: <strong>—</strong></span>
-            <span class="print-separator">•</span>
-            <span id="print-report-date">Data: <strong>22/09/2026</strong></span>
+      <!-- ==========================================================
+           VIEW 1: DASHBOARD EXECUTIVO GERAL (Diretoria & Gestão)
+           ========================================================== -->
+      <section id="view-dashboard" class="app-view active">
+        <!-- Top Bar Executiva -->
+        <header class="top-bar">
+          <div class="top-bar-left">
+            <h1 class="page-title">Dashboard Executivo</h1>
+            <span class="closer-active-pill" id="header-period-pill">
+              <span class="pulse-dot"></span>
+              <span id="exec-month-display">Setembro • 2026</span>
+            </span>
           </div>
+
+          <div class="top-bar-right">
+            <!-- Botões Rápidos de Acesso direto para SDRs e Closers -->
+            <button type="button" class="btn-top-cta btn-cta-sdr" id="btn-quick-goto-sdr">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              </svg>
+              <span>Gerar Relatório SDR</span>
+            </button>
+
+            <button type="button" class="btn-top-cta btn-cta-closer" id="btn-quick-goto-closer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+              <span>Hub Closers</span>
+            </button>
+
+            <button type="button" class="btn-top-icon" id="btn-open-settings" title="Configurar Meta e Pipeline">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- ============================================================
+             4 CARDS EXECUTIVOS SUPERIORES (Faturamento, Contratos, Mesa, Projeção)
+             ============================================================ -->
+        <section class="kpi-four-grid">
+          <!-- Card 1: Faturamento Realizado (Hero Escuro) -->
+          <div class="kpi-card card-dark-hero">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-lime">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <span class="kpi-tag-status lime-tag" id="exec-revenue-pct">0% da meta</span>
+            </div>
+            <span class="kpi-card-subtitle">FATURAMENTO REALIZADO</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value highlight-lime" id="exec-revenue-total">R$ 0,00</span>
+            </div>
+            <div class="kpi-card-footer-info">
+              <span>Cash coletado no mês</span>
+              <strong id="exec-revenue-sales-count">0 vendas</strong>
+            </div>
+          </div>
+
+          <!-- Card 2: Contratos Enviados (Branco) -->
+          <div class="kpi-card card-white">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-gray">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+              </div>
+              <span class="kpi-tag-status gray-tag" id="exec-contracts-count">0 emitidos</span>
+            </div>
+            <span class="kpi-card-subtitle">CONTRATOS ENVIADOS</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value dark-text" id="exec-contracts-total">R$ 0,00</span>
+            </div>
+            <div class="kpi-card-footer-info">
+              <span>Volume emitido</span>
+              <span id="exec-contracts-avg">Ticket médio: R$ 0,00</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Dinheiro na Mesa (Pipeline Quente) -->
+          <div class="kpi-card card-white">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+              <span class="kpi-tag-status orange-tag" id="exec-table-tag">Em negociação</span>
+            </div>
+            <span class="kpi-card-subtitle">DINHEIRO NA MESA</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value dark-text highlight-orange" id="exec-money-on-table">R$ 45.000,00</span>
+            </div>
+            <div class="kpi-card-footer-info">
+              <span>Pipeline ativo</span>
+              <button type="button" class="btn-inline-link" id="btn-edit-table-money">Ajustar</button>
+            </div>
+          </div>
+
+          <!-- Card 4: Projeção de Faturamento até o Fim do Mês (Forecast) -->
+          <div class="kpi-card card-dark-secondary">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-lime-outline">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+              </div>
+              <span class="kpi-tag-status lime-outline-tag" id="exec-projection-badge">Forecast Run-Rate</span>
+            </div>
+            <span class="kpi-card-subtitle">PROJEÇÃO FINAL DO MÊS</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value highlight-lime" id="exec-projection-total">R$ 0,00</span>
+            </div>
+            <div class="kpi-card-footer-info">
+              <span id="exec-projection-meta-pct">0% da meta</span>
+              <span id="exec-projection-pace">Estimativa final</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             SEÇÃO: ANDAMENTO DO MÊS & RITMO DE VENDAS (PACING)
+             ============================================================ -->
+        <section class="white-box-card pacing-section">
+          <div class="box-card-header">
+            <div class="header-left-title">
+              <h2 class="box-card-title">Andamento do Mês & Pacing Comercial</h2>
+              <p class="box-card-desc">Comparativo entre o tempo decorrido do mês e a velocidade de alcance da meta financeira</p>
+            </div>
+            <div class="pacing-header-actions">
+              <span class="pacing-status-pill" id="exec-pacing-pill">
+                <span class="pulse-dot"></span>
+                <span id="exec-pacing-status-text">Calculando ritmo...</span>
+              </span>
+              <button type="button" class="btn-uifry-sec" id="btn-open-goal-modal" style="padding: 6px 12px; font-size: 11.5px;">
+                Meta: <strong id="exec-goal-label">R$ 100.000,00</strong> ✎
+              </button>
+            </div>
+          </div>
+
+          <!-- Barra Visual de Pacing -->
+          <div class="pacing-visual-container">
+            <div class="pacing-labels-row">
+              <div class="pacing-legend-item">
+                <span class="legend-color-dot dot-gray"></span>
+                <span>Tempo Decorrido: <strong id="exec-time-elapsed-label">0% (Dia 0 de 30)</strong></span>
+              </div>
+              <div class="pacing-legend-item">
+                <span class="legend-color-dot dot-lime"></span>
+                <span>Meta Atingida: <strong id="exec-meta-elapsed-label">0% (R$ 0,00)</strong></span>
+              </div>
+            </div>
+
+            <!-- Trilhas de Progresso Sobrepostas -->
+            <div class="pacing-dual-track">
+              <!-- Trilha de Tempo Decorrido (Fundo) -->
+              <div class="pacing-track-time">
+                <div class="pacing-fill-time" id="pacing-bar-time" style="width: 50%;"></div>
+                <div class="pacing-pin-time" id="pacing-pin-time" style="left: 50%;">
+                  <span class="pin-bubble">Hoje (Dia <span id="pin-day-num">15</span>)</span>
+                </div>
+              </div>
+
+              <!-- Trilha de Meta Faturada (Frente) -->
+              <div class="pacing-track-money">
+                <div class="pacing-fill-money" id="pacing-bar-money" style="width: 40%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Detalhadas de Velocidade (Run-Rate) -->
+          <div class="pacing-stats-grid">
+            <div class="pacing-stat-box">
+              <span class="pacing-stat-label">DIAS TRANSCORRIDOS</span>
+              <span class="pacing-stat-val" id="stat-days-passed">0 dias</span>
+              <span class="pacing-stat-sub" id="stat-days-remaining">0 dias restantes</span>
+            </div>
+
+            <div class="pacing-stat-box">
+              <span class="pacing-stat-label">RITMO DIÁRIO ATUAL</span>
+              <span class="pacing-stat-val" id="stat-current-daily-pace">R$ 0,00 / dia</span>
+              <span class="pacing-stat-sub">Média real do mês</span>
+            </div>
+
+            <div class="pacing-stat-box">
+              <span class="pacing-stat-label">RITMO NECESSÁRIO</span>
+              <span class="pacing-stat-val highlight-lime" id="stat-required-daily-pace">R$ 0,00 / dia</span>
+              <span class="pacing-stat-sub">Para bater a meta de 100%</span>
+            </div>
+
+            <div class="pacing-stat-box">
+              <span class="pacing-stat-label">GAP PARA A META</span>
+              <span class="pacing-stat-val" id="stat-goal-gap">R$ 100.000,00</span>
+              <span class="pacing-stat-sub" id="stat-gap-status">Faltam fechar</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             BANNERS DE ACESSO RÁPIDO PARA SDRs E CLOSERS GERAREM RELATÓRIOS
+             ============================================================ -->
+        <section class="quick-module-banners">
+          <!-- Banner SDRs -->
+          <div class="banner-module-card banner-sdr" id="banner-go-sdr">
+            <div class="banner-module-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <div class="banner-module-body">
+              <div class="banner-tag">MÓDULO DE PROSPECÇÃO</div>
+              <h3 class="banner-title">Relatório Diário dos SDRs</h3>
+              <p class="banner-desc">Lançamento diário de leads abordados, contatos feitos, reuniões agendadas e exportação do PDF oficial de prospecção.</p>
+              <button type="button" class="btn-banner-action">
+                <span>Acessar Painel do SDR</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Banner Closers -->
+          <div class="banner-module-card banner-closer" id="banner-go-closer">
+            <div class="banner-module-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </div>
+            <div class="banner-module-body">
+              <div class="banner-tag">MÓDULO DE FECHAMENTO</div>
+              <h3 class="banner-title">Relatório dos Closers</h3>
+              <p class="banner-desc">Lançamento diário de reuniões realizadas, contratos emitidos e cash coletado (Tales, José, Muller e Elinaldo) com PDF.</p>
+              <button type="button" class="btn-banner-action">
+                <span>Acessar Hub dos Closers</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             FUNIL COMERCIAL CONSOLIDADO (Data Viz)
+             ============================================================ -->
+        <section class="white-box-card">
+          <div class="box-card-header">
+            <div class="header-left-title">
+              <h2 class="box-card-title">Funil Comercial Consolidado</h2>
+              <p class="box-card-desc">Fluxo de conversão ponta a ponta: da prospecção de SDR ao fechamento pelos Closers</p>
+            </div>
+            <span class="kpi-mini-pill">Mês Corrente</span>
+          </div>
+
+          <div class="commercial-funnel-pipeline">
+            <!-- Etapa 1: Leads Abordados -->
+            <div class="funnel-step">
+              <span class="funnel-step-order">01. SDR</span>
+              <span class="funnel-step-name">Leads Abordados</span>
+              <span class="funnel-step-val" id="funnel-leads-val">0</span>
+              <span class="funnel-step-sub">Volume inicial</span>
+            </div>
+
+            <div class="funnel-connector">
+              <span class="funnel-conv-tag" id="funnel-conv-contact">0%</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <!-- Etapa 2: Contatos Efetivos -->
+            <div class="funnel-step">
+              <span class="funnel-step-order">02. SDR</span>
+              <span class="funnel-step-name">Contatos Efetivos</span>
+              <span class="funnel-step-val" id="funnel-contacts-val">0</span>
+              <span class="funnel-step-sub">Conexões feitas</span>
+            </div>
+
+            <div class="funnel-connector">
+              <span class="funnel-conv-tag" id="funnel-conv-schedule">0%</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <!-- Etapa 3: Reuniões Agendadas -->
+            <div class="funnel-step">
+              <span class="funnel-step-order">03. HANDOVER</span>
+              <span class="funnel-step-name">Reuniões Agendadas</span>
+              <span class="funnel-step-val" id="funnel-scheduled-val">0</span>
+              <span class="funnel-step-sub">Passadas aos Closers</span>
+            </div>
+
+            <div class="funnel-connector">
+              <span class="funnel-conv-tag" id="funnel-conv-held">0%</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <!-- Etapa 4: Reuniões Realizadas -->
+            <div class="funnel-step">
+              <span class="funnel-step-order">04. CLOSER</span>
+              <span class="funnel-step-name">Reuniões Realizadas</span>
+              <span class="funnel-step-val" id="funnel-held-val">0</span>
+              <span class="funnel-step-sub">Pitches conduzidos</span>
+            </div>
+
+            <div class="funnel-connector">
+              <span class="funnel-conv-tag" id="funnel-conv-sales">0%</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <!-- Etapa 5: Vendas Fechadas -->
+            <div class="funnel-step step-winner">
+              <span class="funnel-step-order">05. FECHAMENTO</span>
+              <span class="funnel-step-name">Vendas Ganhas</span>
+              <span class="funnel-step-val highlight-lime" id="funnel-sales-val">0</span>
+              <span class="funnel-step-sub" id="funnel-total-cash-sub">R$ 0,00</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             RANKING & PERFORMANCE DA EQUIPE (Closers & SDRs)
+             ============================================================ -->
+        <section class="white-box-card">
+          <div class="box-card-header">
+            <div class="header-left-title">
+              <h2 class="box-card-title">Ranking da Equipe Comercial</h2>
+              <p class="box-card-desc">Desempenho individual acumulado no mês</p>
+            </div>
+            <button type="button" class="btn-uifry-sec" id="btn-export-exec-csv" style="padding: 6px 12px; font-size: 11.5px;">Exportar CSV</button>
+          </div>
+
+          <div class="table-responsive-box">
+            <table class="uifry-table">
+              <thead>
+                <tr>
+                  <th>Membro</th>
+                  <th>Função</th>
+                  <th style="text-align: center;">Esforço / Contatos</th>
+                  <th style="text-align: center;">Reuniões (Ag / Real)</th>
+                  <th style="text-align: center;">Tx. Conversão</th>
+                  <th style="text-align: center;">Vendas</th>
+                  <th style="text-align: right;">Contratos</th>
+                  <th style="text-align: right;">Cash Coletado</th>
+                </tr>
+              </thead>
+              <tbody id="exec-ranking-table-body">
+                <!-- Preenchido via app.js -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <!-- ==========================================================
+           VIEW 2: HUB DOS SDRs (Prospecção & Qualificação)
+           ========================================================== -->
+      <section id="view-sdrs" class="app-view">
+        <!-- Top Bar SDR -->
+        <header class="top-bar">
+          <div class="top-bar-left">
+            <h1 class="page-title">Hub dos SDRs</h1>
+            <span class="closer-active-pill" id="header-sdr-pill">
+              <span class="pulse-dot"></span>
+              <span id="header-sdr-name">SDR 1</span>
+            </span>
+          </div>
+
+          <div class="top-bar-right">
+            <div class="date-pill-widget">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <input type="date" id="sdr-report-date" class="date-pill-input">
+            </div>
+
+            <button type="button" class="btn-top-cta btn-cta-closer" id="btn-sdr-to-dashboard">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span>Voltar ao Dashboard</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- 3 KPIs do SDR no topo -->
+        <section class="kpi-three-grid">
+          <!-- Card 1: Reuniões Agendadas -->
+          <div class="kpi-card card-dark-hero">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-lime">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                </svg>
+              </div>
+              <span class="kpi-tag-status lime-tag" id="sdr-scheduled-badge">Hoje</span>
+            </div>
+            <span class="kpi-card-subtitle">REUNIÕES AGENDADAS</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value highlight-lime" id="sdr-kpi-scheduled">0</span>
+              <span class="kpi-card-badge-pill" id="sdr-kpi-qualified-sub">0 qualificadas</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Contatos Efetivos (Conexões) -->
+          <div class="kpi-card card-white">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-gray">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+              </div>
+              <span class="kpi-tag-status gray-tag" id="sdr-kpi-contact-rate">0% conexão</span>
+            </div>
+            <span class="kpi-card-subtitle">CONTATOS EFETIVOS</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value dark-text" id="sdr-kpi-contacts">0</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Pipeline / Dinheiro Gerado -->
+          <div class="kpi-card card-white">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-black">
+                <span class="badge-dollar-sym">$</span>
+              </div>
+              <span class="kpi-tag-status lime-tag">Pipeline SDR</span>
+            </div>
+            <span class="kpi-card-subtitle">PIPELINE GERADO</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value dark-text highlight-green" id="sdr-kpi-pipeline">R$ 0,00</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Grid Central do SDR: Formulário (65%) e Activity / Ações (35%) -->
+        <section class="dashboard-middle-grid">
+          <!-- Coluna Esquerda: Formulário de Lançamento do SDR -->
+          <div class="grid-col-left">
+            <div class="white-box-card">
+              <div class="box-card-header">
+                <div class="header-left-title">
+                  <h2 class="box-card-title">Lançamento de Prospecção do SDR</h2>
+                  <p class="box-card-desc">Registre as métricas diárias de esforço, conexões e reuniões agendadas</p>
+                </div>
+
+                <!-- Seletor do SDR -->
+                <div class="closer-selector-segmented" id="sdr-segmented-selector">
+                  <button type="button" class="segmented-btn active" data-sdr="SDR 1">SDR 1</button>
+                  <button type="button" class="segmented-btn" data-sdr="SDR 2">SDR 2</button>
+                  <button type="button" class="segmented-btn" data-sdr="SDR 3">SDR 3</button>
+                  <button type="button" class="segmented-btn" data-sdr="SDR 4">SDR 4</button>
+                </div>
+              </div>
+
+              <!-- Seção 01: Esforço & Prospecção -->
+              <div class="form-subsection">
+                <div class="subsection-header">
+                  <span class="subsection-badge">01</span>
+                  <span class="subsection-title">MÉTRICAS DE ESFORÇO & PROSPECÇÃO</span>
+                </div>
+
+                <div class="fields-row-3">
+                  <div class="field-control">
+                    <label for="input-sdr-leads" class="field-label">LEADS ABORDADOS</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">#</span>
+                      <input type="number" id="input-sdr-leads" class="uifry-input" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+
+                  <div class="field-control">
+                    <label for="input-sdr-calls" class="field-label">LIGAÇÕES FEITAS</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">#</span>
+                      <input type="number" id="input-sdr-calls" class="uifry-input" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+
+                  <div class="field-control">
+                    <label for="input-sdr-whatsapp" class="field-label">WHATSAPP / MENSAGENS</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">#</span>
+                      <input type="number" id="input-sdr-whatsapp" class="uifry-input" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fields-row-2" style="margin-top: 14px;">
+                  <div class="field-control">
+                    <label for="input-sdr-contacts" class="field-label highlight-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                      </svg>
+                      CONTATOS EFETIVOS (CONEXÕES)
+                    </label>
+                    <div class="uifry-input-box lime-highlight-box">
+                      <span class="field-prefix lime-color">✓</span>
+                      <input type="number" id="input-sdr-contacts" class="uifry-input font-bold" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+
+                  <div class="field-control">
+                    <label for="input-sdr-name-custom" class="field-label">NOME DO SDR (OPCIONAL)</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">👤</span>
+                      <input type="text" id="input-sdr-name-custom" class="uifry-input" placeholder="Ex: Lucas SDR">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Seção 02: Qualificação & Agendamento -->
+              <div class="form-subsection">
+                <div class="subsection-header">
+                  <span class="subsection-badge">02</span>
+                  <span class="subsection-title">QUALIFICAÇÃO & REUNIÕES AGENDADAS</span>
+                </div>
+
+                <div class="fields-row-3">
+                  <div class="field-control">
+                    <label for="input-sdr-scheduled" class="field-label highlight-label">REUNIÕES AGENDADAS</label>
+                    <div class="uifry-input-box lime-highlight-box">
+                      <span class="field-prefix lime-color">📅</span>
+                      <input type="number" id="input-sdr-scheduled" class="uifry-input font-bold" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+
+                  <div class="field-control">
+                    <label for="input-sdr-qualified" class="field-label">REUNIÕES QUALIFICADAS (ICP)</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">⭐</span>
+                      <input type="number" id="input-sdr-qualified" class="uifry-input" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+
+                  <div class="field-control">
+                    <label for="input-sdr-noshow" class="field-label">NO-SHOW (FALTAS)</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">✖</span>
+                      <input type="number" id="input-sdr-noshow" class="uifry-input" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Pipeline Estimado -->
+                <div class="fields-row-1" style="margin-top: 14px;">
+                  <div class="field-control">
+                    <label for="input-sdr-pipeline" class="field-label">PIPELINE GERADO ESTIMADO (R$ ENCAMINHADO AOS CLOSERS)</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">$</span>
+                      <input type="text" id="input-sdr-pipeline" class="uifry-input font-bold" placeholder="R$ 0,00" value="R$ 0,00">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna Direita: Activity do SDR + Ações Executivas -->
+          <div class="grid-col-right">
+            <!-- Círculos de Activity do SDR -->
+            <div class="white-box-card">
+              <h2 class="box-card-title">Eficiência do SDR</h2>
+
+              <div class="uifry-bubbles-stage">
+                <!-- Bolha Verde-Limão: Taxa de Agendamento -->
+                <div class="bubble-circle bubble-lime">
+                  <span class="bubble-val" id="sdr-bubble-schedule-rate">0%</span>
+                  <span class="bubble-sub">Tx. Agendamento</span>
+                </div>
+
+                <!-- Bolha Branca: Taxa de Conexão -->
+                <div class="bubble-circle bubble-white">
+                  <span class="bubble-val" id="sdr-bubble-contact-rate">0%</span>
+                  <span class="bubble-sub">Tx. Conexão</span>
+                </div>
+
+                <!-- Bolha Escura: Total Esforço -->
+                <div class="bubble-circle bubble-dark">
+                  <span class="bubble-val" id="sdr-bubble-effort">0</span>
+                  <span class="bubble-sub">Atividades</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card de Ações Executivas do SDR -->
+            <div class="white-box-card actions-box-card">
+              <!-- BOTÃO DE DESTAQUE: GERAR RELATÓRIO DO SDR EM PDF -->
+              <button type="button" class="btn-uifry-lime" id="btn-generate-sdr-pdf">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                <span id="btn-sdr-pdf-label">GERAR RELATÓRIO DO SDR (PDF)</span>
+              </button>
+
+              <div class="actions-secondary-row">
+                <button type="button" class="btn-uifry-sec" id="btn-save-sdr-report">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  </svg>
+                  <span>Salvar</span>
+                </button>
+
+                <button type="button" class="btn-uifry-sec" id="btn-reset-sdr-form">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="1 4 1 10 7 10"></polyline>
+                    <polyline points="23 20 23 14 17 14"></polyline>
+                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                  </svg>
+                  <span>Limpar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Histórico dos Relatórios dos SDRs -->
+        <section class="white-box-card" style="margin-top: 18px;">
+          <div class="box-card-header">
+            <div class="header-left-title">
+              <h2 class="box-card-title">Histórico de Relatórios dos SDRs</h2>
+              <p class="box-card-desc">Registros salvos de prospecção e agendamento</p>
+            </div>
+            <button type="button" class="btn-uifry-sec" id="btn-export-sdr-csv" style="padding: 6px 12px; font-size: 11.5px;">Exportar CSV SDR</button>
+          </div>
+
+          <div class="table-responsive-box">
+            <table class="uifry-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>SDR</th>
+                  <th>Leads</th>
+                  <th>Ligações</th>
+                  <th>WhatsApp</th>
+                  <th>Contatos Efetivos</th>
+                  <th>Tx. Conexão</th>
+                  <th>Reuniões Agendadas</th>
+                  <th>Reuniões Qualificadas</th>
+                  <th>Pipeline Gerado</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="sdr-history-table-body">
+                <!-- Preenchido via app.js -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <!-- ==========================================================
+           VIEW 3: HUB DOS CLOSERS (Tales, José, Muller, Elinaldo)
+           ========================================================== -->
+      <section id="view-closers" class="app-view">
+        <!-- Cabeçalho Exclusivo para Impressão / PDF A4 do Closer -->
+        <div class="print-header">
+          <div class="print-brand">
+            <img src="assets/logo.png" alt="FAZENDO ACONTECER™" class="print-logo-img">
+            <span class="print-brand-sub">HUB COMERCIAL • FAZENDO ACONTECER</span>
+          </div>
+          <div class="print-meta">
+            <span class="print-title">RELATÓRIO DIÁRIO DE PERFORMANCE</span>
+            <div class="print-details">
+              <span id="print-closer-name">Nome: <strong>—</strong></span>
+              <span class="print-separator">•</span>
+              <span id="print-report-date">Data: <strong>22/09/2026</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Bar Interativa do Closer -->
+        <header class="top-bar">
+          <div class="top-bar-left">
+            <h1 class="page-title">Hub dos Closers</h1>
+            <span class="closer-active-pill" id="header-closer-pill">
+              <span class="pulse-dot"></span>
+              <span id="header-closer-name">Muller</span>
+            </span>
+          </div>
+
+          <div class="top-bar-right">
+            <div class="date-pill-widget">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <input type="date" id="report-date" class="date-pill-input">
+            </div>
+
+            <button type="button" class="btn-top-cta btn-cta-sdr" id="btn-closer-to-dashboard">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span>Voltar ao Dashboard</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- CARDS DE KPI SUPERIORES (Estilo uifry: 1 escuro + 2 brancos) -->
+        <section class="kpi-three-grid">
+          <!-- Card 1: Escuro Hero (Total Vendas) -->
+          <div class="kpi-card card-dark-hero">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-lime">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                  <path d="M12 12v.01"></path>
+                  <path d="M17 12h.01"></path>
+                  <path d="M7 12h.01"></path>
+                </svg>
+              </div>
+              <button type="button" class="kpi-dots-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+              </button>
+            </div>
+            <span class="kpi-card-subtitle">Total Vendas (Hoje)</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value" id="kpi-sales-num">0</span>
+              <span class="kpi-card-badge-pill" id="kpi-sales-sub">0 nova(s)</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Branco (Valor de Contrato) -->
+          <div class="kpi-card card-white">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-gray">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+              </div>
+              <button type="button" class="kpi-dots-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+              </button>
+            </div>
+            <span class="kpi-card-subtitle">Valor de Contrato</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value dark-text" id="kpi-contract-num">R$ 0,00</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Branco (Cash Coletado) -->
+          <div class="kpi-card card-white">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-black">
+                <span class="badge-dollar-sym">$</span>
+              </div>
+              <button type="button" class="kpi-dots-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+              </button>
+            </div>
+            <span class="kpi-card-subtitle">Cash Coletado</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value dark-text highlight-green" id="kpi-cash-num">R$ 0,00</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- GRID CENTRAL DO CLOSER -->
+        <section class="dashboard-middle-grid">
+          <!-- COLUNA ESQUERDA: Formulário de Métricas + Overview Chart -->
+          <div class="grid-col-left">
+            <div class="white-box-card" id="section-metrics">
+              <div class="box-card-header">
+                <div class="header-left-title">
+                  <h2 class="box-card-title">Métricas de Performance</h2>
+                  <p class="box-card-desc">Lançamento diário de esforço e conversão comercial</p>
+                </div>
+
+                <!-- Seletor Rápido de Closer no Card -->
+                <div class="closer-selector-segmented">
+                  <button type="button" class="segmented-btn" data-closer="Tales">Tales</button>
+                  <button type="button" class="segmented-btn" data-closer="José">José</button>
+                  <button type="button" class="segmented-btn active" data-closer="Muller">Muller</button>
+                  <button type="button" class="segmented-btn" data-closer="Elinaldo">Elinaldo</button>
+                </div>
+              </div>
+
+              <!-- SEÇÃO 1: MÉTRICA DE ESFORÇO E VOLUME DE LEADS -->
+              <div class="form-subsection">
+                <div class="subsection-header">
+                  <span class="subsection-badge">01</span>
+                  <span class="subsection-title">MÉTRICA DE ESFORÇO E VOLUME DE LEADS</span>
+                </div>
+
+                <div class="fields-row-3">
+                  <div class="field-control">
+                    <label for="input-leads" class="field-label">LEAD RECEBIDOS</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">#</span>
+                      <input type="number" id="input-leads" class="uifry-input" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+
+                  <div class="field-control">
+                    <label for="input-followups" class="field-label">QUANTIDADE DE FOLLOW-UP FEITOS</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">#</span>
+                      <input type="number" id="input-followups" class="uifry-input" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+
+                  <div class="field-control">
+                    <label for="input-prospeccoes" class="field-label">QUANTAS PROSPECÇÃO NO DIA</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">#</span>
+                      <input type="number" id="input-prospeccoes" class="uifry-input" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SEÇÃO 2: PERFORMANCE COMERCIAL -->
+              <div class="form-subsection">
+                <div class="subsection-header">
+                  <span class="subsection-badge">02</span>
+                  <span class="subsection-title">PERFORMANCE COMERCIAL</span>
+                </div>
+
+                <div class="fields-row-3">
+                  <div class="field-control">
+                    <label for="input-meetings-scheduled" class="field-label">REUNIÃO AGENDADA</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">#</span>
+                      <input type="number" id="input-meetings-scheduled" class="uifry-input" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+
+                  <div class="field-control">
+                    <label for="input-meetings-held" class="field-label">REUNIÃO REALIZADA</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">#</span>
+                      <input type="number" id="input-meetings-held" class="uifry-input" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+
+                  <div class="field-control">
+                    <label for="input-sales" class="field-label">QUANTAS VENDAS</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 14 14"></polyline>
+                        </svg>
+                      </span>
+                      <input type="number" id="input-sales" class="uifry-input" min="0" placeholder="0" value="0">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Valores Financeiros com Máscara de Moeda -->
+                <div class="fields-row-2" style="margin-top: 14px;">
+                  <div class="field-control">
+                    <label for="input-contract-val" class="field-label">VALOR DE CONTRATO</label>
+                    <div class="uifry-input-box">
+                      <span class="field-prefix">$</span>
+                      <input type="text" id="input-contract-val" class="uifry-input" placeholder="R$ 0,00" value="R$ 0,00">
+                    </div>
+                  </div>
+
+                  <div class="field-control">
+                    <label for="input-cash-collected" class="field-label highlight-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;">
+                        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                        <line x1="2" y1="10" x2="22" y2="10"></line>
+                      </svg>
+                      CASH COLETADO
+                    </label>
+                    <div class="uifry-input-box lime-highlight-box">
+                      <span class="field-prefix lime-color">$</span>
+                      <input type="text" id="input-cash-collected" class="uifry-input font-bold" placeholder="R$ 0,00" value="R$ 0,00">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Overview (Gráfico de Barras Estilo uifry) -->
+            <div class="white-box-card">
+              <div class="box-card-header">
+                <div class="header-left-title">
+                  <h2 class="box-card-title">Overview</h2>
+                  <p class="box-card-desc">Atividade e evolução da operação comercial</p>
+                </div>
+                <span class="kpi-mini-pill">Semanal</span>
+              </div>
+
+              <div class="uifry-barchart-container">
+                <div class="barchart-col"><div class="bar-track"><div class="bar-fill" style="height: 35%;"></div></div><span class="bar-month">Jan</span></div>
+                <div class="barchart-col"><div class="bar-track"><div class="bar-fill" style="height: 48%;"></div></div><span class="bar-month">Feb</span></div>
+                <div class="barchart-col"><div class="bar-track"><div class="bar-fill" style="height: 60%;"></div></div><span class="bar-month">Mar</span></div>
+                <div class="barchart-col"><div class="bar-track"><div class="bar-fill" style="height: 40%;"></div></div><span class="bar-month">Apr</span></div>
+                <div class="barchart-col"><div class="bar-track"><div class="bar-fill" style="height: 52%;"></div></div><span class="bar-month">May</span></div>
+                <div class="barchart-col active-col">
+                  <div class="tooltip-lime-pill" id="overview-floating-tooltip">
+                    <span id="overview-tooltip-text">from R$ 5.999 $</span>
+                    <span class="tooltip-arrow"></span>
+                  </div>
+                  <div class="bar-track"><div class="bar-fill active-fill" style="height: 85%;"></div></div>
+                  <span class="bar-month active-month">Jun</span>
+                </div>
+                <div class="barchart-col"><div class="bar-track"><div class="bar-fill" style="height: 44%;"></div></div><span class="bar-month">Jul</span></div>
+                <div class="barchart-col"><div class="bar-track"><div class="bar-fill" style="height: 30%;"></div></div><span class="bar-month">Aug</span></div>
+                <div class="barchart-col"><div class="bar-track"><div class="bar-fill" style="height: 65%;"></div></div><span class="bar-month">Sep</span></div>
+                <div class="barchart-col"><div class="bar-track"><div class="bar-fill" style="height: 75%;"></div></div><span class="bar-month">Oct</span></div>
+                <div class="barchart-col"><div class="bar-track"><div class="bar-fill" style="height: 70%;"></div></div><span class="bar-month">Nov</span></div>
+                <div class="barchart-col"><div class="bar-track"><div class="bar-fill" style="height: 55%;"></div></div><span class="bar-month">Dec</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- COLUNA DIREITA: Activity (Bubble Chart) + Comparison + Ações -->
+          <div class="grid-col-right">
+            <!-- Card Activity -->
+            <div class="white-box-card">
+              <h2 class="box-card-title">Activity</h2>
+
+              <div class="uifry-bubbles-stage">
+                <div class="bubble-circle bubble-lime">
+                  <span class="bubble-val" id="bubble-conversion-rate">0%</span>
+                  <span class="bubble-sub">Conversão</span>
+                </div>
+
+                <div class="bubble-circle bubble-white">
+                  <span class="bubble-val" id="bubble-attendance-rate">0%</span>
+                  <span class="bubble-sub">Presença</span>
+                </div>
+
+                <div class="bubble-circle bubble-dark">
+                  <span class="bubble-val" id="bubble-effort-total">0</span>
+                  <span class="bubble-sub">Esforço</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Comparison (Month) -->
+            <div class="white-box-card">
+              <h2 class="box-card-title">Comparison (Month)</h2>
+              <div class="comparison-rows-list">
+                <div class="comp-row">
+                  <span class="comp-label">Meta Vendas</span>
+                  <div class="comp-bar-track">
+                    <div class="comp-bar-fill bar-lime-fill" id="comp-bar-sales" style="width: 65%;"></div>
+                  </div>
+                </div>
+
+                <div class="comp-row">
+                  <span class="comp-label">Meta Reuniões</span>
+                  <div class="comp-bar-track">
+                    <div class="comp-bar-fill bar-dark-fill" id="comp-bar-meetings" style="width: 80%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card de Ações Executivas -->
+            <div class="white-box-card actions-box-card">
+              <button type="button" class="btn-uifry-lime" id="btn-generate-pdf">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                <span id="btn-pdf-label">GERAR RELATÓRIO DE MULLER (PDF)</span>
+              </button>
+
+              <div class="actions-secondary-row">
+                <button type="button" class="btn-uifry-sec" id="btn-save-log">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  </svg>
+                  <span>Salvar</span>
+                </button>
+
+                <button type="button" class="btn-uifry-sec" id="btn-reset-form">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="1 4 1 10 7 10"></polyline>
+                    <polyline points="23 20 23 14 17 14"></polyline>
+                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                  </svg>
+                  <span>Limpar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- ==========================================================
+           VIEW 4: HISTÓRICO & DADOS CONSOLIDADOS
+           ========================================================== -->
+      <section id="view-history" class="app-view">
+        <header class="top-bar">
+          <div class="top-bar-left">
+            <h1 class="page-title">Histórico de Performance</h1>
+            <span class="closer-active-pill">
+              <span class="pulse-dot"></span>
+              <span id="history-total-count">0 registros</span>
+            </span>
+          </div>
+
+          <div class="top-bar-right">
+            <button type="button" class="btn-uifry-sec" id="btn-export-csv" style="padding: 7px 14px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Exportar CSV</span>
+            </button>
+
+            <button type="button" class="btn-uifry-sec" id="btn-clear-history" style="padding: 7px 14px; color:#e04848;">
+              <span>Limpar Histórico</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Filtros Rápidos de Histórico -->
+        <div class="white-box-card" style="margin-bottom: 18px;">
+          <div class="history-filters-bar">
+            <div class="filter-group">
+              <label class="filter-label">Membro:</label>
+              <select id="history-filter-member" class="uifry-select">
+                <option value="all">Toda a Equipe</option>
+                <option value="Tales">Tales (Closer)</option>
+                <option value="José">José (Closer)</option>
+                <option value="Muller">Muller (Closer)</option>
+                <option value="Elinaldo">Elinaldo (Closer)</option>
+                <option value="SDR 1">SDR 1</option>
+                <option value="SDR 2">SDR 2</option>
+                <option value="SDR 3">SDR 3</option>
+                <option value="SDR 4">SDR 4</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Tipo:</label>
+              <select id="history-filter-type" class="uifry-select">
+                <option value="all">Todos os Relatórios</option>
+                <option value="closer">Apenas Closers</option>
+                <option value="sdr">Apenas SDRs</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="white-box-card">
+          <div class="table-responsive-box">
+            <table class="uifry-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Membro</th>
+                  <th>Papel</th>
+                  <th>Leads / Abord.</th>
+                  <th>Follow-ups / Conexões</th>
+                  <th>Reuniões Agendadas</th>
+                  <th>Reuniões Realizadas</th>
+                  <th>Vendas</th>
+                  <th>Contratos</th>
+                  <th>Cash Coletado</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <!-- Inserido dinamicamente via app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================
+           CABEÇALHO & ÁREA DE IMPRESSÃO A4 DO SDR (PDF SDR)
+           ========================================================== -->
+      <div id="print-sdr-report" class="print-sdr-container">
+        <div class="print-header">
+          <div class="print-brand">
+            <img src="assets/logo.png" alt="FAZENDO ACONTECER™" class="print-logo-img">
+            <span class="print-brand-sub">MÓDULO DE PROSPECÇÃO • SDR</span>
+          </div>
+          <div class="print-meta">
+            <span class="print-title">RELATÓRIO DIÁRIO DE PROSPECÇÃO</span>
+            <div class="print-details">
+              <span id="print-sdr-name">SDR: <strong>SDR 1</strong></span>
+              <span class="print-separator">•</span>
+              <span id="print-sdr-date">Data: <strong>22/09/2026</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="print-sdr-body" id="print-sdr-body-content">
+          <!-- Renderizado via app.js -->
+        </div>
+
+        <div class="print-footer-tag">
+          <span>Fazendo Acontecer™ • Hub Comercial • Documento Executivo de Performance</span>
         </div>
       </div>
 
-      <!-- Top Bar Interativa -->
-      <header class="top-bar">
-        <div class="top-bar-left">
-          <h1 class="page-title">Dashboard</h1>
-          <span class="closer-active-pill" id="header-closer-pill">
-            <span class="pulse-dot"></span>
-            <span id="header-closer-name">Muller</span>
-          </span>
-        </div>
-
-        <div class="top-bar-right">
-          <!-- Seletor de Data Estilizado -->
-          <div class="date-pill-widget">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            <input type="date" id="report-date" class="date-pill-input">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;color:#808191;">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-
-          <!-- Botões Rápidos do Topo (Busca, Info, Mais opções) -->
-          <button type="button" class="btn-top-icon" title="Buscar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </button>
-
-          <button type="button" class="btn-top-icon" id="btn-quick-info" title="Informações">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-          </button>
-
-          <button type="button" class="btn-top-icon" id="btn-top-menu" title="Opções">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="1"></circle>
-              <circle cx="19" cy="12" r="1"></circle>
-              <circle cx="5" cy="12" r="1"></circle>
-            </svg>
-          </button>
-        </div>
-      </header>
-
-      <!-- ============================================================
-           CARDS DE KPI SUPERIORES (Estilo exato uifry: 1 escuro + 2 brancos)
-           ============================================================ -->
-      <section class="kpi-three-grid">
-        <!-- Card 1: Escuro Hero (Total Vendas) -->
-        <div class="kpi-card card-dark-hero">
-          <div class="kpi-card-top">
-            <div class="kpi-badge-icon badge-lime">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                <path d="M12 12v.01"></path>
-                <path d="M17 12h.01"></path>
-                <path d="M7 12h.01"></path>
-              </svg>
-            </div>
-            <button type="button" class="kpi-dots-btn">
-              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
-            </button>
-          </div>
-          <span class="kpi-card-subtitle">Total Vendas (Hoje)</span>
-          <div class="kpi-card-value-row">
-            <span class="kpi-card-big-value" id="kpi-sales-num">0</span>
-            <span class="kpi-card-badge-pill" id="kpi-sales-sub">0 nova(s)</span>
-          </div>
-        </div>
-
-        <!-- Card 2: Branco (Valor de Contrato) -->
-        <div class="kpi-card card-white">
-          <div class="kpi-card-top">
-            <div class="kpi-badge-icon badge-gray">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-              </svg>
-            </div>
-            <button type="button" class="kpi-dots-btn">
-              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
-            </button>
-          </div>
-          <span class="kpi-card-subtitle">Valor de Contrato</span>
-          <div class="kpi-card-value-row">
-            <span class="kpi-card-big-value dark-text" id="kpi-contract-num">R$ 0,00</span>
-          </div>
-        </div>
-
-        <!-- Card 3: Branco (Cash Coletado) -->
-        <div class="kpi-card card-white">
-          <div class="kpi-card-top">
-            <div class="kpi-badge-icon badge-black">
-              <span class="badge-dollar-sym">$</span>
-            </div>
-            <button type="button" class="kpi-dots-btn">
-              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
-            </button>
-          </div>
-          <span class="kpi-card-subtitle">Cash Coletado</span>
-          <div class="kpi-card-value-row">
-            <span class="kpi-card-big-value dark-text highlight-green" id="kpi-cash-num">R$ 0,00</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================================
-           GRID CENTRAL (Layout uifry: Esquerda ~65%, Direita ~35%)
-           ============================================================ -->
-      <section class="dashboard-middle-grid">
-
-        <!-- COLUNA ESQUERDA: Formulário de Métricas + Overview Chart -->
-        <div class="grid-col-left">
-
-          <!-- Card de Preenchimento das Métricas (Estilo uifry Clean) -->
-          <div class="white-box-card" id="section-metrics">
-            <div class="box-card-header">
-              <div class="header-left-title">
-                <h2 class="box-card-title">Métricas de Performance</h2>
-                <p class="box-card-desc">Lançamento diário de esforço e conversão comercial</p>
-              </div>
-
-              <!-- Seletor Rápido de Closer no Card -->
-              <div class="closer-selector-segmented">
-                <button type="button" class="segmented-btn" data-closer="Tales">Tales</button>
-                <button type="button" class="segmented-btn" data-closer="José">José</button>
-                <button type="button" class="segmented-btn active" data-closer="Muller">Muller</button>
-                <button type="button" class="segmented-btn" data-closer="Elinaldo">Elinaldo</button>
-              </div>
-            </div>
-
-            <!-- SEÇÃO 1: MÉTRICA DE ESFORÇO E VOLUME DE LEADS -->
-            <div class="form-subsection">
-              <div class="subsection-header">
-                <span class="subsection-badge">01</span>
-                <span class="subsection-title">MÉTRICA DE ESFORÇO E VOLUME DE LEADS</span>
-              </div>
-
-              <div class="fields-row-3">
-                <div class="field-control">
-                  <label for="input-leads" class="field-label">LEAD RECEBIDOS</label>
-                  <div class="uifry-input-box">
-                    <span class="field-prefix">#</span>
-                    <input type="number" id="input-leads" class="uifry-input" min="0" placeholder="0" value="0">
-                  </div>
-                </div>
-
-                <div class="field-control">
-                  <label for="input-followups" class="field-label">QUANTIDADE DE FOLLOW-UP FEITOS</label>
-                  <div class="uifry-input-box">
-                    <span class="field-prefix">#</span>
-                    <input type="number" id="input-followups" class="uifry-input" min="0" placeholder="0" value="0">
-                  </div>
-                </div>
-
-                <div class="field-control">
-                  <label for="input-prospeccoes" class="field-label">QUANTAS PROSPECÇÃO NO DIA</label>
-                  <div class="uifry-input-box">
-                    <span class="field-prefix">#</span>
-                    <input type="number" id="input-prospeccoes" class="uifry-input" min="0" placeholder="0" value="0">
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- SEÇÃO 2: PERFORMANCE COMERCIAL -->
-            <div class="form-subsection">
-              <div class="subsection-header">
-                <span class="subsection-badge">02</span>
-                <span class="subsection-title">PERFORMANCE COMERCIAL</span>
-              </div>
-
-              <div class="fields-row-3">
-                <div class="field-control">
-                  <label for="input-meetings-scheduled" class="field-label">REUNIÃO AGENDADA</label>
-                  <div class="uifry-input-box">
-                    <span class="field-prefix">#</span>
-                    <input type="number" id="input-meetings-scheduled" class="uifry-input" min="0" placeholder="0" value="0">
-                  </div>
-                </div>
-
-                <div class="field-control">
-                  <label for="input-meetings-held" class="field-label">REUNIÃO REALIZADA</label>
-                  <div class="uifry-input-box">
-                    <span class="field-prefix">#</span>
-                    <input type="number" id="input-meetings-held" class="uifry-input" min="0" placeholder="0" value="0">
-                  </div>
-                </div>
-
-                <div class="field-control">
-                  <label for="input-sales" class="field-label">QUANTAS VENDAS</label>
-                  <div class="uifry-input-box">
-                    <span class="field-prefix">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 14 14"></polyline>
-                      </svg>
-                    </span>
-                    <input type="number" id="input-sales" class="uifry-input" min="0" placeholder="0" value="0">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Valores Financeiros com Máscara de Moeda -->
-              <div class="fields-row-2" style="margin-top: 14px;">
-                <div class="field-control">
-                  <label for="input-contract-val" class="field-label">VALOR DE CONTRATO</label>
-                  <div class="uifry-input-box">
-                    <span class="field-prefix">$</span>
-                    <input type="text" id="input-contract-val" class="uifry-input" placeholder="R$ 0,00" value="R$ 0,00">
-                  </div>
-                </div>
-
-                <div class="field-control">
-                  <label for="input-cash-collected" class="field-label highlight-label">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;">
-                      <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                      <line x1="2" y1="10" x2="22" y2="10"></line>
-                    </svg>
-                    CASH COLETADO
-                  </label>
-                  <div class="uifry-input-box lime-highlight-box">
-                    <span class="field-prefix lime-color">$</span>
-                    <input type="text" id="input-cash-collected" class="uifry-input font-bold" placeholder="R$ 0,00" value="R$ 0,00">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card de Overview (Gráfico de Barras idêntico ao uifry) -->
-          <div class="white-box-card">
-            <div class="box-card-header">
-              <div class="header-left-title">
-                <h2 class="box-card-title">Overview</h2>
-                <p class="box-card-desc">Atividade e evolução semanal da equipe</p>
-              </div>
-              <span class="kpi-mini-pill">Semanal</span>
-            </div>
-
-            <!-- Gráfico de Colunas Estilo uifry -->
-            <div class="uifry-barchart-container">
-              <!-- Barra 1: Jan -->
-              <div class="barchart-col">
-                <div class="bar-track"><div class="bar-fill" style="height: 35%;"></div></div>
-                <span class="bar-month">Jan</span>
-              </div>
-              <!-- Barra 2: Fev -->
-              <div class="barchart-col">
-                <div class="bar-track"><div class="bar-fill" style="height: 48%;"></div></div>
-                <span class="bar-month">Feb</span>
-              </div>
-              <!-- Barra 3: Mar -->
-              <div class="barchart-col">
-                <div class="bar-track"><div class="bar-fill" style="height: 60%;"></div></div>
-                <span class="bar-month">Mar</span>
-              </div>
-              <!-- Barra 4: Abr -->
-              <div class="barchart-col">
-                <div class="bar-track"><div class="bar-fill" style="height: 40%;"></div></div>
-                <span class="bar-month">Apr</span>
-              </div>
-              <!-- Barra 5: Mai -->
-              <div class="barchart-col">
-                <div class="bar-track"><div class="bar-fill" style="height: 52%;"></div></div>
-                <span class="bar-month">May</span>
-              </div>
-              <!-- Barra 6: Jun (Ativa com Tooltip Flutuante estilo uifry) -->
-              <div class="barchart-col active-col">
-                <div class="tooltip-lime-pill" id="overview-floating-tooltip">
-                  <span id="overview-tooltip-text">from R$ 5.999 $</span>
-                  <span class="tooltip-arrow"></span>
-                </div>
-                <div class="bar-track"><div class="bar-fill active-fill" style="height: 85%;"></div></div>
-                <span class="bar-month active-month">Jun</span>
-              </div>
-              <!-- Barra 7: Jul -->
-              <div class="barchart-col">
-                <div class="bar-track"><div class="bar-fill" style="height: 44%;"></div></div>
-                <span class="bar-month">Jul</span>
-              </div>
-              <!-- Barra 8: Ago -->
-              <div class="barchart-col">
-                <div class="bar-track"><div class="bar-fill" style="height: 30%;"></div></div>
-                <span class="bar-month">Aug</span>
-              </div>
-              <!-- Barra 9: Set -->
-              <div class="barchart-col">
-                <div class="bar-track"><div class="bar-fill" style="height: 65%;"></div></div>
-                <span class="bar-month">Sep</span>
-              </div>
-              <!-- Barra 10: Out -->
-              <div class="barchart-col">
-                <div class="bar-track"><div class="bar-fill" style="height: 75%;"></div></div>
-                <span class="bar-month">Oct</span>
-              </div>
-              <!-- Barra 11: Nov -->
-              <div class="barchart-col">
-                <div class="bar-track"><div class="bar-fill" style="height: 70%;"></div></div>
-                <span class="bar-month">Nov</span>
-              </div>
-              <!-- Barra 12: Dez -->
-              <div class="barchart-col">
-                <div class="bar-track"><div class="bar-fill" style="height: 55%;"></div></div>
-                <span class="bar-month">Dec</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- COLUNA DIREITA: Activity (Bubble Chart) + Comparison + Ações -->
-        <div class="grid-col-right">
-
-          <!-- Card Activity (Bubble Chart idêntico ao uifry) -->
-          <div class="white-box-card">
-            <h2 class="box-card-title">Activity</h2>
-
-            <div class="uifry-bubbles-stage">
-              <!-- Bolha Verde-Limão Principal -->
-              <div class="bubble-circle bubble-lime">
-                <span class="bubble-val" id="bubble-conversion-rate">50%</span>
-                <span class="bubble-sub">Conversão</span>
-              </div>
-
-              <!-- Bolha Branca Secundária Sobreposta -->
-              <div class="bubble-circle bubble-white">
-                <span class="bubble-val" id="bubble-attendance-rate">75%</span>
-                <span class="bubble-sub">Presença</span>
-              </div>
-
-              <!-- Bolha Escura Terciária Sobreposta -->
-              <div class="bubble-circle bubble-dark">
-                <span class="bubble-val" id="bubble-effort-total">0</span>
-                <span class="bubble-sub">Esforço</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card Comparison (Month) -->
-          <div class="white-box-card">
-            <h2 class="box-card-title">Comparison (Month)</h2>
-            <div class="comparison-rows-list">
-              <div class="comp-row">
-                <span class="comp-label">Meta Vendas</span>
-                <div class="comp-bar-track">
-                  <div class="comp-bar-fill bar-lime-fill" id="comp-bar-sales" style="width: 65%;"></div>
-                </div>
-              </div>
-
-              <div class="comp-row">
-                <span class="comp-label">Meta Reuniões</span>
-                <div class="comp-bar-track">
-                  <div class="comp-bar-fill bar-dark-fill" id="comp-bar-meetings" style="width: 80%;"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card de Ações Executivas -->
-          <div class="white-box-card actions-box-card">
-            <button type="button" class="btn-uifry-lime" id="btn-generate-pdf">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-              </svg>
-              <span id="btn-pdf-label">GERAR RELATÓRIO DE MULLER (PDF)</span>
-            </button>
-
-            <div class="actions-secondary-row">
-              <button type="button" class="btn-uifry-sec" id="btn-copy-whatsapp">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                </svg>
-                <span>WhatsApp</span>
-              </button>
-
-              <button type="button" class="btn-uifry-sec" id="btn-save-log">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                </svg>
-                <span>Salvar</span>
-              </button>
-
-              <button type="button" class="btn-uifry-sec" id="btn-reset-form">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="1 4 1 10 7 10"></polyline>
-                  <polyline points="23 20 23 14 17 14"></polyline>
-                  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
-                </svg>
-                <span>Limpar</span>
-              </button>
-            </div>
-          </div>
-
-        </div>
-
-      </section>
-
-      <!-- ============================================================
-           SEÇÃO INFERIOR: Transaction History (Histórico de Registros)
-           ============================================================ -->
-      <section class="white-box-card" id="section-history" style="margin-top: 18px;">
-        <div class="box-card-header">
-          <div class="header-left-title">
-            <h2 class="box-card-title">Transaction History</h2>
-            <p class="box-card-desc">Histórico completo de relatórios lançados pelos Closers</p>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button type="button" class="btn-uifry-sec" id="btn-export-csv" style="padding: 6px 12px; font-size: 11.5px;">Exportar CSV</button>
-            <button type="button" class="btn-uifry-sec" id="btn-clear-history" style="padding: 6px 12px; font-size: 11.5px; color:#e04848;">Limpar Histórico</button>
-          </div>
-        </div>
-
-        <div class="table-responsive-box">
-          <table class="uifry-table">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Closer</th>
-                <th>Leads</th>
-                <th>Follow-ups</th>
-                <th>Prospecção</th>
-                <th>Reuniões Ag.</th>
-                <th>Reuniões Real.</th>
-                <th>Vendas</th>
-                <th>Valor Contrato</th>
-                <th>Cash Coletado</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="history-table-body">
-              <!-- Inserido dinamicamente via app.js -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-
     </main>
+  </div>
+
+  <!-- ============================================================
+       MODAL: CONFIGURAÇÃO DE META MENSAL & DINHEIRO NA MESA
+       ============================================================ -->
+  <div class="modal-backdrop" id="modal-settings">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Configurar Metas & Pipeline</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-settings">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-field">
+          <label for="setting-monthly-goal" class="field-label">META MENSAL DE FATURAMENTO</label>
+          <div class="uifry-input-box">
+            <span class="field-prefix">$</span>
+            <input type="text" id="setting-monthly-goal" class="uifry-input font-bold" value="R$ 100.000,00">
+          </div>
+          <span class="modal-hint">A meta financeira mensal utilizada no cálculo de Pacing e Projeção.</span>
+        </div>
+
+        <div class="modal-field" style="margin-top: 16px;">
+          <label for="setting-money-table" class="field-label">DINHEIRO NA MESA ATUAL (PIPELINE ABERTO)</label>
+          <div class="uifry-input-box">
+            <span class="field-prefix">$</span>
+            <input type="text" id="setting-money-table" class="uifry-input font-bold" value="R$ 45.000,00">
+          </div>
+          <span class="modal-hint">Valor total estimado de contratos e propostas em negociação com os Closers.</span>
+        </div>
+
+        <div class="modal-field" style="margin-top: 16px;">
+          <label for="setting-close-rate" class="field-label">TAXA ESTIMADA DE FECHAMENTO DO PIPELINE (%)</label>
+          <div class="uifry-input-box">
+            <span class="field-prefix">%</span>
+            <input type="number" id="setting-close-rate" class="uifry-input" min="5" max="100" value="30">
+          </div>
+          <span class="modal-hint">Percentual histórico de conversão do dinheiro na mesa em receita líquida.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-uifry-sec" id="btn-cancel-settings">Cancelar</button>
+        <button type="button" class="btn-uifry-lime" id="btn-save-settings">Salvar Configurações</button>
+      </div>
+    </div>
   </div>
 
   <div class="toast-container" id="toast-container"></div>
