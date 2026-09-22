@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal da Equipe • Lançamento de Relatório Diário</title>
-  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="shortcut icon" href="favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -99,114 +100,157 @@
             <span class="field-hint" id="date-helper-text">Relatório referente ao dia selecionado.</span>
           </div>
 
-          <!-- ETAPA 4: MÉTRICAS DO DIA (CAMPOS GERAIS UNIFICADOS) -->
+          <!-- ETAPA 4: MÉTRICAS DO DIA -->
           <div class="form-section" id="section-general-fields">
             <div class="section-title-row">
               <span class="section-number">4</span>
-              <span class="section-title">MÉTRICAS DO DIA (GERAL)</span>
+              <span class="section-title">MÉTRICAS DO DIA</span>
             </div>
-            <p style="font-size: 13px; color: var(--text-secondary); margin: -4px 0 10px 0;">Preencha os números e atividades do seu dia. Deixe como 0 o que não se aplicar.</p>
 
-            <!-- Bloco 1: Prospecção & Contato -->
-            <div class="fields-group-box">
-              <span class="group-title">ATIVIDADES DE CONTATO & PROSPECÇÃO</span>
-              <div class="inputs-grid-3">
-                <div class="field-item">
-                  <label for="rep-leads">Leads Abordados</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="rep-leads" class="apple-input" min="0" value="0">
+            <!-- KPI Cards de Resumo no Topo (Live) -->
+            <div class="report-kpi-grid">
+              <div class="report-kpi-card">
+                <span class="report-kpi-label">TOTAL VENDAS</span>
+                <div class="report-kpi-val-row">
+                  <span class="report-kpi-val" id="live-kpi-sales">0</span>
+                </div>
+                <span class="report-kpi-sub" id="live-kpi-sales-sub">0 nova(s)</span>
+              </div>
+
+              <div class="report-kpi-card">
+                <span class="report-kpi-label">VALOR CONTRATO</span>
+                <div class="report-kpi-val-row">
+                  <span class="report-kpi-val" id="live-kpi-contract">R$ 0,00</span>
+                </div>
+                <span class="report-kpi-sub">Contratos enviados</span>
+              </div>
+
+              <div class="report-kpi-card highlight-cash-card">
+                <span class="report-kpi-label badge-cash-label">CASH COLETADO</span>
+                <div class="report-kpi-val-row">
+                  <span class="report-kpi-val lime-text" id="live-kpi-cash">R$ 0,00</span>
+                </div>
+                <span class="report-kpi-sub lime-sub">Receita recebida</span>
+              </div>
+
+              <div class="report-kpi-card">
+                <span class="report-kpi-label">ESFORÇO ATIVO</span>
+                <div class="report-kpi-val-row">
+                  <span class="report-kpi-val" id="live-kpi-effort">0</span>
+                </div>
+                <span class="report-kpi-sub">Follow-ups + Prospecções</span>
+              </div>
+            </div>
+
+            <!-- SEÇÃO 1: MÉTRICA DE ESFORÇO E VOLUME DE LEADS -->
+            <div class="report-section-card">
+              <div class="report-section-header">
+                <div class="report-header-icon icon-clock">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 14"></polyline>
+                  </svg>
+                </div>
+                <div class="report-header-info">
+                  <h3 class="report-header-title">MÉTRICA DE ESFORÇO E VOLUME DE LEADS</h3>
+                  <p class="report-header-sub">Métricas de primeiro abordagem e novos orçamentos</p>
+                </div>
+              </div>
+
+              <div class="report-fields-grid-3">
+                <div class="report-field-item">
+                  <label for="rep-leads" class="report-field-label">LEAD RECEBIDOS</label>
+                  <div class="report-input-row">
+                    <span class="report-input-prefix">#</span>
+                    <input type="number" id="rep-leads" class="report-clean-input" min="0" value="0" placeholder="0">
                   </div>
                 </div>
-                <div class="field-item">
-                  <label for="rep-calls">Ligações Feitas</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="rep-calls" class="apple-input" min="0" value="0">
+
+                <div class="report-field-item">
+                  <label for="rep-followups" class="report-field-label">QUANTIDADE DE FOLLOW-UP FEITOS</label>
+                  <div class="report-input-row">
+                    <span class="report-input-prefix">#</span>
+                    <input type="number" id="rep-followups" class="report-clean-input" min="0" value="0" placeholder="0">
                   </div>
                 </div>
-                <div class="field-item">
-                  <label for="rep-whatsapp">Mensagens WhatsApp</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="rep-whatsapp" class="apple-input" min="0" value="0">
-                  </div>
-                </div>
-                <div class="field-item">
-                  <label for="rep-contacts">Contatos Efetivos (Conexões)</label>
-                  <div class="apple-input-box highlight-border-green">
-                    <input type="number" id="rep-contacts" class="apple-input" min="0" value="0">
-                  </div>
-                </div>
-                <div class="field-item">
-                  <label for="rep-followups">Follow-ups Feitos</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="rep-followups" class="apple-input" min="0" value="0">
-                  </div>
-                </div>
-                <div class="field-item">
-                  <label for="rep-prospeccoes">Prospecções Ativas</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="rep-prospeccoes" class="apple-input" min="0" value="0">
+
+                <div class="report-field-item">
+                  <label for="rep-prospeccoes" class="report-field-label">QUANTAS PROSPECÇÃO NO DIA</label>
+                  <div class="report-input-row">
+                    <span class="report-input-prefix">#</span>
+                    <input type="number" id="rep-prospeccoes" class="report-clean-input" min="0" value="0" placeholder="0">
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Bloco 2: Reuniões & Qualificação -->
-            <div class="fields-group-box">
-              <span class="group-title">REUNIÕES & QUALIFICAÇÃO</span>
-              <div class="inputs-grid-2">
-                <div class="field-item">
-                  <label for="rep-scheduled">Reuniões Agendadas</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="rep-scheduled" class="apple-input" min="0" value="0">
+            <!-- SEÇÃO 2: PERFORMANCE COMERCIAL -->
+            <div class="report-section-card">
+              <div class="report-section-header">
+                <div class="report-header-icon icon-chart">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                  </svg>
+                </div>
+                <div class="report-header-info">
+                  <h3 class="report-header-title">PERFORMANCE COMERCIAL</h3>
+                  <p class="report-header-sub">Métricas de reuniões agendadas, reuniões realizadas e vendas</p>
+                </div>
+              </div>
+
+              <div class="report-fields-grid-3">
+                <div class="report-field-item">
+                  <label for="rep-scheduled" class="report-field-label">REUNIÃO AGENDADA</label>
+                  <div class="report-input-row">
+                    <span class="report-input-prefix">#</span>
+                    <input type="number" id="rep-scheduled" class="report-clean-input" min="0" value="0" placeholder="0">
                   </div>
                 </div>
-                <div class="field-item">
-                  <label for="rep-held">Reuniões Realizadas (Held)</label>
-                  <div class="apple-input-box highlight-border-green">
-                    <input type="number" id="rep-held" class="apple-input" min="0" value="0">
+
+                <div class="report-field-item">
+                  <label for="rep-held" class="report-field-label">REUNIÃO REALIZADA</label>
+                  <div class="report-input-row">
+                    <span class="report-input-prefix">#</span>
+                    <input type="number" id="rep-held" class="report-clean-input" min="0" value="0" placeholder="0">
                   </div>
                 </div>
-                <div class="field-item">
-                  <label for="rep-qualified">Qualificadas no ICP</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="rep-qualified" class="apple-input" min="0" value="0">
-                  </div>
-                </div>
-                <div class="field-item">
-                  <label for="rep-noshow">No-Shows (Faltas)</label>
-                  <div class="apple-input-box">
-                    <input type="number" id="rep-noshow" class="apple-input" min="0" value="0">
+
+                <div class="report-field-item">
+                  <label for="rep-sales" class="report-field-label">QUANTAS VENDAS</label>
+                  <div class="report-input-row">
+                    <span class="report-input-prefix prefix-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 14 14"></polyline>
+                      </svg>
+                    </span>
+                    <input type="number" id="rep-sales" class="report-clean-input" min="0" value="0" placeholder="0">
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Bloco 3: Vendas & Fechamento Financeiro -->
-            <div class="fields-group-box">
-              <span class="group-title">VENDAS & RESULTADOS FINANCEIROS</span>
-              <div class="inputs-grid-2">
-                <div class="field-item">
-                  <label for="rep-sales">Vendas Fechadas (un)</label>
-                  <div class="apple-input-box highlight-border-green">
-                    <input type="number" id="rep-sales" class="apple-input font-bold" min="0" value="0">
+              <div class="report-fields-grid-2" style="margin-top: 18px;">
+                <div class="report-field-item">
+                  <label for="rep-contract-val" class="report-field-label">VALOR DE CONTRATO</label>
+                  <div class="report-input-row">
+                    <span class="report-input-prefix">$</span>
+                    <input type="text" id="rep-contract-val" class="report-clean-input" placeholder="R$ 0,00" value="R$ 0,00">
                   </div>
                 </div>
-                <div class="field-item">
-                  <label for="rep-contracts">Valor em Contratos Fechados</label>
-                  <div class="apple-input-box">
-                    <input type="text" id="rep-contracts" class="apple-input font-numeric" value="R$ 0,00">
-                  </div>
-                </div>
-                <div class="field-item">
-                  <label for="rep-cash">Cash Coletado (Entrada)</label>
-                  <div class="apple-input-box highlight-border-green">
-                    <input type="text" id="rep-cash" class="apple-input font-numeric font-highlight font-bold" value="R$ 0,00">
-                  </div>
-                </div>
-                <div class="field-item">
-                  <label for="rep-pipeline">Pipeline Estimado / Em Negociação</label>
-                  <div class="apple-input-box highlight-border-green">
-                    <input type="text" id="rep-pipeline" class="apple-input font-numeric font-highlight" value="R$ 0,00">
+
+                <div class="report-field-item">
+                  <label for="rep-cash-collected" class="report-field-label label-cash-lime">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;margin-right:4px;">
+                      <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                      <line x1="2" y1="10" x2="22" y2="10"></line>
+                    </svg>
+                    CASH COLETADO
+                  </label>
+                  <div class="report-input-row highlight-lime-row">
+                    <span class="report-input-prefix lime-prefix">$</span>
+                    <input type="text" id="rep-cash-collected" class="report-clean-input lime-input font-bold" placeholder="R$ 0,00" value="R$ 0,00">
                   </div>
                 </div>
               </div>

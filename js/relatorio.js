@@ -35,23 +35,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }).catch(err => console.warn('Erro ao buscar clientes no portal:', err));
   }
 
-  // Inputs das Métricas Gerais
+  // Inputs das Métricas Gerais (Exatamente os 8 campos solicitados)
   const inputRepLeads = document.getElementById('rep-leads');
-  const inputRepCalls = document.getElementById('rep-calls');
-  const inputRepWhatsapp = document.getElementById('rep-whatsapp');
-  const inputRepContacts = document.getElementById('rep-contacts');
   const inputRepFollowups = document.getElementById('rep-followups');
   const inputRepProspeccoes = document.getElementById('rep-prospeccoes');
 
   const inputRepScheduled = document.getElementById('rep-scheduled');
   const inputRepHeld = document.getElementById('rep-held');
-  const inputRepQualified = document.getElementById('rep-qualified');
-  const inputRepNoshow = document.getElementById('rep-noshow');
-
   const inputRepSales = document.getElementById('rep-sales');
-  const inputRepContracts = document.getElementById('rep-contracts');
-  const inputRepCash = document.getElementById('rep-cash');
-  const inputRepPipeline = document.getElementById('rep-pipeline');
+  const inputRepContracts = document.getElementById('rep-contract-val') || document.getElementById('rep-contracts');
+  const inputRepCash = document.getElementById('rep-cash-collected') || document.getElementById('rep-cash');
+
+  // Preview KPI cards (Live)
+  const liveKpiSales = document.getElementById('live-kpi-sales');
+  const liveKpiSalesSub = document.getElementById('live-kpi-sales-sub');
+  const liveKpiContract = document.getElementById('live-kpi-contract');
+  const liveKpiCash = document.getElementById('live-kpi-cash');
+  const liveKpiEffort = document.getElementById('live-kpi-effort');
+
+  function updateLiveKpis() {
+    const sales = parseInt(inputRepSales ? inputRepSales.value : 0, 10) || 0;
+    const contract = inputRepContracts ? (inputRepContracts.value || 'R$ 0,00') : 'R$ 0,00';
+    const cash = inputRepCash ? (inputRepCash.value || 'R$ 0,00') : 'R$ 0,00';
+    const followups = parseInt(inputRepFollowups ? inputRepFollowups.value : 0, 10) || 0;
+    const prospeccoes = parseInt(inputRepProspeccoes ? inputRepProspeccoes.value : 0, 10) || 0;
+    const totalEffort = followups + prospeccoes;
+
+    if (liveKpiSales) liveKpiSales.textContent = sales;
+    if (liveKpiSalesSub) liveKpiSalesSub.textContent = `${sales} nova(s)`;
+    if (liveKpiContract) liveKpiContract.textContent = contract;
+    if (liveKpiCash) liveKpiCash.textContent = cash;
+    if (liveKpiEffort) liveKpiEffort.textContent = totalEffort;
+  }
 
   // Modal de Revisão
   const btnOpenReview = document.getElementById('btn-open-review');
@@ -140,10 +155,12 @@ document.addEventListener('DOMContentLoaded', () => {
       let val = e.target.value.replace(/\D/g, '');
       if (!val) {
         e.target.value = 'R$ 0,00';
+        updateLiveKpis();
         return;
       }
       const num = parseInt(val, 10) / 100;
       e.target.value = num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      updateLiveKpis();
     });
 
     inputElem.addEventListener('focus', (e) => {
@@ -155,7 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   attachMoneyMask(inputRepContracts);
   attachMoneyMask(inputRepCash);
-  attachMoneyMask(inputRepPipeline);
+
+  // Ouvintes para atualização dos cards de KPI no topo em tempo real
+  [inputRepSales, inputRepFollowups, inputRepProspeccoes].forEach(el => {
+    if (el) {
+      el.addEventListener('input', updateLiveKpis);
+      el.addEventListener('change', updateLiveKpis);
+    }
+  });
 
   function formatMoneyString(rawStr) {
     if (!rawStr) return 'R$ 0,00';
@@ -182,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
-  // COLETA DE DADOS DO FORMULÁRIO GERAL
+  // COLETA DE DADOS DO FORMULÁRIO GERAL (8 CAMPOS)
   // ============================================================
   let pendingReportData = null;
 
@@ -191,31 +215,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const effectiveName = currentName || 'Tales';
     const selectedClientId = selectClientId ? selectClientId.value : null;
 
-    // Atividades de Contato & Prospecção
+    // Seção 1: Esforço & Volume de Leads
     const leads = Math.max(0, parseInt(inputRepLeads ? inputRepLeads.value : 0, 10) || 0);
-    const calls = Math.max(0, parseInt(inputRepCalls ? inputRepCalls.value : 0, 10) || 0);
-    const whatsapp = Math.max(0, parseInt(inputRepWhatsapp ? inputRepWhatsapp.value : 0, 10) || 0);
-    const contacts = Math.max(0, parseInt(inputRepContacts ? inputRepContacts.value : 0, 10) || 0);
     const followups = Math.max(0, parseInt(inputRepFollowups ? inputRepFollowups.value : 0, 10) || 0);
     const prospeccoes = Math.max(0, parseInt(inputRepProspeccoes ? inputRepProspeccoes.value : 0, 10) || 0);
 
-    // Reuniões & Qualificação
+    // Seção 2: Performance Comercial
     const scheduled = Math.max(0, parseInt(inputRepScheduled ? inputRepScheduled.value : 0, 10) || 0);
     const held = Math.max(0, parseInt(inputRepHeld ? inputRepHeld.value : 0, 10) || 0);
-    const qualified = Math.max(0, parseInt(inputRepQualified ? inputRepQualified.value : 0, 10) || 0);
-    const noshow = Math.max(0, parseInt(inputRepNoshow ? inputRepNoshow.value : 0, 10) || 0);
-
-    // Vendas & Resultados Financeiros
     const sales = Math.max(0, parseInt(inputRepSales ? inputRepSales.value : 0, 10) || 0);
     const contracts = formatMoneyString(inputRepContracts ? inputRepContracts.value : 0);
     const cash = formatMoneyString(inputRepCash ? inputRepCash.value : 0);
-    const pipeline = formatMoneyString(inputRepPipeline ? inputRepPipeline.value : 0);
 
     // Métricas Calculadas
-    const totalEffort = calls + whatsapp + followups + prospeccoes;
+    const totalEffort = followups + prospeccoes;
     const attendanceRate = scheduled > 0 ? Math.min(100, Math.round((held / scheduled) * 100)) : (held > 0 ? 100 : 0);
     const convRate = held > 0 ? Math.min(100, Math.round((sales / held) * 100)) : (sales > 0 ? 100 : 0);
-    const contactRate = leads > 0 ? Math.min(100, Math.round((contacts / leads) * 100)) : 0;
 
     let clientLabel = '🌐 Geral / Fazendo Acontecer™';
     if (selectClientId && selectClientId.selectedIndex >= 0) {
@@ -229,23 +244,22 @@ document.addEventListener('DOMContentLoaded', () => {
       clientLabel: clientLabel,
       date: selectedDate,
       leads,
-      calls,
-      whatsapp,
-      contacts,
       followups,
       prospeccoes,
       totalEffort,
-      contactRate,
       scheduled,
       held,
-      qualified,
-      noshow,
       attendanceRate,
       convRate,
       sales,
       contracts,
       cash,
-      pipeline
+      calls: 0,
+      whatsapp: 0,
+      contacts: 0,
+      qualified: 0,
+      noshow: Math.max(0, scheduled - held),
+      pipeline: 'R$ 0,00'
     };
   }
 
@@ -278,40 +292,40 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="review-stat-val highlight-green">${pendingReportData.cash}</span>
         </div>
         <div class="review-stat-item">
-          <span class="review-stat-label">VENDAS FECHADAS</span>
+          <span class="review-stat-label">TOTAL VENDAS</span>
           <span class="review-stat-val highlight-green">${pendingReportData.sales} un</span>
         </div>
         <div class="review-stat-item">
-          <span class="review-stat-label">PIPELINE GERADO</span>
-          <span class="review-stat-val highlight-green">${pendingReportData.pipeline}</span>
-        </div>
-        <div class="review-stat-item">
-          <span class="review-stat-label">VALOR CONTRATOS</span>
+          <span class="review-stat-label">VALOR CONTRATO</span>
           <span class="review-stat-val">${pendingReportData.contracts}</span>
         </div>
         <div class="review-stat-item">
-          <span class="review-stat-label">REUNIÕES REALIZADAS</span>
-          <span class="review-stat-val">${pendingReportData.held} de ${pendingReportData.scheduled} agend.</span>
+          <span class="review-stat-label">ESFORÇO ATIVO</span>
+          <span class="review-stat-val highlight-green">${pendingReportData.totalEffort}</span>
+        </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">LEAD RECEBIDOS</span>
+          <span class="review-stat-val">${pendingReportData.leads}</span>
+        </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">FOLLOW-UP FEITOS</span>
+          <span class="review-stat-val">${pendingReportData.followups}</span>
+        </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">PROSPECÇÃO NO DIA</span>
+          <span class="review-stat-val">${pendingReportData.prospeccoes}</span>
+        </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">REUNIÃO AGENDADA</span>
+          <span class="review-stat-val">${pendingReportData.scheduled}</span>
+        </div>
+        <div class="review-stat-item">
+          <span class="review-stat-label">REUNIÃO REALIZADA</span>
+          <span class="review-stat-val">${pendingReportData.held}</span>
         </div>
         <div class="review-stat-item">
           <span class="review-stat-label">CONVERSÃO (V/R)</span>
           <span class="review-stat-val">${pendingReportData.convRate}%</span>
-        </div>
-        <div class="review-stat-item">
-          <span class="review-stat-label">CONTATOS EFETIVOS</span>
-          <span class="review-stat-val">${pendingReportData.contacts} (de ${pendingReportData.leads} leads)</span>
-        </div>
-        <div class="review-stat-item">
-          <span class="review-stat-label">QUALIFICADAS NO ICP</span>
-          <span class="review-stat-val">${pendingReportData.qualified}</span>
-        </div>
-        <div class="review-stat-item">
-          <span class="review-stat-label">LIGAÇÕES & WHATSAPP</span>
-          <span class="review-stat-val">${pendingReportData.calls} lig / ${pendingReportData.whatsapp} wpp</span>
-        </div>
-        <div class="review-stat-item">
-          <span class="review-stat-label">FOLLOW-UPS / PROSP.</span>
-          <span class="review-stat-val">${pendingReportData.followups + pendingReportData.prospeccoes}</span>
         </div>
       </div>
     `;
@@ -479,40 +493,36 @@ document.addEventListener('DOMContentLoaded', () => {
         <span class="metric-box-val lime-val">${data.cash}</span>
       </div>
       <div class="card-metric-box">
-        <span class="metric-box-label">VENDAS FECHADAS</span>
+        <span class="metric-box-label">TOTAL VENDAS</span>
         <span class="metric-box-val lime-val">${data.sales} un</span>
       </div>
       <div class="card-metric-box">
-        <span class="metric-box-label">PIPELINE GERADO</span>
-        <span class="metric-box-val lime-val">${data.pipeline}</span>
-      </div>
-      <div class="card-metric-box">
-        <span class="metric-box-label">VALOR CONTRATOS</span>
+        <span class="metric-box-label">VALOR CONTRATO</span>
         <span class="metric-box-val">${data.contracts}</span>
       </div>
       <div class="card-metric-box">
+        <span class="metric-box-label">ESFORÇO ATIVO</span>
+        <span class="metric-box-val lime-val">${data.totalEffort}</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">LEAD RECEBIDOS</span>
+        <span class="metric-box-val">${data.leads}</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">FOLLOW-UP FEITOS</span>
+        <span class="metric-box-val">${data.followups}</span>
+      </div>
+      <div class="card-metric-box">
+        <span class="metric-box-label">PROSPECÇÃO NO DIA</span>
+        <span class="metric-box-val">${data.prospeccoes}</span>
+      </div>
+      <div class="card-metric-box">
         <span class="metric-box-label">REUNIÕES REALIZADAS</span>
-        <span class="metric-box-val">${data.held} / ${data.scheduled} agend.</span>
+        <span class="metric-box-val">${data.held} de ${data.scheduled} agend.</span>
       </div>
       <div class="card-metric-box">
         <span class="metric-box-label">CONVERSÃO (V/R)</span>
         <span class="metric-box-val lime-val">${data.convRate}%</span>
-      </div>
-      <div class="card-metric-box">
-        <span class="metric-box-label">CONTATOS EFETIVOS</span>
-        <span class="metric-box-val">${data.contacts}</span>
-      </div>
-      <div class="card-metric-box">
-        <span class="metric-box-label">QUALIFICADAS ICP</span>
-        <span class="metric-box-val">${data.qualified}</span>
-      </div>
-      <div class="card-metric-box">
-        <span class="metric-box-label">LEADS ABORDADOS</span>
-        <span class="metric-box-val">${data.leads}</span>
-      </div>
-      <div class="card-metric-box">
-        <span class="metric-box-label">LIGAÇÕES & WPP</span>
-        <span class="metric-box-val">${data.calls + data.whatsapp}</span>
       </div>
     `;
 
@@ -584,22 +594,25 @@ document.addEventListener('DOMContentLoaded', () => {
     btnCopyWhatsapp.addEventListener('click', () => {
       if (!pendingReportData) return;
 
-      let text = `*FAZENDO ACONTECER™ • RELATÓRIO DO DIA*\n`;
+      let text = `📊 *FAZENDO ACONTECER™ • RELATÓRIO DO DIA*\n`;
+      text += `━━━━━━━━━━━━━━━━━━━━━\n`;
+      text += `👤 *Membro:* ${pendingReportData.name}\n`;
       text += `📅 *Data:* ${formatDateBR(pendingReportData.date)}\n`;
-      text += `👤 *Responsável:* ${pendingReportData.name}\n`;
       if (pendingReportData.clientLabel && !pendingReportData.clientLabel.includes('Geral')) {
         text += `🏢 *Projeto:* ${pendingReportData.clientLabel}\n`;
       }
       text += `━━━━━━━━━━━━━━━━━━━━━\n`;
-      text += `💰 *Cash Coletado:* ${pendingReportData.cash}\n`;
-      text += `🎯 *Vendas Fechadas:* ${pendingReportData.sales} un\n`;
-      text += `📄 *Valor em Contratos:* ${pendingReportData.contracts}\n`;
-      text += `💎 *Pipeline Gerado:* ${pendingReportData.pipeline}\n`;
-      text += `🤝 *Reuniões Realizadas:* ${pendingReportData.held} de ${pendingReportData.scheduled} agendadas\n`;
-      text += `📈 *Taxa de Conversão:* ${pendingReportData.convRate}%\n`;
-      text += `⭐ *Qualificadas no ICP:* ${pendingReportData.qualified}\n`;
-      text += `📞 *Contatos Efetivos:* ${pendingReportData.contacts} (de ${pendingReportData.leads} leads)\n`;
-      text += `📱 *Atividades:* ${pendingReportData.calls} lig / ${pendingReportData.whatsapp} wpp / ${pendingReportData.followups} follow-ups\n`;
+      text += `💵 *CASH COLETADO:* ${pendingReportData.cash}\n`;
+      text += `🎯 *TOTAL VENDAS:* ${pendingReportData.sales} un\n`;
+      text += `📄 *VALOR CONTRATO:* ${pendingReportData.contracts}\n`;
+      text += `⚡ *ESFORÇO ATIVO:* ${pendingReportData.totalEffort} (Follow-ups + Prospeções)\n`;
+      text += `━━━━━━━━━━━━━━━━━━━━━\n`;
+      text += `📥 *Lead Recebidos:* ${pendingReportData.leads}\n`;
+      text += `🔄 *Follow-up Feitos:* ${pendingReportData.followups}\n`;
+      text += `🚀 *Quantas Prospecção no Dia:* ${pendingReportData.prospeccoes}\n`;
+      text += `📅 *Reunião Agendada:* ${pendingReportData.scheduled}\n`;
+      text += `🤝 *Reunião Realizada:* ${pendingReportData.held}\n`;
+      text += `📈 *Conversão (V/R):* ${pendingReportData.convRate}%\n`;
       text += `━━━━━━━━━━━━━━━━━━━━━\n`;
       text += `_Gerado via Portal Comercial • Fazendo Acontecer™_`;
 
@@ -634,28 +647,27 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   if (btnNewReport) {
     btnNewReport.addEventListener('click', () => {
-      // Resetar formulário
+      // Resetar formulário com os 8 campos exatos
       if (inputRepLeads) inputRepLeads.value = 0;
-      if (inputRepCalls) inputRepCalls.value = 0;
-      if (inputRepWhatsapp) inputRepWhatsapp.value = 0;
-      if (inputRepContacts) inputRepContacts.value = 0;
       if (inputRepFollowups) inputRepFollowups.value = 0;
       if (inputRepProspeccoes) inputRepProspeccoes.value = 0;
 
       if (inputRepScheduled) inputRepScheduled.value = 0;
       if (inputRepHeld) inputRepHeld.value = 0;
-      if (inputRepQualified) inputRepQualified.value = 0;
-      if (inputRepNoshow) inputRepNoshow.value = 0;
-
       if (inputRepSales) inputRepSales.value = 0;
+
       if (inputRepContracts) inputRepContracts.value = 'R$ 0,00';
       if (inputRepCash) inputRepCash.value = 'R$ 0,00';
-      if (inputRepPipeline) inputRepPipeline.value = 'R$ 0,00';
+
+      updateLiveKpis();
 
       successScreen.style.display = 'none';
       formContainer.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
+
+  // Inicializar preview dos KPIs no topo
+  updateLiveKpis();
 
 });

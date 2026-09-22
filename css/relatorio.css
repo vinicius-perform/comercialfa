@@ -1077,6 +1077,237 @@ input[type=number] {
 /* ==========================================================================
    ESTILOS DE IMPRESSÃO (PDF DIRETO DO NAVEGADOR)
    ========================================================================== */
+/* ==========================================================================
+   CARDS DE PREVIEW KPI NO TOPO DO FORMULÁRIO (ESTILO MEDIA_1790106547240)
+   ========================================================================== */
+.report-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .report-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 440px) {
+  .report-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.report-kpi-card {
+  background: #11141c;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+
+.report-kpi-card.highlight-cash-card {
+  background: rgba(30, 41, 25, 0.6);
+  border-color: rgba(163, 230, 53, 0.25);
+}
+
+.report-kpi-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #8b949e;
+  text-transform: uppercase;
+}
+
+.report-kpi-label.badge-cash-label {
+  background: rgba(163, 230, 53, 0.22);
+  color: #a3e635;
+  padding: 2px 8px;
+  border-radius: 4px;
+  align-self: flex-start;
+  font-weight: 800;
+}
+
+.report-kpi-val-row {
+  margin-top: 8px;
+}
+
+.report-kpi-val {
+  font-family: var(--font-display, var(--font-sans));
+  font-size: 26px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.report-kpi-val.lime-text {
+  color: #a3e635;
+}
+
+.report-kpi-sub {
+  font-size: 11px;
+  color: #8b949e;
+  margin-top: 5px;
+}
+
+.report-kpi-sub.lime-sub {
+  color: #a3e635;
+  opacity: 0.85;
+}
+
+/* ==========================================================================
+   SEÇÕES DE CAMPOS DE MÉTRICAS (ESTILO MEDIA_1790106547240)
+   ========================================================================== */
+.report-section-card {
+  background: #11141c;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.report-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.report-header-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a3e635;
+  flex-shrink: 0;
+}
+
+.report-header-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.report-header-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.report-header-sub {
+  font-size: 11.5px;
+  color: #8b949e;
+  margin: 2px 0 0 0;
+}
+
+.report-fields-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.report-fields-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+@media (max-width: 640px) {
+  .report-fields-grid-3, .report-fields-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.report-field-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.report-field-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #8b949e;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.report-field-label.label-cash-lime {
+  color: #a3e635;
+  font-weight: 800;
+}
+
+.report-input-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.12);
+  padding: 4px 0 6px 0;
+  transition: all 0.2s ease;
+}
+
+.report-input-row:focus-within {
+  border-bottom-color: #a3e635;
+}
+
+.report-input-row.highlight-lime-row {
+  border-bottom-color: rgba(163, 230, 53, 0.4);
+}
+
+.report-input-row.highlight-lime-row:focus-within {
+  border-bottom-color: #a3e635;
+}
+
+.report-input-prefix {
+  font-size: 16px;
+  font-weight: 700;
+  color: #8b949e;
+  margin-right: 8px;
+  user-select: none;
+}
+
+.report-input-prefix.prefix-icon {
+  display: flex;
+  align-items: center;
+  color: #8b949e;
+}
+
+.report-input-prefix.lime-prefix {
+  color: #a3e635;
+}
+
+.report-clean-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: var(--font-display, var(--font-sans));
+  font-size: 20px;
+  font-weight: 700;
+  outline: none;
+  font-variant-numeric: tabular-nums;
+  padding: 0;
+}
+
+.report-clean-input.lime-input {
+  color: #a3e635;
+}
+
 @media print {
   body {
     background: #ffffff !important;
