@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Botões de navegação rápida
   const btnQuickGotoSdr = document.getElementById('btn-quick-goto-sdr');
   const btnQuickGotoCloser = document.getElementById('btn-quick-goto-closer');
+  const btnCopyTeamLink = document.getElementById('btn-copy-team-link');
   const bannerGoSdr = document.getElementById('banner-go-sdr');
   const bannerGoCloser = document.getElementById('banner-go-closer');
   const btnSdrToDashboard = document.getElementById('btn-sdr-to-dashboard');
@@ -518,6 +519,29 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnQuickGotoCloser) {
     btnQuickGotoCloser.addEventListener('click', () => showView('view-closers'));
   }
+  if (btnCopyTeamLink) {
+    btnCopyTeamLink.addEventListener('click', () => {
+      const currentUrl = window.location.href;
+      let baseUrl = currentUrl.split('#')[0];
+      if (baseUrl.endsWith('index.html')) {
+        baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('index.html'));
+      }
+      if (!baseUrl.endsWith('/')) {
+        baseUrl += '/';
+      }
+      const teamUrl = baseUrl + 'relatorio.html';
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(teamUrl).then(() => {
+          showToast('Link da equipe copiado! Envie no WhatsApp.');
+        }).catch(() => {
+          window.open(teamUrl, '_blank');
+        });
+      } else {
+        window.open(teamUrl, '_blank');
+      }
+    });
+  }
   if (bannerGoSdr) {
     bannerGoSdr.addEventListener('click', () => showView('view-sdrs'));
   }
@@ -530,6 +554,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnCloserToDashboard) {
     btnCloserToDashboard.addEventListener('click', () => showView('view-dashboard'));
   }
+
+  // Sincronização automática quando relatórios forem enviados pela equipe no portal relatorio.html
+  window.addEventListener('storage', (e) => {
+    if (e.key === STORAGE_CLOSER_REPORTS || e.key === STORAGE_SDR_REPORTS) {
+      updateExecDashboard();
+      if (typeof renderConsolidatedHistory === 'function') {
+        renderConsolidatedHistory();
+      }
+      showToast('Novos dados de relatório recebidos da equipe!');
+    }
+  });
 
   // ============================================================
   // DASHBOARD EXECUTIVO GERAL • CÁLCULOS, ANDAMENTO & PROJEÇÃO

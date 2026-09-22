@@ -383,6 +383,24 @@ body {
   transform: translateY(-1px);
 }
 
+.btn-cta-copy-link {
+  background: #1a1e26;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.btn-cta-copy-link svg {
+  color: var(--accent-lime);
+}
+
+.btn-cta-copy-link:hover {
+  background: #11141a;
+  border-color: var(--accent-lime);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px var(--accent-lime-glow);
+}
+
 .btn-top-cta svg {
   width: 15px;
   height: 15px;
