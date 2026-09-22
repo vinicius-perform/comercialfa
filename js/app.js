@@ -7,10 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   // CONFIGURAÇÃO, CONSTANTES & ESTADO GLOBAL
   // ============================================================
-  const closersList = ['Tales', 'José', 'Muller', 'Elinaldo'];
+  const closersList = ['Tales', 'José', 'Elinaldo'];
   const sdrsList = ['SDR 1', 'SDR 2', 'SDR 3', 'SDR 4'];
   
-  let currentCloser = 'Muller';
+  let currentCloser = 'Tales';
   let currentSdr = 'SDR 1';
   let currentView = 'view-dashboard';
 
@@ -62,20 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
           sales: 1,
           contractVal: 'R$ 15.000,00',
           cashCollected: 'R$ 12.500,00',
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: `Muller_${yyyy}-${mm}-22`,
-          closer: 'Muller',
-          date: formattedToday,
-          leads: 22,
-          followups: 40,
-          prospeccoes: 20,
-          meetingsScheduled: 8,
-          meetingsHeld: 6,
-          sales: 3,
-          contractVal: 'R$ 38.000,00',
-          cashCollected: 'R$ 26.500,00',
           updatedAt: new Date().toISOString()
         },
         {
@@ -415,7 +401,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function getStoredCloserReports() {
     try {
       const data = localStorage.getItem(STORAGE_CLOSER_REPORTS);
-      return data ? JSON.parse(data) : [];
+      const reports = data ? JSON.parse(data) : [];
+      return reports.filter(r => r.closer !== 'Muller');
     } catch (e) {
       console.error('Erro ao ler relatórios dos closers', e);
       return [];
@@ -1470,6 +1457,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showView('view-dashboard');
   }
 
-  selectCloser('Muller');
+  selectCloser('Tales');
   selectSdr('SDR 1');
 });

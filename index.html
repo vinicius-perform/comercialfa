@@ -71,21 +71,17 @@
             <span class="nav-label">Hub Closers</span>
           </a>
 
-          <!-- Sub-seletor rápido de Closers -->
+          <!-- Sub-seletor rápido da Equipe -->
           <div class="sidebar-closers-sub">
-            <span class="sub-section-title">CLOSERS DA EQUIPE</span>
+            <span class="sub-section-title">EQUIPE</span>
             <div class="closers-chips-list">
-              <button type="button" class="closer-chip" data-closer="Tales">
+              <button type="button" class="closer-chip active" data-closer="Tales">
                 <span class="chip-avatar">T</span>
                 <span>Tales</span>
               </button>
               <button type="button" class="closer-chip" data-closer="José">
                 <span class="chip-avatar">J</span>
                 <span>José</span>
-              </button>
-              <button type="button" class="closer-chip active" data-closer="Muller">
-                <span class="chip-avatar">M</span>
-                <span>Muller</span>
               </button>
               <button type="button" class="closer-chip" data-closer="Elinaldo">
                 <span class="chip-avatar">E</span>
@@ -386,8 +382,8 @@
             </div>
             <div class="banner-module-body">
               <div class="banner-tag">MÓDULO DE FECHAMENTO</div>
-              <h3 class="banner-title">Relatório dos Closers</h3>
-              <p class="banner-desc">Lançamento diário de reuniões realizadas, contratos emitidos e cash coletado (Tales, José, Muller e Elinaldo) com PDF.</p>
+              <h3 class="banner-title">Relatório da Equipe</h3>
+              <p class="banner-desc">Lançamento diário de reuniões realizadas, contratos emitidos e cash coletado (Tales, José e Elinaldo) com PDF.</p>
               <button type="button" class="btn-banner-action">
                 <span>Acessar Hub dos Closers</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -819,7 +815,7 @@
       </section>
 
       <!-- ==========================================================
-           VIEW 3: HUB DOS CLOSERS (Tales, José, Muller, Elinaldo)
+           VIEW 3: HUB DE FECHAMENTO (Tales, José, Elinaldo)
            ========================================================== -->
       <section id="view-closers" class="app-view">
         <!-- Cabeçalho Exclusivo para Impressão / PDF A4 do Closer -->
@@ -841,10 +837,10 @@
         <!-- Top Bar Interativa do Closer -->
         <header class="top-bar">
           <div class="top-bar-left">
-            <h1 class="page-title">Hub dos Closers</h1>
+            <h1 class="page-title">Hub da Equipe</h1>
             <span class="closer-active-pill" id="header-closer-pill">
               <span class="pulse-dot"></span>
-              <span id="header-closer-name">Muller</span>
+              <span id="header-closer-name">Tales</span>
             </span>
           </div>
 
@@ -942,11 +938,10 @@
                   <p class="box-card-desc">Lançamento diário de esforço e conversão comercial</p>
                 </div>
 
-                <!-- Seletor Rápido de Closer no Card -->
+                <!-- Seletor Rápido da Equipe no Card -->
                 <div class="closer-selector-segmented">
-                  <button type="button" class="segmented-btn" data-closer="Tales">Tales</button>
+                  <button type="button" class="segmented-btn active" data-closer="Tales">Tales</button>
                   <button type="button" class="segmented-btn" data-closer="José">José</button>
-                  <button type="button" class="segmented-btn active" data-closer="Muller">Muller</button>
                   <button type="button" class="segmented-btn" data-closer="Elinaldo">Elinaldo</button>
                 </div>
               </div>
@@ -1137,7 +1132,7 @@
                   <line x1="16" y1="13" x2="8" y2="13"></line>
                   <line x1="16" y1="17" x2="8" y2="17"></line>
                 </svg>
-                <span id="btn-pdf-label">GERAR RELATÓRIO DE MULLER (PDF)</span>
+                <span id="btn-pdf-label">GERAR RELATÓRIO DE TALES (PDF)</span>
               </button>
 
               <div class="actions-secondary-row">
@@ -1201,7 +1196,6 @@
                 <option value="all">Toda a Equipe</option>
                 <option value="Tales">Tales (Closer)</option>
                 <option value="José">José (Closer)</option>
-                <option value="Muller">Muller (Closer)</option>
                 <option value="Elinaldo">Elinaldo (Closer)</option>
                 <option value="SDR 1">SDR 1</option>
                 <option value="SDR 2">SDR 2</option>

@@ -4,10 +4,9 @@ Interface web dark-tech de alta fidelidade para preenchimento de métricas diár
 
 ---
 
-## 👥 Closers Integrados
+## 👥 Membros Integrados
 - **Tales**
 - **José**
-- **Muller**
 - **Elinaldo**
 
 ---
