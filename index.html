@@ -39,6 +39,17 @@
             </span>
             <span class="nav-label">Dashboard Geral</span>
           </a>
+
+          <a href="#projects" class="nav-link" data-view="view-projects" id="nav-projects">
+            <span class="nav-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                <line x1="12" y1="11" x2="12" y2="17"></line>
+                <line x1="9" y1="14" x2="15" y2="14"></line>
+              </svg>
+            </span>
+            <span class="nav-label">Projetos & Clientes</span>
+          </a>
         </nav>
       </div>
 
@@ -152,10 +163,38 @@
         <header class="top-bar">
           <div class="top-bar-left">
             <h1 class="page-title">Dashboard Executivo</h1>
-            <span class="closer-active-pill" id="header-period-pill">
-              <span class="pulse-dot"></span>
-              <span id="exec-month-display">Setembro • 2026</span>
-            </span>
+            <div class="topbar-filters-wrapper">
+              <!-- Seletor de Cliente / Projeto -->
+              <div class="topbar-filter-chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <select id="dash-filter-client" class="topbar-filter-select">
+                  <option value="all">🌐 Visão Consolidada (Todos os Clientes)</option>
+                </select>
+              </div>
+
+              <!-- Seletor de Mês -->
+              <div class="topbar-filter-chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <select id="dash-filter-month" class="topbar-filter-select">
+                  <option value="2026-09">Setembro • 2026 (Atual)</option>
+                  <option value="2026-08">Agosto • 2026</option>
+                  <option value="2026-07">Julho • 2026</option>
+                </select>
+              </div>
+
+              <!-- Badge Supabase Cloud Status -->
+              <span class="supabase-cloud-badge" id="supabase-cloud-status" title="Conexão com Banco de Dados Supabase">
+                <span class="cloud-dot"></span>
+                <span id="supabase-cloud-text">Supabase Conectado</span>
+              </span>
+            </div>
           </div>
 
           <div class="top-bar-right">
@@ -476,7 +515,58 @@
       </section>
 
       <!-- ==========================================================
-           VIEW 2: HUB DOS SDRs (Prospecção & Qualificação)
+           VIEW: GESTÃO DE PROJETOS & CLIENTES (Planejamento Mensal)
+           ========================================================== -->
+      <section id="view-projects" class="app-view">
+        <!-- Top Bar Projetos -->
+        <header class="top-bar">
+          <div class="top-bar-left">
+            <h1 class="page-title">Projetos & Clientes</h1>
+            <span class="closer-active-pill" id="projects-active-pill">
+              <span class="pulse-dot"></span>
+              <span id="projects-active-count">Carregando clientes...</span>
+            </span>
+          </div>
+
+          <div class="top-bar-right">
+            <button type="button" class="btn-top-cta btn-cta-sdr" id="btn-open-create-client">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>+ Novo Cliente</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- KPI Summary Strip de Projetos -->
+        <div class="projects-summary-strip">
+          <div class="p-strip-item">
+            <span class="p-strip-label">CLIENTES ATIVOS</span>
+            <span class="p-strip-val" id="p-stat-total-clients">0</span>
+          </div>
+          <div class="p-strip-item">
+            <span class="p-strip-label">META TOTAL PLANEJADA (MÊS)</span>
+            <span class="p-strip-val highlight-lime" id="p-stat-planned-rev">R$ 0,00</span>
+          </div>
+          <div class="p-strip-item">
+            <span class="p-strip-label">FATURAMENTO REALIZADO (MÊS)</span>
+            <span class="p-strip-val" id="p-stat-actual-rev">R$ 0,00</span>
+          </div>
+          <div class="p-strip-item">
+            <span class="p-strip-label">COBERTURA DA META</span>
+            <span class="p-strip-val" id="p-stat-achievement">0%</span>
+          </div>
+        </div>
+
+        <!-- Grid de Cards dos Clientes -->
+        <div class="projects-clients-grid" id="projects-clients-container">
+          <!-- Injetado dinamicamente via app.js -->
+        </div>
+      </section>
+
+      <!-- ==========================================================
+           VIEW 3: HUB DOS SDRs (Prospecção & Qualificação)
            ========================================================== -->
       <section id="view-sdrs" class="app-view">
         <!-- Top Bar SDR -->
@@ -1289,7 +1379,164 @@
     </div>
   </div>
 
+  <!-- ============================================================
+       MODAL: CADASTRO / EDIÇÃO DE CLIENTE
+       ============================================================ -->
+  <div class="modal-backdrop" id="modal-client">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-client-title">Novo Cliente / Projeto</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-client">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="client-form-id" value="">
+        <div class="modal-field">
+          <label for="client-name" class="field-label">NOME DA EMPRESA / CLIENTE *</label>
+          <div class="uifry-input-box">
+            <input type="text" id="client-name" class="uifry-input font-bold" placeholder="Ex: Grupo Alpha Consultoria" required>
+          </div>
+        </div>
+
+        <div class="modal-field" style="margin-top: 14px;">
+          <label for="client-segment" class="field-label">SEGMENTO DE ATUAÇÃO</label>
+          <div class="uifry-input-box">
+            <input type="text" id="client-segment" class="uifry-input" placeholder="Ex: B2B SaaS, Consultoria, Educação, etc.">
+          </div>
+        </div>
+
+        <div class="modal-field" style="margin-top: 14px;">
+          <label for="client-responsible" class="field-label">RESPONSÁVEL COMERCIAL</label>
+          <div class="uifry-input-box">
+            <select id="client-responsible" class="uifry-input" style="background: transparent; border: none; cursor: pointer;">
+              <option value="Tales">Tales (Closer)</option>
+              <option value="José">José (Closer)</option>
+              <option value="Elinaldo">Elinaldo (Closer)</option>
+              <option value="Diretoria">Diretoria Comercial</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-field" style="margin-top: 14px;">
+          <label for="client-status" class="field-label">STATUS DO PROJETO</label>
+          <div class="uifry-input-box">
+            <select id="client-status" class="uifry-input" style="background: transparent; border: none; cursor: pointer;">
+              <option value="active">🟢 Ativo (Em Operação)</option>
+              <option value="onboarding">🟡 Em Onboarding</option>
+              <option value="paused">⚪ Pausado / Em Espera</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-uifry-sec" id="btn-cancel-client">Cancelar</button>
+        <button type="button" class="btn-uifry-lime" id="btn-save-client">Salvar Cliente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: PLANEJAMENTO MENSAL DO CLIENTE
+       ============================================================ -->
+  <div class="modal-backdrop" id="modal-planning">
+    <div class="modal-card modal-card-wide">
+      <div class="modal-header">
+        <div>
+          <span class="planning-header-tag" id="planning-client-tag">CLIENTE</span>
+          <h3 class="modal-title" id="planning-client-name">Planejamento do Mês</h3>
+        </div>
+        <button type="button" class="modal-close-btn" id="btn-close-planning">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="planning-client-id" value="">
+        
+        <!-- Seleção de Mês do Planejamento -->
+        <div class="planning-month-bar">
+          <label class="field-label">MÊS DE REFERÊNCIA:</label>
+          <input type="month" id="planning-month-picker" class="planning-month-input" value="2026-09">
+        </div>
+
+        <!-- Grade de Metas do Mês -->
+        <div class="planning-fields-grid">
+          <div class="modal-field">
+            <label for="plan-revenue-goal" class="field-label">META DE FATURAMENTO (R$) *</label>
+            <div class="uifry-input-box lime-highlight-box">
+              <span class="field-prefix lime-color">$</span>
+              <input type="text" id="plan-revenue-goal" class="uifry-input font-bold" value="R$ 50.000,00" required>
+            </div>
+            <span class="modal-hint">Receita líquida total esperada no mês.</span>
+          </div>
+
+          <div class="modal-field">
+            <label for="plan-sales-goal" class="field-label">META DE VENDAS (UNIDADES)</label>
+            <div class="uifry-input-box">
+              <input type="number" id="plan-sales-goal" class="uifry-input font-bold" min="0" value="5">
+            </div>
+            <span class="modal-hint">Número de contratos fechados.</span>
+          </div>
+
+          <div class="modal-field">
+            <label for="plan-meetings-goal" class="field-label">META DE REUNIÕES</label>
+            <div class="uifry-input-box">
+              <input type="number" id="plan-meetings-goal" class="uifry-input font-bold" min="0" value="15">
+            </div>
+            <span class="modal-hint">Reuniões qualificadas realizadas.</span>
+          </div>
+
+          <div class="modal-field">
+            <label for="plan-money-table" class="field-label">DINHEIRO NA MESA PREVISTO (R$)</label>
+            <div class="uifry-input-box">
+              <span class="field-prefix">$</span>
+              <input type="text" id="plan-money-table" class="uifry-input" value="R$ 25.000,00">
+            </div>
+            <span class="modal-hint">Pipeline estimado em negociação.</span>
+          </div>
+        </div>
+
+        <div class="modal-field" style="margin-top: 14px;">
+          <label for="plan-notes" class="field-label">DIRETRIZES & ESTRATÉGIA DO MÊS</label>
+          <div class="uifry-input-box">
+            <input type="text" id="plan-notes" class="uifry-input" placeholder="Ex: Foco no ICP de indústrias, oferta de ticket premium, etc.">
+          </div>
+        </div>
+
+        <!-- Histórico de Planejamento do Cliente -->
+        <div class="planning-history-box" style="margin-top: 18px;">
+          <span class="field-label">HISTÓRICO DE MESES DESTE CLIENTE</span>
+          <div class="table-responsive-box" style="margin-top: 8px;">
+            <table class="uifry-table" style="font-size: 12px;">
+              <thead>
+                <tr>
+                  <th>Mês</th>
+                  <th>Meta Faturamento</th>
+                  <th>Realizado</th>
+                  <th>Atingimento</th>
+                  <th>Vendas</th>
+                  <th style="text-align: right;">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="planning-history-table-body">
+                <!-- Preenchido via app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-uifry-sec" id="btn-cancel-planning">Fechar</button>
+        <button type="button" class="btn-uifry-lime" id="btn-save-planning">Salvar Planejamento</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast-container" id="toast-container"></div>
+  <!-- Supabase JS CDN & Motores -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -25,6 +25,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputReportDate = document.getElementById('input-report-date');
   const btnSetToday = document.getElementById('btn-set-today');
   const displayTodayText = document.getElementById('display-today-text');
+  const selectClientId = document.getElementById('report-client-id');
+
+  // Carrega clientes disponíveis no seletor
+  if (selectClientId && typeof dbFetchClients === 'function') {
+    dbFetchClients().then(clients => {
+      if (Array.isArray(clients)) {
+        clients.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = `${c.name} (${c.segment || 'Geral'})`;
+          selectClientId.appendChild(opt);
+        });
+      }
+    }).catch(err => console.warn('Erro ao buscar clientes no portal:', err));
+  }
 
   // Closer Inputs
   const inputCLeads = document.getElementById('c-leads');
@@ -255,10 +270,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const totalEffort = followups + prospeccoes;
       const attendanceRate = scheduled > 0 ? Math.min(100, Math.round((held / scheduled) * 100)) : (held > 0 ? 100 : 0);
       const convRate = held > 0 ? Math.min(100, Math.round((sales / held) * 100)) : (sales > 0 ? 100 : 0);
+      const selectedClientId = selectClientId ? selectClientId.value : null;
 
       return {
         role: 'closer',
         name: effectiveName,
+        clientId: selectedClientId,
         date: selectedDate,
         leads,
         followups,
@@ -281,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const qualified = Math.max(0, parseInt(inputSQualified.value, 10) || 0);
       const noshow = Math.max(0, parseInt(inputSNoshow.value, 10) || 0);
       const pipeline = formatMoneyString(inputSPipeline.value);
+      const selectedClientId = selectClientId ? selectClientId.value : null;
 
       const contactRate = leads > 0 ? Math.min(100, Math.round((contacts / leads) * 100)) : 0;
       const scheduleRate = contacts > 0 ? Math.min(100, Math.round((scheduled / contacts) * 100)) : 0;
@@ -288,6 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return {
         role: 'sdr',
         name: effectiveName,
+        clientId: selectedClientId,
         date: selectedDate,
         leads,
         calls,
@@ -404,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.role === 'closer') {
       let reports = [];
       try {
-        const raw = localStorage.getItem(STORAGE_CLOSER_REPORTS);
+        const raw = localStorage.getItem('closerReports_v2') || localStorage.getItem('fa_closers_uifry_reports_v1');
         reports = raw ? JSON.parse(raw) : [];
       } catch (err) {
         reports = [];
@@ -414,6 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const record = {
         id: reportId,
         closer: data.name,
+        clientId: data.clientId || null,
         date: data.date,
         leads: data.leads,
         followups: data.followups,
@@ -432,12 +452,18 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         reports.unshift(record);
       }
-      localStorage.setItem(STORAGE_CLOSER_REPORTS, JSON.stringify(reports));
+      localStorage.setItem('closerReports_v2', JSON.stringify(reports));
+      localStorage.setItem('fa_closers_uifry_reports_v1', JSON.stringify(reports));
+
+      // Sincronização em nuvem via Supabase
+      if (typeof dbSyncCloserReport === 'function') {
+        dbSyncCloserReport(record);
+      }
 
     } else {
       let reports = [];
       try {
-        const raw = localStorage.getItem(STORAGE_SDR_REPORTS);
+        const raw = localStorage.getItem('sdrReports_v2') || localStorage.getItem('fa_sdr_reports_v1');
         reports = raw ? JSON.parse(raw) : [];
       } catch (err) {
         reports = [];
@@ -450,6 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const record = {
         id: reportId,
         sdr: sdrKey,
+        clientId: data.clientId || null,
         customName: customName,
         date: data.date,
         leads: data.leads,
@@ -459,6 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scheduled: data.scheduled,
         qualified: data.qualified,
         noshow: data.noshow,
+        pipeline: data.pipeline,
         pipelineVal: data.pipeline,
         updatedAt: new Date().toISOString()
       };
@@ -469,7 +497,13 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         reports.unshift(record);
       }
-      localStorage.setItem(STORAGE_SDR_REPORTS, JSON.stringify(reports));
+      localStorage.setItem('sdrReports_v2', JSON.stringify(reports));
+      localStorage.setItem('fa_sdr_reports_v1', JSON.stringify(reports));
+
+      // Sincronização em nuvem via Supabase
+      if (typeof dbSyncSdrReport === 'function') {
+        dbSyncSdrReport(record);
+      }
     }
   }
 

@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Views
   const views = {
     'view-dashboard': document.getElementById('view-dashboard'),
+    'view-projects': document.getElementById('view-projects'),
     'view-sdrs': document.getElementById('view-sdrs'),
     'view-closers': document.getElementById('view-closers'),
     'view-history': document.getElementById('view-history')
@@ -132,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Links da Sidebar
   const navLinks = {
     'view-dashboard': document.getElementById('nav-dashboard'),
+    'view-projects': document.getElementById('nav-projects'),
     'view-sdrs': document.getElementById('nav-sdrs'),
     'view-closers': document.getElementById('nav-closers'),
     'view-history': document.getElementById('nav-history')
@@ -194,6 +196,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const execRankingTableBody = document.getElementById('exec-ranking-table-body');
   const btnExportExecCsv = document.getElementById('btn-export-exec-csv');
+
+  // --- FILTROS TOPBAR & CONEXÃO SUPABASE ---
+  const dashFilterClient = document.getElementById('dash-filter-client');
+  const dashFilterMonth = document.getElementById('dash-filter-month');
+  const supabaseCloudStatus = document.getElementById('supabase-cloud-status');
+  const supabaseCloudText = document.getElementById('supabase-cloud-text');
+
+  // --- ELEMENTOS DA ABA PROJETOS & CLIENTES ---
+  const btnOpenCreateClient = document.getElementById('btn-open-create-client');
+  const projectsClientsContainer = document.getElementById('projects-clients-container');
+  const projectsActiveCount = document.getElementById('projects-active-count');
+  const pStatTotalClients = document.getElementById('p-stat-total-clients');
+  const pStatPlannedRev = document.getElementById('p-stat-planned-rev');
+  const pStatActualRev = document.getElementById('p-stat-actual-rev');
+  const pStatAchievement = document.getElementById('p-stat-achievement');
+
+  // Modal de Cliente
+  const modalClient = document.getElementById('modal-client');
+  const modalClientTitle = document.getElementById('modal-client-title');
+  const clientFormId = document.getElementById('client-form-id');
+  const clientName = document.getElementById('client-name');
+  const clientSegment = document.getElementById('client-segment');
+  const clientResponsible = document.getElementById('client-responsible');
+  const clientStatus = document.getElementById('client-status');
+  const btnCloseClient = document.getElementById('btn-close-client');
+  const btnCancelClient = document.getElementById('btn-cancel-client');
+  const btnSaveClient = document.getElementById('btn-save-client');
+
+  // Modal de Planejamento Mensal
+  const modalPlanning = document.getElementById('modal-planning');
+  const planningClientId = document.getElementById('planning-client-id');
+  const planningClientName = document.getElementById('planning-client-name');
+  const planningClientTag = document.getElementById('planning-client-tag');
+  const planningMonthPicker = document.getElementById('planning-month-picker');
+  const planRevenueGoal = document.getElementById('plan-revenue-goal');
+  const planSalesGoal = document.getElementById('plan-sales-goal');
+  const planMeetingsGoal = document.getElementById('plan-meetings-goal');
+  const planMoneyTable = document.getElementById('plan-money-table');
+  const planNotes = document.getElementById('plan-notes');
+  const planningHistoryTableBody = document.getElementById('planning-history-table-body');
+  const btnClosePlanning = document.getElementById('btn-close-planning');
+  const btnCancelPlanning = document.getElementById('btn-cancel-planning');
+  const btnSavePlanning = document.getElementById('btn-save-planning');
 
   // --- ELEMENTOS DO HUB DE SDRs ---
   const sdrReportDate = document.getElementById('sdr-report-date');
@@ -395,15 +440,27 @@ document.addEventListener('DOMContentLoaded', () => {
   setupCurrencyInput(inputSdrPipeline);
   setupCurrencyInput(settingMonthlyGoal);
   setupCurrencyInput(settingMoneyTable);
+  setupCurrencyInput(planRevenueGoal);
+  setupCurrencyInput(planMoneyTable);
 
   // ============================================================
   // LOCAL STORAGE HELPERS
   // ============================================================
   function getStoredCloserReports() {
     try {
-      const data = localStorage.getItem(STORAGE_CLOSER_REPORTS);
-      const reports = data ? JSON.parse(data) : [];
-      return reports.filter(r => r.closer !== 'Muller');
+      const data1 = localStorage.getItem(STORAGE_CLOSER_REPORTS);
+      const data2 = localStorage.getItem('closerReports_v2');
+      const r1 = data1 ? JSON.parse(data1) : [];
+      const r2 = data2 ? JSON.parse(data2) : [];
+      
+      const map = new Map();
+      r1.forEach(r => map.set(r.id, r));
+      r2.forEach(r => {
+        const existing = map.get(r.id) || {};
+        map.set(r.id, { ...existing, ...r });
+      });
+
+      return Array.from(map.values()).filter(r => r.closer !== 'Muller');
     } catch (e) {
       console.error('Erro ao ler relatórios dos closers', e);
       return [];
@@ -413,6 +470,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveStoredCloserReports(reports) {
     try {
       localStorage.setItem(STORAGE_CLOSER_REPORTS, JSON.stringify(reports));
+      localStorage.setItem('closerReports_v2', JSON.stringify(reports));
+
+      // Sincroniza com Supabase Cloud se disponível
+      if (typeof dbSyncCloserReport === 'function' && Array.isArray(reports)) {
+        reports.forEach(r => dbSyncCloserReport(r));
+      }
     } catch (e) {
       console.error('Erro ao salvar relatórios dos closers', e);
     }
@@ -420,8 +483,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function getStoredSdrReports() {
     try {
-      const data = localStorage.getItem(STORAGE_SDR_REPORTS);
-      return data ? JSON.parse(data) : [];
+      const data1 = localStorage.getItem(STORAGE_SDR_REPORTS);
+      const data2 = localStorage.getItem('sdrReports_v2');
+      const r1 = data1 ? JSON.parse(data1) : [];
+      const r2 = data2 ? JSON.parse(data2) : [];
+
+      const map = new Map();
+      r1.forEach(r => map.set(r.id, r));
+      r2.forEach(r => {
+        const existing = map.get(r.id) || {};
+        map.set(r.id, { ...existing, ...r });
+      });
+
+      return Array.from(map.values());
     } catch (e) {
       console.error('Erro ao ler relatórios dos SDRs', e);
       return [];
@@ -431,6 +505,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveStoredSdrReports(reports) {
     try {
       localStorage.setItem(STORAGE_SDR_REPORTS, JSON.stringify(reports));
+      localStorage.setItem('sdrReports_v2', JSON.stringify(reports));
+
+      // Sincroniza com Supabase Cloud se disponível
+      if (typeof dbSyncSdrReport === 'function' && Array.isArray(reports)) {
+        reports.forEach(r => dbSyncSdrReport(r));
+      }
     } catch (e) {
       console.error('Erro ao salvar relatórios dos SDRs', e);
     }
@@ -492,6 +572,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Recalcula conforme a visão
     if (viewId === 'view-dashboard') {
       updateExecDashboard();
+    } else if (viewId === 'view-projects') {
+      renderProjectsView();
     } else if (viewId === 'view-sdrs') {
       loadSdrDayData();
       renderSdrHistory();
@@ -570,22 +652,81 @@ document.addEventListener('DOMContentLoaded', () => {
   // DASHBOARD EXECUTIVO GERAL • CÁLCULOS, ANDAMENTO & PROJEÇÃO
   // ============================================================
   function updateExecDashboard() {
-    const goal = getMonthlyGoal();
-    const tableMoney = getMoneyOnTable();
+    const selectedClientId = dashFilterClient ? dashFilterClient.value : 'all';
+    const selectedMonth = dashFilterMonth ? dashFilterMonth.value : currentMonthKey;
+
+    // Extrai ano e mês selecionados
+    const [selY, selM] = (selectedMonth || currentMonthKey).split('-').map(Number);
+    const totalDaysInMonth = new Date(selY, selM, 0).getDate();
+    const isCurrentMonth = (selectedMonth === currentMonthKey);
+    const isPastMonth = (selectedMonth < currentMonthKey);
+
+    let passedDays = 0;
+    let remainingDays = 0;
+    let timeElapsedPct = 0;
+
+    if (isPastMonth) {
+      passedDays = totalDaysInMonth;
+      remainingDays = 0;
+      timeElapsedPct = 100;
+    } else if (isCurrentMonth) {
+      passedDays = Math.max(1, today.getDate());
+      remainingDays = Math.max(0, totalDaysInMonth - passedDays);
+      timeElapsedPct = Math.round((passedDays / totalDaysInMonth) * 100);
+    } else {
+      passedDays = 0;
+      remainingDays = totalDaysInMonth;
+      timeElapsedPct = 0;
+    }
+
     const winRate = getPipelineWinRate();
 
-    // Dias do mês
-    const totalDaysInMonth = new Date(yyyy, today.getMonth() + 1, 0).getDate();
-    const passedDays = Math.max(1, today.getDate());
-    const remainingDays = Math.max(0, totalDaysInMonth - passedDays);
-    const timeElapsedPct = Math.round((passedDays / totalDaysInMonth) * 100);
-
-    // Carrega registros do mês corrente
+    // Carrega registros
     const closerReports = getStoredCloserReports();
     const sdrReports = getStoredSdrReports();
 
-    const monthCloserReports = closerReports.filter(r => (r.date || '').startsWith(currentMonthKey));
-    const monthSdrReports = sdrReports.filter(r => (r.date || '').startsWith(currentMonthKey));
+    let monthCloserReports = closerReports.filter(r => (r.date || '').startsWith(selectedMonth));
+    let monthSdrReports = sdrReports.filter(r => (r.date || '').startsWith(selectedMonth));
+
+    // Se filtrou por um cliente específico
+    if (selectedClientId !== 'all') {
+      const allClients = JSON.parse(localStorage.getItem('projects_clients_v2') || '[]');
+      const targetClient = allClients.find(c => c.id === selectedClientId);
+
+      monthCloserReports = monthCloserReports.filter(r => {
+        if (r.clientId) return r.clientId === selectedClientId;
+        return targetClient && targetClient.responsible === r.closer;
+      });
+      monthSdrReports = monthSdrReports.filter(r => {
+        if (r.clientId) return r.clientId === selectedClientId;
+        return targetClient && targetClient.responsible === r.sdr;
+      });
+    }
+
+    // Busca metas de planejamento para o mês e cliente selecionados
+    let goal = 0;
+    let tableMoney = 0;
+    const plannings = JSON.parse(localStorage.getItem('projects_planning_v2') || '[]');
+
+    if (selectedClientId !== 'all') {
+      const plan = plannings.find(p => p.client_id === selectedClientId && p.year_month === selectedMonth);
+      if (plan) {
+        goal = Number(plan.revenue_goal) || 0;
+        tableMoney = Number(plan.money_on_table) || 0;
+      } else {
+        goal = getMonthlyGoal();
+        tableMoney = getMoneyOnTable();
+      }
+    } else {
+      const monthPlans = plannings.filter(p => p.year_month === selectedMonth);
+      if (monthPlans.length > 0) {
+        goal = monthPlans.reduce((sum, p) => sum + (Number(p.revenue_goal) || 0), 0);
+        tableMoney = monthPlans.reduce((sum, p) => sum + (Number(p.money_on_table) || 0), 0);
+      } else {
+        goal = getMonthlyGoal();
+        tableMoney = getMoneyOnTable();
+      }
+    }
 
     // Totais de Closers
     let totalRevenue = 0;
@@ -622,22 +763,32 @@ document.addEventListener('DOMContentLoaded', () => {
       totalSdrLeads += parseInt(r.leads, 10) || 0;
       totalSdrContacts += parseInt(r.contacts, 10) || 0;
       totalSdrScheduled += parseInt(r.scheduled, 10) || 0;
-      totalSdrPipeline += parseMoneyToNumber(r.pipeline);
+      totalSdrPipeline += parseMoneyToNumber(r.pipeline || r.pipelineVal);
     });
 
-    // Adiciona o pipeline gerado pelos SDRs ao dinheiro na mesa se aplicável
     const effectiveTableMoney = tableMoney + (totalSdrPipeline > 0 ? totalSdrPipeline * 0.5 : 0);
 
     // Cálculos de Projeção & Run-Rate
     const dailyPace = passedDays > 0 ? (totalRevenue / passedDays) : 0;
-    const runRateTotal = dailyPace * totalDaysInMonth;
-    const tableForecastBonus = effectiveTableMoney * (winRate / 100);
-    const projectedTotal = totalRevenue + (dailyPace * remainingDays) + tableForecastBonus;
+    let runRateTotal = 0;
+    let projectedTotal = 0;
+    let goalPct = goal > 0 ? Math.round((totalRevenue / goal) * 100) : 0;
+    let projectionGoalPct = 0;
+    let goalGap = Math.max(0, goal - totalRevenue);
+    let requiredDailyPace = 0;
 
-    const goalPct = goal > 0 ? Math.round((totalRevenue / goal) * 100) : 0;
-    const projectionGoalPct = goal > 0 ? Math.round((projectedTotal / goal) * 100) : 0;
-    const goalGap = Math.max(0, goal - totalRevenue);
-    const requiredDailyPace = remainingDays > 0 ? (goalGap / remainingDays) : 0;
+    if (isPastMonth) {
+      runRateTotal = totalRevenue;
+      projectedTotal = totalRevenue;
+      projectionGoalPct = goalPct;
+      requiredDailyPace = 0;
+    } else {
+      runRateTotal = dailyPace * totalDaysInMonth;
+      const tableForecastBonus = effectiveTableMoney * (winRate / 100);
+      projectedTotal = totalRevenue + (dailyPace * remainingDays) + tableForecastBonus;
+      projectionGoalPct = goal > 0 ? Math.round((projectedTotal / goal) * 100) : 0;
+      requiredDailyPace = remainingDays > 0 ? (goalGap / remainingDays) : 0;
+    }
 
     // Atualização dos 4 Cards Executivos Superiores
     if (execRevenueTotal) execRevenueTotal.textContent = formatNumberToMoney(totalRevenue);
@@ -653,41 +804,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (execMoneyOnTable) execMoneyOnTable.textContent = formatNumberToMoney(effectiveTableMoney);
     if (execProjectionTotal) execProjectionTotal.textContent = formatNumberToMoney(projectedTotal);
-    if (execProjectionMetaPct) execProjectionMetaPct.textContent = `${projectionGoalPct}% da meta esperada`;
+    if (execProjectionMetaPct) {
+      if (isPastMonth) {
+        execProjectionMetaPct.textContent = `Mês finalizado com ${goalPct}% da meta`;
+      } else {
+        execProjectionMetaPct.textContent = `${projectionGoalPct}% da meta esperada`;
+      }
+    }
 
     // Atualização da Barra de Pacing
     const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-    const currentMonthName = monthNames[today.getMonth()] || 'Mês';
+    const selectedMonthName = monthNames[selM - 1] || 'Mês';
 
-    if (execMonthDisplay) execMonthDisplay.textContent = `${currentMonthName} • ${yyyy}`;
+    if (execMonthDisplay) {
+      if (selectedClientId !== 'all') {
+        const allClients = JSON.parse(localStorage.getItem('projects_clients_v2') || '[]');
+        const targetClient = allClients.find(c => c.id === selectedClientId);
+        execMonthDisplay.textContent = `${targetClient ? targetClient.name : 'Cliente'} • ${selectedMonthName} ${selY}`;
+      } else {
+        execMonthDisplay.textContent = `Consolidado • ${selectedMonthName} ${selY}`;
+      }
+    }
+
     if (execGoalLabel) execGoalLabel.textContent = formatNumberToMoney(goal);
-    if (execTimeElapsedLabel) execTimeElapsedLabel.textContent = `${timeElapsedPct}% (Dia ${passedDays} de ${totalDaysInMonth})`;
+    if (execTimeElapsedLabel) {
+      if (isPastMonth) {
+        execTimeElapsedLabel.textContent = `100% (Mês Encerrado • ${totalDaysInMonth} dias)`;
+      } else {
+        execTimeElapsedLabel.textContent = `${timeElapsedPct}% (Dia ${passedDays} de ${totalDaysInMonth})`;
+      }
+    }
     if (execMetaElapsedLabel) execMetaElapsedLabel.textContent = `${goalPct}% (${formatNumberToMoney(totalRevenue)})`;
 
     if (pacingBarTime) pacingBarTime.style.width = `${Math.min(100, timeElapsedPct)}%`;
     if (pacingPinTime) pacingPinTime.style.left = `${Math.min(100, timeElapsedPct)}%`;
     if (pacingBarMoney) pacingBarMoney.style.width = `${Math.min(100, goalPct)}%`;
-    if (pinDayNum) pinDayNum.textContent = passedDays;
+    if (pinDayNum) pinDayNum.textContent = isPastMonth ? totalDaysInMonth : passedDays;
 
     // Status do Ritmo (Pacing)
-    const pacingDiff = goalPct - timeElapsedPct;
     if (execPacingPill && execPacingStatusText) {
-      if (pacingDiff >= 0) {
-        execPacingPill.className = 'pacing-status-pill';
-        execPacingStatusText.textContent = `⚡ Ritmo Excelente (+${pacingDiff}% adiantado)`;
-      } else if (pacingDiff >= -15) {
-        execPacingPill.className = 'pacing-status-pill warning';
-        execPacingStatusText.textContent = `⚠️ Pacing Moderado (${Math.abs(pacingDiff)}% abaixo da data)`;
+      if (isPastMonth) {
+        if (totalRevenue >= goal && goal > 0) {
+          execPacingPill.className = 'pacing-status-pill';
+          execPacingStatusText.textContent = `🎯 Mês Encerrado: Meta Batida! (${goalPct}%)`;
+        } else {
+          execPacingPill.className = 'pacing-status-pill warning';
+          execPacingStatusText.textContent = `🏁 Mês Encerrado (${goalPct}% atingido)`;
+        }
       } else {
-        execPacingPill.className = 'pacing-status-pill warning';
-        execPacingStatusText.textContent = `⚠️ Atenção Comercial: Acelerar Fechamento`;
+        const pacingDiff = goalPct - timeElapsedPct;
+        if (pacingDiff >= 0) {
+          execPacingPill.className = 'pacing-status-pill';
+          execPacingStatusText.textContent = `⚡ Ritmo Excelente (+${pacingDiff}% adiantado)`;
+        } else if (pacingDiff >= -15) {
+          execPacingPill.className = 'pacing-status-pill warning';
+          execPacingStatusText.textContent = `⚠️ Pacing Moderado (${Math.abs(pacingDiff)}% abaixo da data)`;
+        } else {
+          execPacingPill.className = 'pacing-status-pill warning';
+          execPacingStatusText.textContent = `⚠️ Atenção Comercial: Acelerar Fechamento`;
+        }
       }
     }
 
     if (statDaysPassed) statDaysPassed.textContent = `${passedDays} dias`;
-    if (statDaysRemaining) statDaysRemaining.textContent = `${remainingDays} dias restantes`;
+    if (statDaysRemaining) statDaysRemaining.textContent = isPastMonth ? '0 dias (encerrado)' : `${remainingDays} dias restantes`;
     if (statCurrentDailyPace) statCurrentDailyPace.textContent = `${formatNumberToMoney(dailyPace)} / dia`;
-    if (statRequiredDailyPace) statRequiredDailyPace.textContent = `${formatNumberToMoney(requiredDailyPace)} / dia`;
+    if (statRequiredDailyPace) statRequiredDailyPace.textContent = isPastMonth ? '—' : `${formatNumberToMoney(requiredDailyPace)} / dia`;
+
     const statGapStatus = document.getElementById('stat-gap-status');
     const gapBox = document.querySelector('.gap-danger-box');
     if (statGoalGap) {
@@ -704,7 +887,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statGoalGap.textContent = formatNumberToMoney(goalGap);
         statGoalGap.classList.remove('highlight-lime');
         statGoalGap.classList.add('highlight-red');
-        if (statGapStatus) statGapStatus.textContent = 'Faltam fechar';
+        if (statGapStatus) statGapStatus.textContent = isPastMonth ? 'Gap final não atingido' : 'Faltam fechar';
         if (gapBox) {
           gapBox.style.background = '';
           gapBox.style.borderColor = '';
@@ -1498,9 +1681,524 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
+  // POVOAMENTO DE FILTROS DA TOPBAR (CLIENTES & MESES)
+  // ============================================================
+  async function populateTopBarFilters() {
+    if (!dashFilterClient) return;
+
+    const clients = await dbFetchClients();
+    const currentVal = dashFilterClient.value || 'all';
+
+    dashFilterClient.innerHTML = '<option value="all">🌐 Visão Consolidada (Todos os Clientes)</option>';
+    clients.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = `${c.name} (${c.segment || 'Geral'})`;
+      dashFilterClient.appendChild(opt);
+    });
+
+    if (Array.from(dashFilterClient.options).some(o => o.value === currentVal)) {
+      dashFilterClient.value = currentVal;
+    } else {
+      dashFilterClient.value = 'all';
+    }
+  }
+
+  function populateMonthFilter() {
+    if (!dashFilterMonth) return;
+    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+    const months = new Set();
+    months.add(currentMonthKey);
+
+    // Adiciona últimos 5 meses
+    for (let i = 1; i <= 5; i++) {
+      const d = new Date(yyyy, today.getMonth() - i, 1);
+      const mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      months.add(mKey);
+    }
+
+    // Adiciona meses com planejamento
+    const plannings = JSON.parse(localStorage.getItem('projects_planning_v2') || '[]');
+    plannings.forEach(p => {
+      if (p.year_month) months.add(p.year_month);
+    });
+
+    const sortedMonths = Array.from(months).sort().reverse();
+    const currentVal = dashFilterMonth.value || currentMonthKey;
+
+    dashFilterMonth.innerHTML = '';
+    sortedMonths.forEach(mKey => {
+      const [mY, mM] = mKey.split('-').map(Number);
+      const mName = monthNames[mM - 1] || mKey;
+      const opt = document.createElement('option');
+      opt.value = mKey;
+      opt.textContent = mKey === currentMonthKey ? `${mName} • ${mY} (Atual)` : `${mName} • ${mY}`;
+      dashFilterMonth.appendChild(opt);
+    });
+
+    if (Array.from(dashFilterMonth.options).some(o => o.value === currentVal)) {
+      dashFilterMonth.value = currentVal;
+    } else {
+      dashFilterMonth.value = currentMonthKey;
+    }
+  }
+
+  if (dashFilterClient) {
+    dashFilterClient.addEventListener('change', () => {
+      updateExecDashboard();
+    });
+  }
+
+  if (dashFilterMonth) {
+    dashFilterMonth.addEventListener('change', () => {
+      updateExecDashboard();
+      if (currentView === 'view-projects') {
+        renderProjectsView();
+      }
+    });
+  }
+
+  // ============================================================
+  // STATUS DE CONEXÃO COM O SUPABASE CLOUD
+  // ============================================================
+  async function initSupabaseHealth() {
+    if (!supabaseCloudStatus || !supabaseCloudText) return;
+    try {
+      const isHealthy = await checkSupabaseHealth();
+      if (isHealthy) {
+        supabaseCloudStatus.classList.remove('pending');
+        supabaseCloudStatus.classList.add('connected');
+        supabaseCloudText.textContent = 'Supabase Conectado';
+        supabaseCloudStatus.title = 'Banco de Dados Supabase Cloud ativo e conectado.';
+      } else {
+        supabaseCloudStatus.classList.remove('connected');
+        supabaseCloudStatus.classList.add('pending');
+        supabaseCloudText.textContent = 'Nuvem: Executar SQL';
+        supabaseCloudStatus.title = 'Tabelas do Supabase pendentes. Clique para ver instruções.';
+      }
+    } catch (e) {
+      supabaseCloudStatus.classList.add('pending');
+      supabaseCloudText.textContent = 'Nuvem: Pendente';
+    }
+  }
+
+  if (supabaseCloudStatus) {
+    supabaseCloudStatus.addEventListener('click', () => {
+      alert("Conexão com Supabase Cloud:\n\n• URL: https://gaerznidutdufqcfhpst.supabase.co\n• Status Atual: " + (supabaseCloudText ? supabaseCloudText.textContent : '') + "\n\nPara ativar o banco na nuvem:\n1. Acesse o painel do Supabase da sua conta.\n2. Abra o 'SQL Editor'.\n3. Copie e cole todo o conteúdo do arquivo 'supabase-schema.sql' e clique em 'Run'.\n\nEnquanto isso, toda a sua aplicação funciona 100% no cache local seguro sem perdas!");
+    });
+  }
+
+  // ============================================================
+  // GESTÃO DE PROJETOS, CLIENTES & PLANEJAMENTO MENSAL
+  // ============================================================
+  let activePlanningClient = null;
+
+  async function renderProjectsView() {
+    if (!projectsClientsContainer) return;
+
+    const clients = await dbFetchClients();
+    const plannings = await dbFetchPlannings();
+    const closerReports = getStoredCloserReports();
+
+    // Determina o mês de referência para o resumo dos projetos
+    const refMonth = dashFilterMonth ? dashFilterMonth.value : currentMonthKey;
+
+    // Métricas Globais da Barra de Projetos
+    const activeClientsCount = clients.filter(c => c.status === 'active').length;
+    let totalPlannedRev = 0;
+    let totalActualRev = 0;
+
+    // Calcula somatórios por cliente no mês de referência
+    const clientStatsMap = {};
+
+    clients.forEach(c => {
+      const plan = plannings.find(p => p.client_id === c.id && p.year_month === refMonth);
+      const plannedRev = plan ? Number(plan.revenue_goal) || 0 : 0;
+      const plannedSales = plan ? Number(plan.sales_goal) || 0 : 0;
+      const plannedMeetings = plan ? Number(plan.meetings_goal) || 0 : 0;
+      const moneyTable = plan ? Number(plan.money_on_table) || 0 : 0;
+      const notes = plan ? (plan.notes || '') : '';
+
+      // Relatórios associados ao cliente
+      const reports = closerReports.filter(r => {
+        if (!r.date || !r.date.startsWith(refMonth)) return false;
+        if (r.clientId) return r.clientId === c.id;
+        return c.responsible && r.closer === c.responsible;
+      });
+
+      const actualRev = reports.reduce((sum, r) => sum + parseMoneyToNumber(r.cashCollected), 0);
+      const actualSales = reports.reduce((sum, r) => sum + (parseInt(r.sales, 10) || 0), 0);
+      const actualMeetings = reports.reduce((sum, r) => sum + (parseInt(r.meetingsHeld, 10) || 0), 0);
+
+      totalPlannedRev += plannedRev;
+      totalActualRev += actualRev;
+
+      clientStatsMap[c.id] = {
+        plannedRev,
+        plannedSales,
+        plannedMeetings,
+        moneyTable,
+        notes,
+        actualRev,
+        actualSales,
+        actualMeetings,
+        pct: plannedRev > 0 ? Math.round((actualRev / plannedRev) * 100) : 0
+      };
+    });
+
+    const globalPct = totalPlannedRev > 0 ? Math.round((totalActualRev / totalPlannedRev) * 100) : 0;
+
+    // Atualiza Strip Superior
+    if (pStatTotalClients) pStatTotalClients.textContent = `${activeClientsCount} / ${clients.length}`;
+    if (pStatPlannedRev) pStatPlannedRev.textContent = formatNumberToMoney(totalPlannedRev);
+    if (pStatActualRev) pStatActualRev.textContent = formatNumberToMoney(totalActualRev);
+    if (pStatAchievement) pStatAchievement.textContent = `${globalPct}%`;
+    if (projectsActiveCount) projectsActiveCount.textContent = `${clients.length} cliente(s) cadastrado(s)`;
+
+    // Renderiza Cards
+    projectsClientsContainer.innerHTML = '';
+    if (clients.length === 0) {
+      projectsClientsContainer.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #fff; border: 1px dashed var(--border-card); border-radius: var(--radius-lg);">
+          <p style="font-size: 15px; color: var(--text-secondary); margin-bottom: 12px;">Nenhum cliente ou projeto cadastrado no momento.</p>
+          <button type="button" class="btn-apple-primary" id="btn-empty-add-client">Cadastrar Primeiro Cliente</button>
+        </div>
+      `;
+      const btnEmpty = document.getElementById('btn-empty-add-client');
+      if (btnEmpty) btnEmpty.addEventListener('click', () => openClientModal());
+      return;
+    }
+
+    clients.forEach(c => {
+      const stats = clientStatsMap[c.id] || {
+        plannedRev: 0,
+        plannedSales: 0,
+        plannedMeetings: 0,
+        moneyTable: 0,
+        notes: '',
+        actualRev: 0,
+        actualSales: 0,
+        actualMeetings: 0,
+        pct: 0
+      };
+
+      const card = document.createElement('div');
+      card.className = 'project-card';
+      card.dataset.clientId = c.id;
+
+      card.innerHTML = `
+        <div class="project-card-header">
+          <div class="project-card-title-box">
+            <h3 class="project-card-name">${c.name}</h3>
+            <span class="project-card-segment">${c.segment || 'Segmento B2B'}</span>
+          </div>
+          <span class="project-status-pill status-${c.status || 'active'}">
+            ${c.status === 'active' ? '🟢 Ativo' : c.status === 'onboarding' ? '🟡 Onboarding' : '⚪ Pausado'}
+          </span>
+        </div>
+
+        <div class="project-card-stats">
+          <div class="p-card-stat">
+            <span class="p-card-stat-label">META DO MÊS (${refMonth})</span>
+            <span class="p-card-stat-val highlight-lime">${formatNumberToMoney(stats.plannedRev)}</span>
+          </div>
+          <div class="p-card-stat">
+            <span class="p-card-stat-label">FATURAMENTO REALIZADO</span>
+            <span class="p-card-stat-val" style="color: ${stats.actualRev >= stats.plannedRev && stats.plannedRev > 0 ? '#10b981' : 'var(--text-dark)'};">
+              ${formatNumberToMoney(stats.actualRev)}
+            </span>
+          </div>
+          <div class="p-card-stat">
+            <span class="p-card-stat-label">VENDAS (UN)</span>
+            <span class="p-card-stat-val">${stats.actualSales} / ${stats.plannedSales} un</span>
+          </div>
+          <div class="p-card-stat">
+            <span class="p-card-stat-label">DINHEIRO NA MESA</span>
+            <span class="p-card-stat-val">${formatNumberToMoney(stats.moneyTable)}</span>
+          </div>
+        </div>
+
+        <div class="project-progress-box">
+          <div class="project-progress-label-row">
+            <span>Atingimento da Meta</span>
+            <span class="font-bold">${stats.pct}%</span>
+          </div>
+          <div class="project-progress-track">
+            <div class="project-progress-fill" style="width: ${Math.min(100, stats.pct)}%;"></div>
+          </div>
+        </div>
+
+        ${stats.notes ? `<div style="font-size: 11px; color: var(--text-secondary); background: #fbfbfc; padding: 6px 10px; border-radius: 6px; border-left: 2px solid var(--accent-lime); font-style: italic;">“${stats.notes}”</div>` : ''}
+
+        <div class="project-card-footer">
+          <span class="project-responsible-tag">Closer: <strong>${c.responsible || 'Geral'}</strong></span>
+          <div class="project-card-actions">
+            <button type="button" class="btn-apple-secondary btn-client-plan" data-id="${c.id}" style="padding: 5px 10px; font-size: 11px;" title="Configurar Planejamento Mensal">
+              📅 Planejamento
+            </button>
+            <button type="button" class="btn-apple-secondary btn-client-edit" data-id="${c.id}" style="padding: 5px 8px; font-size: 11px;" title="Editar cliente">
+              ✏️
+            </button>
+            <button type="button" class="btn-apple-secondary btn-client-del" data-id="${c.id}" style="padding: 5px 8px; font-size: 11px; color: #ef4444;" title="Excluir cliente">
+              🗑️
+            </button>
+          </div>
+        </div>
+      `;
+
+      projectsClientsContainer.appendChild(card);
+    });
+
+    // Eventos dos botões dos cards
+    projectsClientsContainer.querySelectorAll('.btn-client-plan').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cId = btn.getAttribute('data-id');
+        const client = clients.find(c => c.id === cId);
+        if (client) openPlanningModal(client);
+      });
+    });
+
+    projectsClientsContainer.querySelectorAll('.btn-client-edit').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cId = btn.getAttribute('data-id');
+        const client = clients.find(c => c.id === cId);
+        if (client) openClientModal(client);
+      });
+    });
+
+    projectsClientsContainer.querySelectorAll('.btn-client-del').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const cId = btn.getAttribute('data-id');
+        const client = clients.find(c => c.id === cId);
+        if (client && confirm(`Deseja realmente excluir o cliente "${client.name}"?`)) {
+          await dbDeleteClient(cId);
+          await populateTopBarFilters();
+          await renderProjectsView();
+          updateExecDashboard();
+          showToast(`Cliente "${client.name}" excluído.`);
+        }
+      });
+    });
+  }
+
+  // --- MODAL DE CLIENTE ---
+  function openClientModal(client = null) {
+    if (!modalClient) return;
+    if (client) {
+      if (modalClientTitle) modalClientTitle.textContent = 'Editar Cliente / Projeto';
+      if (clientFormId) clientFormId.value = client.id;
+      if (clientName) clientName.value = client.name || '';
+      if (clientSegment) clientSegment.value = client.segment || '';
+      if (clientResponsible) clientResponsible.value = client.responsible || 'Tales';
+      if (clientStatus) clientStatus.value = client.status || 'active';
+    } else {
+      if (modalClientTitle) modalClientTitle.textContent = 'Novo Cliente / Projeto';
+      if (clientFormId) clientFormId.value = '';
+      if (clientName) clientName.value = '';
+      if (clientSegment) clientSegment.value = '';
+      if (clientResponsible) clientResponsible.value = 'Tales';
+      if (clientStatus) clientStatus.value = 'active';
+    }
+    modalClient.classList.add('open');
+    if (clientName) clientName.focus();
+  }
+
+  function closeClientModal() {
+    if (modalClient) modalClient.classList.remove('open');
+  }
+
+  async function saveClientModalData() {
+    if (!clientName || !clientName.value.trim()) {
+      alert('Por favor, informe o nome do cliente / empresa.');
+      if (clientName) clientName.focus();
+      return;
+    }
+
+    const id = clientFormId.value || `cli_${Date.now()}`;
+    const newClient = {
+      id,
+      name: clientName.value.trim(),
+      segment: clientSegment ? clientSegment.value.trim() : '',
+      responsible: clientResponsible ? clientResponsible.value : 'Tales',
+      status: clientStatus ? clientStatus.value : 'active'
+    };
+
+    await dbSaveClient(newClient);
+    closeClientModal();
+    await populateTopBarFilters();
+    await renderProjectsView();
+    updateExecDashboard();
+    showToast(`Cliente "${newClient.name}" salvo com sucesso!`);
+  }
+
+  if (btnOpenCreateClient) btnOpenCreateClient.addEventListener('click', () => openClientModal());
+  if (btnCloseClient) btnCloseClient.addEventListener('click', closeClientModal);
+  if (btnCancelClient) btnCancelClient.addEventListener('click', closeClientModal);
+  if (btnSaveClient) btnSaveClient.addEventListener('click', saveClientModalData);
+
+  if (modalClient) {
+    modalClient.addEventListener('click', (e) => {
+      if (e.target === modalClient) closeClientModal();
+    });
+  }
+
+  // --- MODAL DE PLANEJAMENTO MENSAL ---
+  function openPlanningModal(client) {
+    if (!modalPlanning || !client) return;
+    activePlanningClient = client;
+
+    if (planningClientId) planningClientId.value = client.id;
+    if (planningClientName) planningClientName.textContent = `Planejamento • ${client.name}`;
+    if (planningClientTag) planningClientTag.textContent = client.segment || 'PROJETO';
+
+    const currentPickerMonth = dashFilterMonth ? dashFilterMonth.value : currentMonthKey;
+    if (planningMonthPicker) {
+      planningMonthPicker.value = currentPickerMonth;
+    }
+
+    loadPlanningValuesForMonth(client.id, currentPickerMonth);
+    renderPlanningHistoryTable(client.id);
+
+    modalPlanning.classList.add('open');
+  }
+
+  function closePlanningModal() {
+    if (modalPlanning) modalPlanning.classList.remove('open');
+    activePlanningClient = null;
+  }
+
+  function loadPlanningValuesForMonth(clientId, monthKey) {
+    const plannings = JSON.parse(localStorage.getItem('projects_planning_v2') || '[]');
+    const plan = plannings.find(p => p.client_id === clientId && p.year_month === monthKey);
+
+    if (plan) {
+      if (planRevenueGoal) planRevenueGoal.value = formatNumberToMoney(Number(plan.revenue_goal) || 0);
+      if (planSalesGoal) planSalesGoal.value = plan.sales_goal ?? 5;
+      if (planMeetingsGoal) planMeetingsGoal.value = plan.meetings_goal ?? 15;
+      if (planMoneyTable) planMoneyTable.value = formatNumberToMoney(Number(plan.money_on_table) || 0);
+      if (planNotes) planNotes.value = plan.notes || '';
+    } else {
+      if (planRevenueGoal) planRevenueGoal.value = 'R$ 50.000,00';
+      if (planSalesGoal) planSalesGoal.value = 5;
+      if (planMeetingsGoal) planMeetingsGoal.value = 15;
+      if (planMoneyTable) planMoneyTable.value = 'R$ 25.000,00';
+      if (planNotes) planNotes.value = '';
+    }
+  }
+
+  function renderPlanningHistoryTable(clientId) {
+    if (!planningHistoryTableBody) return;
+    const plannings = JSON.parse(localStorage.getItem('projects_planning_v2') || '[]');
+    const clientPlans = plannings.filter(p => p.client_id === clientId).sort((a,b) => b.year_month.localeCompare(a.year_month));
+    const closerReports = getStoredCloserReports();
+
+    planningHistoryTableBody.innerHTML = '';
+    if (clientPlans.length === 0) {
+      planningHistoryTableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 16px;">
+            Nenhum planejamento registrado para este cliente ainda.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    clientPlans.forEach(p => {
+      const reports = closerReports.filter(r => (r.date || '').startsWith(p.year_month) && (r.clientId === clientId || !r.clientId));
+      const actualRev = reports.reduce((sum, r) => sum + parseMoneyToNumber(r.cashCollected), 0);
+      const actualSales = reports.reduce((sum, r) => sum + (parseInt(r.sales, 10) || 0), 0);
+      const goal = Number(p.revenue_goal) || 0;
+      const pct = goal > 0 ? Math.round((actualRev / goal) * 100) : 0;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${p.year_month}</strong></td>
+        <td>${formatNumberToMoney(goal)}</td>
+        <td style="color: ${actualRev >= goal && goal > 0 ? '#10b981' : 'var(--text-dark)'}; font-weight: 600;">
+          ${formatNumberToMoney(actualRev)}
+        </td>
+        <td>
+          <span class="pacing-status-pill ${pct >= 100 ? '' : 'warning'}" style="font-size: 10px; padding: 2px 7px;">
+            ${pct}%
+          </span>
+        </td>
+        <td>${actualSales} / ${p.sales_goal} un</td>
+        <td style="text-align: right;">
+          <button type="button" class="btn-apple-secondary btn-plan-edit-month" data-month="${p.year_month}" style="padding: 3px 8px; font-size: 11px;">
+            Carregar
+          </button>
+        </td>
+      `;
+      planningHistoryTableBody.appendChild(tr);
+    });
+
+    planningHistoryTableBody.querySelectorAll('.btn-plan-edit-month').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const m = btn.getAttribute('data-month');
+        if (planningMonthPicker) planningMonthPicker.value = m;
+        loadPlanningValuesForMonth(clientId, m);
+      });
+    });
+  }
+
+  if (planningMonthPicker) {
+    planningMonthPicker.addEventListener('change', () => {
+      if (planningClientId && planningClientId.value) {
+        loadPlanningValuesForMonth(planningClientId.value, planningMonthPicker.value);
+      }
+    });
+  }
+
+  async function savePlanningModalData() {
+    const clientId = planningClientId ? planningClientId.value : null;
+    const yearMonth = planningMonthPicker ? planningMonthPicker.value : null;
+    if (!clientId || !yearMonth) {
+      alert('Erro: Dados do cliente ou mês de referência inválidos.');
+      return;
+    }
+
+    const revGoal = parseMoneyToNumber(planRevenueGoal.value);
+    const salesGoal = parseInt(planSalesGoal.value, 10) || 0;
+    const meetingsGoal = parseInt(planMeetingsGoal.value, 10) || 0;
+    const moneyTable = parseMoneyToNumber(planMoneyTable.value);
+    const notes = planNotes ? planNotes.value.trim() : '';
+
+    await dbSavePlanning({
+      client_id: clientId,
+      year_month: yearMonth,
+      revenue_goal: revGoal,
+      sales_goal: salesGoal,
+      meetings_goal: meetingsGoal,
+      money_on_table: moneyTable,
+      notes: notes
+    });
+
+    closePlanningModal();
+    populateMonthFilter();
+    await renderProjectsView();
+    updateExecDashboard();
+    showToast(`Planejamento de ${yearMonth} salvo com sucesso!`);
+  }
+
+  if (btnClosePlanning) btnClosePlanning.addEventListener('click', closePlanningModal);
+  if (btnCancelPlanning) btnCancelPlanning.addEventListener('click', closePlanningModal);
+  if (btnSavePlanning) btnSavePlanning.addEventListener('click', savePlanningModalData);
+
+  if (modalPlanning) {
+    modalPlanning.addEventListener('click', (e) => {
+      if (e.target === modalPlanning) closePlanningModal();
+    });
+  }
+
+  // ============================================================
   // INICIALIZAÇÃO DO SISTEMA
   // ============================================================
   initializeSeedDataIfEmpty();
+  populateTopBarFilters();
+  populateMonthFilter();
+  initSupabaseHealth();
 
   // Roteamento inicial por Hash
   const initialHash = window.location.hash.replace('#', '');
@@ -1508,6 +2206,8 @@ document.addEventListener('DOMContentLoaded', () => {
     showView('view-sdrs');
   } else if (initialHash === 'closers') {
     showView('view-closers');
+  } else if (initialHash === 'projects') {
+    showView('view-projects');
   } else if (initialHash === 'history') {
     showView('view-history');
   } else {

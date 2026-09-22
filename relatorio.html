@@ -116,10 +116,24 @@
             </div>
           </div>
 
-          <!-- ETAPA 2: DATA DO RELATÓRIO -->
+          <!-- SELEÇÃO DE CLIENTE / PROJETO (Opcional) -->
           <div class="form-section">
             <div class="section-title-row">
               <span class="section-number">2</span>
+              <span class="section-title">PROJETO OU CLIENTE</span>
+            </div>
+            <div class="apple-input-box" style="margin-top: 8px;">
+              <select id="report-client-id" class="apple-input" style="cursor: pointer;">
+                <option value="">🌐 Projeto Geral / Fazendo Acontecer™</option>
+              </select>
+            </div>
+            <span class="field-hint">Selecione para qual projeto ou cliente você operou hoje (opcional).</span>
+          </div>
+
+          <!-- ETAPA 3: DATA DO RELATÓRIO -->
+          <div class="form-section">
+            <div class="section-title-row">
+              <span class="section-number">3</span>
               <span class="section-title">DATA DO RELATÓRIO</span>
             </div>
             <div class="date-selection-row">
@@ -450,6 +464,8 @@
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/relatorio.js"></script>
 </body>
 </html>
