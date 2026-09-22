@@ -34,9 +34,8 @@ Interface web dark-tech de alta fidelidade para preenchimento de métricas diár
    - Taxa de comparecimento em reuniões (`Realizadas / Agendadas`)
    - Taxa de conversão de vendas (`Vendas / Realizadas`)
 2. **Gerador de Relatório PDF**: botão executivo de exportação direta formatado para A4 com cabeçalho corporativo limpo (`@media print`).
-3. **Resumo Automático para WhatsApp**: copia com 1 clique o relatório formatado com emojis e separadores, pronto para colar no grupo comercial.
-4. **Persistência Local (LocalStorage)**: os dados ficam salvos no navegador por data e por closer.
-5. **Histórico da Equipe & Exportação CSV**: visualize todos os lançamentos passados e exporte relatórios consolidados em planilha `.csv`.
+3. **Persistência Local (LocalStorage)**: os dados ficam salvos no navegador por data e por closer.
+4. **Histórico da Equipe & Exportação CSV**: visualize todos os lançamentos passados e exporte relatórios consolidados em planilha `.csv`.
 
 ---
 

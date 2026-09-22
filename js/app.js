@@ -6,7 +6,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   // --- CONFIGURAÇÃO & ESTADO ---
   const closers = ['Tales', 'José', 'Muller', 'Elinaldo'];
-  let currentCloser = 'Muller';
+  let currentCloser = null;
 
   // Data atual padrão (YYYY-MM-DD)
   const today = new Date();
@@ -103,23 +103,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function showToast(message) {
+  function showToast(message, isWarning = false) {
     if (!toastContainer) return;
     const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="20 6 9 17 4 12"></polyline>
-      </svg>
-      <span>${message}</span>
-    `;
+    toast.className = `toast ${isWarning ? 'toast-warning' : ''}`;
+    toast.innerHTML = isWarning
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+           <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+           <line x1="12" y1="9" x2="12" y2="13"></line>
+           <line x1="12" y1="17" x2="12.01" y2="17"></line>
+         </svg>
+         <span>${message}</span>`
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+           <polyline points="20 6 9 17 4 12"></polyline>
+         </svg>
+         <span>${message}</span>`;
     toastContainer.appendChild(toast);
 
     setTimeout(() => toast.classList.add('show'), 20);
     setTimeout(() => {
       toast.classList.remove('show');
       setTimeout(() => toast.remove(), 300);
-    }, 3200);
+    }, 3500);
   }
 
   function formatDateBR(dateStr) {
@@ -139,6 +144,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const cents = parseInt(digits, 10) / 100;
     return `R$ ${cents.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+
+  function parseMoneyToNumber(raw) {
+    if (raw === undefined || raw === null) return 0;
+    if (typeof raw === 'number') return raw;
+    const digits = String(raw).replace(/\D/g, '');
+    if (!digits) return 0;
+    return parseInt(digits, 10) / 100;
+  }
+
+  function formatNumberToMoney(num) {
+    if (num === undefined || num === null || isNaN(num)) return 'R$ 0,00';
+    return `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+
+  function getMonthNameBR(yearMonthStr) {
+    if (!yearMonthStr) return 'Mês Atual';
+    const parts = yearMonthStr.split('-');
+    if (parts.length < 2) return yearMonthStr;
+    const year = parts[0];
+    const monthIdx = parseInt(parts[1], 10) - 1;
+    const monthNames = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    return `${monthNames[monthIdx] || parts[1]} de ${year}`;
   }
 
   function setupCurrencyInput(input) {
@@ -201,9 +232,29 @@ document.addEventListener('DOMContentLoaded', () => {
   setupCurrencyInput(inputContractVal);
   setupCurrencyInput(inputCashCollected);
 
-  // --- SELEÇÃO DE CLOSER ---
+  // --- VALIDAÇÃO DE SELEÇÃO OBRIGATÓRIA ---
+  function validateCloserSelected() {
+    if (!currentCloser) {
+      showToast('⚠️ Selecione um nome antes de continuar!', true);
+      const grid = document.querySelector('.closers-grid');
+      if (grid) {
+        grid.classList.remove('highlight-error');
+        void grid.offsetWidth; // Força reflow para reiniciar animação
+        grid.classList.add('highlight-error');
+        setTimeout(() => grid.classList.remove('highlight-error'), 1200);
+      }
+      return false;
+    }
+    return true;
+  }
+
+  // --- SELEÇÃO DE MEMBRO ---
   function selectCloser(closerName) {
     currentCloser = closerName;
+    isDataSaved = false;
+
+    const grid = document.querySelector('.closers-grid');
+    if (grid) grid.classList.remove('highlight-error');
 
     // Atualiza chips da sidebar
     closerChips.forEach(chip => {
@@ -228,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sidebarUserName) sidebarUserName.textContent = `${closerName} Closer`;
     if (sidebarUserAvatar) sidebarUserAvatar.textContent = closerName.charAt(0).toUpperCase();
     if (btnPdfLabel) btnPdfLabel.textContent = `GERAR RELATÓRIO DE ${closerName.toUpperCase()} (PDF)`;
-    if (printCloserName) printCloserName.innerHTML = `Closer: <strong>${closerName.toUpperCase()}</strong>`;
+    if (printCloserName) printCloserName.innerHTML = `Nome: <strong>${closerName.toUpperCase()}</strong>`;
 
     loadDayData();
   }
@@ -293,6 +344,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- CARREGAR DADOS DO DIA ---
   function loadDayData() {
+    if (!currentCloser) {
+      inputLeads.value = 0;
+      inputFollowups.value = 0;
+      inputProspeccoes.value = 0;
+      inputMeetingsScheduled.value = 0;
+      inputMeetingsHeld.value = 0;
+      inputSales.value = 0;
+      inputContractVal.value = 'R$ 0,00';
+      inputCashCollected.value = 'R$ 0,00';
+      updateDashboard();
+      return;
+    }
+
     const selectedDate = dateInput.value || formattedToday;
     const reports = getStoredReports();
     const entry = reports.find(r => r.closer === currentCloser && r.date === selectedDate);
@@ -323,6 +387,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- SALVAR REGISTRO ---
   function saveCurrentReport(showFeedback = true) {
+    if (!validateCloserSelected()) return false;
+
     const selectedDate = dateInput.value || formattedToday;
 
     const newRecord = {
@@ -434,6 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       return;
     }
+  }
 
     reports.forEach(report => {
       const tr = document.createElement('tr');
@@ -468,16 +535,623 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function renderMonthGrid(container, year, month) {
+    if (!container) return;
+    container.innerHTML = '';
+
+    const firstDayIndex = new Date(year, month, 1).getDay(); // 0 = domingo
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+    // Determina o intervalo efetivo para destaque visual
+    let effectiveStart = filterStartDate;
+    let effectiveEnd = filterEndDate;
+
+    if (pickerSelectionStep === 1 && tempRangeStart) {
+      effectiveStart = tempRangeStart;
+      effectiveEnd = hoveredDate || tempRangeStart;
+      if (effectiveEnd < effectiveStart) {
+        const t = effectiveStart;
+        effectiveStart = effectiveEnd;
+        effectiveEnd = t;
+      }
+    }
+
+    // 1. Dias do mês anterior (fora do mês)
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
+      const prevDay = daysInPrevMonth - i;
+      const cell = document.createElement('div');
+      cell.className = 'cal-day-cell outside-month';
+      cell.textContent = prevDay;
+      container.appendChild(cell);
+    }
+
+    // 2. Dias do mês corrente
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const cell = document.createElement('div');
+      cell.className = 'cal-day-cell';
+      cell.textContent = day;
+      cell.dataset.date = dayStr;
+
+      if (filterActivePreset !== 'all' || pickerSelectionStep === 1) {
+        if (dayStr === effectiveStart) {
+          cell.classList.add('range-start');
+        }
+        if (dayStr === effectiveEnd) {
+          cell.classList.add('range-end');
+        }
+        if (dayStr > effectiveStart && dayStr < effectiveEnd) {
+          if (pickerSelectionStep === 1) {
+            cell.classList.add('hover-in-range');
+          } else {
+            cell.classList.add('in-range');
+          }
+        }
+      }
+
+      cell.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleDayClick(dayStr);
+      });
+
+      cell.addEventListener('mouseenter', () => {
+        if (pickerSelectionStep === 1) {
+          hoveredDate = dayStr;
+          renderCalendarDual();
+        }
+      });
+
+      container.appendChild(cell);
+    }
+
+    // 3. Dias do próximo mês para completar a grade
+    const totalRendered = firstDayIndex + daysInMonth;
+    const remaining = (totalRendered % 7 === 0) ? 0 : 7 - (totalRendered % 7);
+    for (let nextDay = 1; nextDay <= remaining; nextDay++) {
+      const cell = document.createElement('div');
+      cell.className = 'cal-day-cell outside-month';
+      cell.textContent = nextDay;
+      container.appendChild(cell);
+    }
+  }
+
+  function renderCalendarDual() {
+    const leftYear = calendarBaseDate.getFullYear();
+    const leftMonth = calendarBaseDate.getMonth();
+
+    const rightDate = new Date(leftYear, leftMonth + 1, 1);
+    const rightYear = rightDate.getFullYear();
+    const rightMonth = rightDate.getMonth();
+
+    if (calLeftTitle) {
+      calLeftTitle.textContent = `${monthNamesPT[leftMonth]} ${leftYear}`;
+    }
+    if (calRightTitle) {
+      calRightTitle.textContent = `${monthNamesPT[rightMonth]} ${rightYear}`;
+    }
+
+    renderMonthGrid(calLeftDays, leftYear, leftMonth);
+    renderMonthGrid(calRightDays, rightYear, rightMonth);
+  }
+
+  function handleDayClick(dateStr) {
+    if (pickerSelectionStep === 0) {
+      tempRangeStart = dateStr;
+      pickerSelectionStep = 1;
+      hoveredDate = dateStr;
+      filterActivePreset = null;
+      updatePresetButtonsUI();
+      renderCalendarDual();
+    } else if (pickerSelectionStep === 1) {
+      if (dateStr < tempRangeStart) {
+        filterStartDate = dateStr;
+        filterEndDate = tempRangeStart;
+      } else {
+        filterStartDate = tempRangeStart;
+        filterEndDate = dateStr;
+      }
+      pickerSelectionStep = 0;
+      tempRangeStart = null;
+      hoveredDate = null;
+      filterActivePreset = null;
+      updatePresetButtonsUI();
+      updateDateRangeButtonText();
+      renderCalendarDual();
+      renderHistory();
+      closeDateRangePopover();
+    }
+  }
+
+  function applyPreset(presetKey) {
+    const now = new Date();
+    const currentY = now.getFullYear();
+    const currentM = now.getMonth();
+
+    if (presetKey === 'today') {
+      filterStartDate = toYYYYMMDD(now);
+      filterEndDate = toYYYYMMDD(now);
+    } else if (presetKey === 'yesterday') {
+      const y = new Date(now);
+      y.setDate(y.getDate() - 1);
+      filterStartDate = toYYYYMMDD(y);
+      filterEndDate = toYYYYMMDD(y);
+    } else if (presetKey === 'last7days') {
+      const s = new Date(now);
+      s.setDate(s.getDate() - 6);
+      filterStartDate = toYYYYMMDD(s);
+      filterEndDate = toYYYYMMDD(now);
+    } else if (presetKey === 'thisMonth') {
+      const f = new Date(currentY, currentM, 1);
+      filterStartDate = toYYYYMMDD(f);
+      filterEndDate = toYYYYMMDD(now);
+    } else if (presetKey === 'lastMonth') {
+      const lmFirst = new Date(currentY, currentM - 1, 1);
+      const lmLast = new Date(currentY, currentM, 0);
+      filterStartDate = toYYYYMMDD(lmFirst);
+      filterEndDate = toYYYYMMDD(lmLast);
+    } else if (presetKey === 'all') {
+      filterStartDate = '2000-01-01';
+      filterEndDate = '2099-12-31';
+    }
+
+    filterActivePreset = presetKey;
+    pickerSelectionStep = 0;
+    tempRangeStart = null;
+    hoveredDate = null;
+
+    if (presetKey !== 'all') {
+      calendarBaseDate = new Date(filterStartDate + 'T00:00:00');
+    } else {
+      calendarBaseDate = new Date(currentY, currentM, 1);
+    }
+
+    updatePresetButtonsUI();
+    updateDateRangeButtonText();
+    renderCalendarDual();
+    renderHistory();
+    closeDateRangePopover();
+  }
+
+  function openDateRangePopover() {
+    if (dateRangePopover) dateRangePopover.classList.add('open');
+    if (dateRangeFilterWrapper) dateRangeFilterWrapper.classList.add('open');
+    if (closerDropdownMenu) closerDropdownMenu.classList.remove('open');
+    if (closerFilterWrapper) closerFilterWrapper.classList.remove('open');
+    renderCalendarDual();
+  }
+
+  function closeDateRangePopover() {
+    if (dateRangePopover) dateRangePopover.classList.remove('open');
+    if (dateRangeFilterWrapper) dateRangeFilterWrapper.classList.remove('open');
+    pickerSelectionStep = 0;
+    tempRangeStart = null;
+    hoveredDate = null;
+  }
+
+  function openCloserDropdown() {
+    if (closerDropdownMenu) closerDropdownMenu.classList.add('open');
+    if (closerFilterWrapper) closerFilterWrapper.classList.add('open');
+    if (dateRangePopover) dateRangePopover.classList.remove('open');
+    if (dateRangeFilterWrapper) dateRangeFilterWrapper.classList.remove('open');
+  }
+
+  function closeCloserDropdown() {
+    if (closerDropdownMenu) closerDropdownMenu.classList.remove('open');
+    if (closerFilterWrapper) closerFilterWrapper.classList.remove('open');
+  }
+
+  // --- FILTRO DOS REGISTROS SALVOS ---
+  function getFilteredReports() {
+    const allReports = getStoredReports();
+
+    return allReports.filter(r => {
+      // Filtro de Data (Intervalo)
+      if (filterStartDate && filterEndDate) {
+        if (!r.date || r.date < filterStartDate || r.date > filterEndDate) {
+          return false;
+        }
+      }
+      // Filtro de Closer
+      if (filterSelectedCloser !== 'all') {
+        if (r.closer !== filterSelectedCloser) {
+          return false;
+        }
+      }
+      return true;
+    }).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  }
+
+  // --- RENDERIZAÇÃO DO HISTÓRICO CONSOLIDADO ---
+  function renderHistory() {
+    const filtered = getFilteredReports();
+
+    if (historyTotalCount) {
+      historyTotalCount.textContent = `${filtered.length} registro(s)`;
+    }
+
+    // Totais Globais
+    let totalLeads = 0;
+    let totalFollowups = 0;
+    let totalProspeccoes = 0;
+    let totalMeetingsScheduled = 0;
+    let totalMeetingsHeld = 0;
+    let totalSales = 0;
+    let totalContractsVal = 0;
+    let totalCashCollected = 0;
+
+    // Consolidação por Closer
+    const closersMap = {};
+    const defaultClosers = ['Tales', 'José', 'Muller', 'Elinaldo'];
+    defaultClosers.forEach(c => {
+      if (filterSelectedCloser === 'all' || filterSelectedCloser === c) {
+        closersMap[c] = {
+          closer: c,
+          days: 0,
+          leads: 0,
+          followups: 0,
+          prospeccoes: 0,
+          meetingsScheduled: 0,
+          meetingsHeld: 0,
+          sales: 0,
+          contractsVal: 0,
+          cashCollected: 0
+        };
+      }
+    });
+
+    filtered.forEach(r => {
+      const leads = parseInt(r.leads, 10) || 0;
+      const followups = parseInt(r.followups, 10) || 0;
+      const prospeccoes = parseInt(r.prospeccoes, 10) || 0;
+      const scheduled = parseInt(r.meetingsScheduled, 10) || 0;
+      const held = parseInt(r.meetingsHeld, 10) || 0;
+      const sales = parseInt(r.sales, 10) || 0;
+      const cVal = parseMoneyToNumber(r.contractVal);
+      const cCash = parseMoneyToNumber(r.cashCollected);
+
+      totalLeads += leads;
+      totalFollowups += followups;
+      totalProspeccoes += prospeccoes;
+      totalMeetingsScheduled += scheduled;
+      totalMeetingsHeld += held;
+      totalSales += sales;
+      totalContractsVal += cVal;
+      totalCashCollected += cCash;
+
+      if (!closersMap[r.closer]) {
+        closersMap[r.closer] = {
+          closer: r.closer,
+          days: 0,
+          leads: 0,
+          followups: 0,
+          prospeccoes: 0,
+          meetingsScheduled: 0,
+          meetingsHeld: 0,
+          sales: 0,
+          contractsVal: 0,
+          cashCollected: 0
+        };
+      }
+
+      closersMap[r.closer].days += 1;
+      closersMap[r.closer].leads += leads;
+      closersMap[r.closer].followups += followups;
+      closersMap[r.closer].prospeccoes += prospeccoes;
+      closersMap[r.closer].meetingsScheduled += scheduled;
+      closersMap[r.closer].meetingsHeld += held;
+      closersMap[r.closer].sales += sales;
+      closersMap[r.closer].contractsVal += cVal;
+      closersMap[r.closer].cashCollected += cCash;
+    });
+
+    const totalEffort = totalFollowups + totalProspeccoes;
+    const generalAttendance = totalMeetingsScheduled > 0 ? Math.round((totalMeetingsHeld / totalMeetingsScheduled) * 100) : 0;
+    const generalConversion = totalMeetingsHeld > 0 ? Math.round((totalSales / totalMeetingsHeld) * 100) : 0;
+
+    // Atualiza os Cards de KPIs Consolidados
+    if (histKpiSales) histKpiSales.textContent = totalSales;
+    if (histKpiConversion) histKpiConversion.textContent = `${generalConversion}% conversão`;
+    if (histKpiContracts) histKpiContracts.textContent = formatNumberToMoney(totalContractsVal);
+    if (histKpiCash) histKpiCash.textContent = formatNumberToMoney(totalCashCollected);
+    if (histKpiEffort) histKpiEffort.textContent = totalEffort;
+    if (histKpiEffortSub) histKpiEffortSub.textContent = `${totalFollowups} flw • ${totalProspeccoes} prosp`;
+    if (histKpiMeetings) histKpiMeetings.textContent = `${totalMeetingsHeld} / ${totalMeetingsScheduled}`;
+    if (histKpiMeetingsSub) histKpiMeetingsSub.textContent = `${generalAttendance}% comparecimento`;
+    if (histKpiLeads) histKpiLeads.textContent = totalLeads;
+    if (histKpiLeadsSub) histKpiLeadsSub.textContent = `${filtered.length} lançamentos`;
+
+    // Renderiza Tabela de Performance por Closer
+    const activeClosersList = Object.values(closersMap).sort((a, b) => b.cashCollected - a.cashCollected || b.sales - a.sales);
+    const activeWithEntries = activeClosersList.filter(c => c.days > 0);
+
+    if (histClosersCount) {
+      histClosersCount.textContent = `${activeWithEntries.length} ativo(s)`;
+    }
+
+    if (closersPerformanceBody) {
+      closersPerformanceBody.innerHTML = '';
+
+      if (activeClosersList.length === 0) {
+        closersPerformanceBody.innerHTML = `
+          <tr><td colspan="11" style="text-align:center; padding: 24px; color: var(--text-muted);">Nenhum dado de closer para exibir no período.</td></tr>
+        `;
+      } else {
+        activeClosersList.forEach(c => {
+          const attendance = c.meetingsScheduled > 0 ? Math.round((c.meetingsHeld / c.meetingsScheduled) * 100) : 0;
+          const conversion = c.meetingsHeld > 0 ? Math.round((c.sales / c.meetingsHeld) * 100) : 0;
+          const initial = (c.closer || 'C').charAt(0).toUpperCase();
+          const isActive = c.days > 0;
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>
+              <div class="closer-table-cell">
+                <span class="closer-mini-badge">${initial}</span>
+                <span class="closer-name-text">${c.closer}</span>
+              </div>
+            </td>
+            <td style="text-align: center;">${isActive ? `<span style="font-weight:700; color:#ffffff;">${c.days} d</span>` : '<span class="muted-dash">—</span>'}</td>
+            <td style="text-align: center;">${isActive && c.leads > 0 ? c.leads : (isActive ? '0' : '<span class="muted-dash">—</span>')}</td>
+            <td style="text-align: center;">${isActive && c.followups > 0 ? c.followups : (isActive ? '0' : '<span class="muted-dash">—</span>')}</td>
+            <td style="text-align: center;">${isActive && c.prospeccoes > 0 ? c.prospeccoes : (isActive ? '0' : '<span class="muted-dash">—</span>')}</td>
+            <td style="text-align: center;">${isActive ? `${c.meetingsScheduled} / ${c.meetingsHeld}` : '<span class="muted-dash">—</span>'}</td>
+            <td style="text-align: center;">${isActive && c.meetingsScheduled > 0 ? `<span class="tbl-pill-badge">${attendance}%</span>` : '<span class="muted-dash">—</span>'}</td>
+            <td style="text-align: center;">${isActive && c.meetingsHeld > 0 ? `<span class="tbl-pill-badge ${conversion > 0 ? 'lime-pill' : ''}">${conversion}%</span>` : '<span class="muted-dash">—</span>'}</td>
+            <td style="text-align: center;">${isActive && c.sales > 0 ? `<span class="sales-highlight">${c.sales}</span>` : (isActive ? '0' : '<span class="muted-dash">—</span>')}</td>
+            <td style="text-align: right;">${isActive && c.contractsVal > 0 ? formatNumberToMoney(c.contractsVal) : (isActive ? 'R$ 0,00' : '<span class="muted-dash">—</span>')}</td>
+            <td style="text-align: right;">${isActive && c.cashCollected > 0 ? `<span class="cash-highlight">${formatNumberToMoney(c.cashCollected)}</span>` : (isActive ? 'R$ 0,00' : '<span class="muted-dash">—</span>')}</td>
+          `;
+          closersPerformanceBody.appendChild(tr);
+        });
+
+        // Linha de Total Geral no rodapé da tabela
+        const totalTr = document.createElement('tr');
+        totalTr.className = 'table-total-row';
+        totalTr.innerHTML = `
+          <td><strong>Total da Equipe</strong></td>
+          <td style="text-align: center;"><strong>${filtered.length} reg.</strong></td>
+          <td style="text-align: center;"><strong>${totalLeads}</strong></td>
+          <td style="text-align: center;"><strong>${totalFollowups}</strong></td>
+          <td style="text-align: center;"><strong>${totalProspeccoes}</strong></td>
+          <td style="text-align: center;"><strong>${totalMeetingsScheduled} / ${totalMeetingsHeld}</strong></td>
+          <td style="text-align: center;"><strong>${totalMeetingsScheduled > 0 ? `<span class="tbl-pill-badge">${generalAttendance}%</span>` : '—'}</strong></td>
+          <td style="text-align: center;"><strong>${totalMeetingsHeld > 0 ? `<span class="tbl-pill-badge lime-pill">${generalConversion}%</span>` : '—'}</strong></td>
+          <td style="text-align: center;"><strong class="sales-highlight">${totalSales}</strong></td>
+          <td style="text-align: right;"><strong>${formatNumberToMoney(totalContractsVal)}</strong></td>
+          <td style="text-align: right;"><strong class="cash-highlight">${formatNumberToMoney(totalCashCollected)}</strong></td>
+        `;
+        closersPerformanceBody.appendChild(totalTr);
+      }
+    }
+  }
+
+  // --- EXPORTAÇÃO EM PDF DO RELATÓRIO CONSOLIDADO ---
+  function exportConsolidatedPDF() {
+    const filtered = getFilteredReports();
+    if (filtered.length === 0) {
+      showToast('Nenhum registro encontrado no filtro atual para gerar o relatório PDF.', true);
+      return;
+    }
+
+    const periodTitle = (filterActivePreset === 'all')
+      ? 'HISTÓRICO COMPLETO CONSOLIDADO'
+      : `${formatDateBR(filterStartDate)} A ${formatDateBR(filterEndDate)}`;
+
+    const closerTitle = filterSelectedCloser === 'all'
+      ? 'TODA A EQUIPE COMERCIAL'
+      : `${filterSelectedCloser.toUpperCase()}`;
+
+    // Totais Globais
+    let totalLeads = 0;
+    let totalFollowups = 0;
+    let totalProspeccoes = 0;
+    let totalMeetingsScheduled = 0;
+    let totalMeetingsHeld = 0;
+    let totalSales = 0;
+    let totalContractsVal = 0;
+    let totalCashCollected = 0;
+
+    const closersMap = {};
+    filtered.forEach(r => {
+      const leads = parseInt(r.leads, 10) || 0;
+      const followups = parseInt(r.followups, 10) || 0;
+      const prospeccoes = parseInt(r.prospeccoes, 10) || 0;
+      const scheduled = parseInt(r.meetingsScheduled, 10) || 0;
+      const held = parseInt(r.meetingsHeld, 10) || 0;
+      const sales = parseInt(r.sales, 10) || 0;
+      const cVal = parseMoneyToNumber(r.contractVal);
+      const cCash = parseMoneyToNumber(r.cashCollected);
+
+      totalLeads += leads;
+      totalFollowups += followups;
+      totalProspeccoes += prospeccoes;
+      totalMeetingsScheduled += scheduled;
+      totalMeetingsHeld += held;
+      totalSales += sales;
+      totalContractsVal += cVal;
+      totalCashCollected += cCash;
+
+      if (!closersMap[r.closer]) {
+        closersMap[r.closer] = {
+          closer: r.closer,
+          days: 0,
+          leads: 0,
+          followups: 0,
+          prospeccoes: 0,
+          meetingsScheduled: 0,
+          meetingsHeld: 0,
+          sales: 0,
+          contractsVal: 0,
+          cashCollected: 0
+        };
+      }
+
+      closersMap[r.closer].days += 1;
+      closersMap[r.closer].leads += leads;
+      closersMap[r.closer].followups += followups;
+      closersMap[r.closer].prospeccoes += prospeccoes;
+      closersMap[r.closer].meetingsScheduled += scheduled;
+      closersMap[r.closer].meetingsHeld += held;
+      closersMap[r.closer].sales += sales;
+      closersMap[r.closer].contractsVal += cVal;
+      closersMap[r.closer].cashCollected += cCash;
+    });
+
+    const totalEffort = totalFollowups + totalProspeccoes;
+    const generalAttendance = totalMeetingsScheduled > 0 ? Math.round((totalMeetingsHeld / totalMeetingsScheduled) * 100) : 0;
+    const generalConversion = totalMeetingsHeld > 0 ? Math.round((totalSales / totalMeetingsHeld) * 100) : 0;
+
+    const sortedClosers = Object.values(closersMap).sort((a, b) => b.cashCollected - a.cashCollected || b.sales - a.sales);
+
+    // Linhas da Tabela de Closers
+    let closersRowsHtml = '';
+    sortedClosers.forEach(c => {
+      const att = c.meetingsScheduled > 0 ? Math.round((c.meetingsHeld / c.meetingsScheduled) * 100) : 0;
+      const conv = c.meetingsHeld > 0 ? Math.round((c.sales / c.meetingsHeld) * 100) : 0;
+      closersRowsHtml += `
+        <tr>
+          <td style="font-weight:700; color:#ffffff;">${c.closer}</td>
+          <td>${c.days} d</td>
+          <td>${c.leads}</td>
+          <td>${c.followups}</td>
+          <td>${c.prospeccoes}</td>
+          <td>${c.meetingsScheduled} / ${c.meetingsHeld}</td>
+          <td>${c.meetingsScheduled > 0 ? `${att}%` : '—'}</td>
+          <td style="color:${conv > 0 ? 'var(--accent-lime)' : '#a0aec0'}; font-weight:700;">${c.meetingsHeld > 0 ? `${conv}%` : '—'}</td>
+          <td style="font-weight:800; color:#ffffff;">${c.sales}</td>
+          <td>${formatNumberToMoney(c.contractsVal)}</td>
+          <td style="color:var(--accent-lime); font-weight:800;">${formatNumberToMoney(c.cashCollected)}</td>
+        </tr>
+      `;
+    });
+
+    const nowBR = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    if (printConsolidatedReport) {
+      printConsolidatedReport.innerHTML = `
+        <div class="consolidated-print-header">
+          <div class="print-brand">
+            <img src="assets/logo.png" alt="FAZENDO ACONTECER™" class="print-logo-img">
+            <span class="print-brand-sub">HUB COMERCIAL • CONSOLIDADO MENSAL</span>
+          </div>
+          <div class="print-meta">
+            <span class="print-title">RELATÓRIO CONSOLIDADO DE PERFORMANCE</span>
+            <div class="print-details">
+              <span>Período: <strong>${periodTitle}</strong></span>
+              <span class="print-separator">•</span>
+              <span>Filtro: <strong>${closerTitle}</strong></span>
+              <span class="print-separator">•</span>
+              <span>Emissão: <strong>${nowBR}</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="consolidated-kpis-row">
+          <div class="consolidated-kpi-box">
+            <span class="history-kpi-label">TOTAL VENDAS</span>
+            <span class="history-kpi-val highlight-lime">${totalSales}</span>
+            <span class="history-kpi-sub">${generalConversion}% conversão geral</span>
+          </div>
+          <div class="consolidated-kpi-box">
+            <span class="history-kpi-label">VALOR CONTRATOS</span>
+            <span class="history-kpi-val">${formatNumberToMoney(totalContractsVal)}</span>
+            <span class="history-kpi-sub">Contratos enviados</span>
+          </div>
+          <div class="consolidated-kpi-box">
+            <span class="history-kpi-label">CASH COLETADO</span>
+            <span class="history-kpi-val highlight-lime">${formatNumberToMoney(totalCashCollected)}</span>
+            <span class="history-kpi-sub">Receita recebida</span>
+          </div>
+          <div class="consolidated-kpi-box">
+            <span class="history-kpi-label">ESFORÇO ATIVO</span>
+            <span class="history-kpi-val">${totalEffort}</span>
+            <span class="history-kpi-sub">${totalFollowups} flw • ${totalProspeccoes} prosp</span>
+          </div>
+          <div class="consolidated-kpi-box">
+            <span class="history-kpi-label">REUNIÕES REALIZADAS</span>
+            <span class="history-kpi-val">${totalMeetingsHeld} / ${totalMeetingsScheduled}</span>
+            <span class="history-kpi-sub">${generalAttendance}% comparecimento</span>
+          </div>
+          <div class="consolidated-kpi-box">
+            <span class="history-kpi-label">LEADS TOTAIS</span>
+            <span class="history-kpi-val">${totalLeads}</span>
+            <span class="history-kpi-sub">${filtered.length} lançamentos</span>
+          </div>
+        </div>
+
+        <div class="consolidated-print-table-section">
+          <span class="consolidated-print-table-title">PERFORMANCE</span>
+          <table class="consolidated-print-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Dias</th>
+                <th>Leads</th>
+                <th>Follow-ups</th>
+                <th>Prospecção</th>
+                <th>Reuniões (Ag/Real)</th>
+                <th>Tx. Comp.</th>
+                <th>Tx. Conv.</th>
+                <th>Vendas</th>
+                <th>Valor Contratos</th>
+                <th>Cash Coletado</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${closersRowsHtml}
+              <tr class="table-total-row">
+                <td><strong>TOTAL GERAL</strong></td>
+                <td><strong>${filtered.length} reg.</strong></td>
+                <td><strong>${totalLeads}</strong></td>
+                <td><strong>${totalFollowups}</strong></td>
+                <td><strong>${totalProspeccoes}</strong></td>
+                <td><strong>${totalMeetingsScheduled} / ${totalMeetingsHeld}</strong></td>
+                <td><strong>${totalMeetingsScheduled > 0 ? `${generalAttendance}%` : '—'}</strong></td>
+                <td><strong style="color:var(--accent-lime);">${totalMeetingsHeld > 0 ? `${generalConversion}%` : '—'}</strong></td>
+                <td><strong>${totalSales}</strong></td>
+                <td><strong>${formatNumberToMoney(totalContractsVal)}</strong></td>
+                <td style="color:var(--accent-lime);"><strong>${formatNumberToMoney(totalCashCollected)}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="consolidated-print-footer">
+          <span>Fazendo Acontecer™ • Hub Comercial • Documento Confidencial de Gestão</span>
+          <span>Consolidado Oficial de Performance • Emitido em ${nowBR}</span>
+        </div>
+      `;
+    }
+
+    // Ativa modo consolidado de impressão
+    document.body.classList.add('print-mode-consolidated');
+
+    const cleanupPrintMode = () => {
+      document.body.classList.remove('print-mode-consolidated');
+      window.removeEventListener('afterprint', cleanupPrintMode);
+    };
+    window.addEventListener('afterprint', cleanupPrintMode);
+
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => {
+        document.body.classList.remove('print-mode-consolidated');
+      }, 2000);
+    }, 100);
+  }
+
+  // --- EXPORTAÇÃO CSV ---
   function exportCSV() {
-    const reports = getStoredReports();
-    if (reports.length === 0) {
-      showToast('Nenhum registro para exportar.');
+    const filtered = getFilteredReports();
+    if (filtered.length === 0) {
+      showToast('Nenhum registro no filtro selecionado para exportar.', true);
       return;
     }
 
     let csv = 'Data,Closer,Leads,Followups,Prospeccoes,ReunioesAgendadas,ReunioesRealizadas,Vendas,ValorContrato,CashColetado\n';
-    reports.forEach(r => {
-      csv += `"${formatDateBR(r.date)}","${r.closer}",${r.leads},${r.followups},${r.prospeccoes},${r.meetingsScheduled},${r.meetingsHeld},${r.sales},"${r.contractVal}","${r.cashCollected}"\n`;
+    filtered.forEach(r => {
+      csv += `"${formatDateBR(r.date)}","${r.closer}",${r.leads ?? 0},${r.followups ?? 0},${r.prospeccoes ?? 0},${r.meetingsScheduled ?? 0},${r.meetingsHeld ?? 0},${r.sales ?? 0},"${formatMoneyString(r.contractVal)}","${formatMoneyString(r.cashCollected)}"\n`;
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -496,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- EVENT LISTENERS ---
+  // --- EVENT LISTENERS DOS FILTROS EM PÍLULA & DATE RANGE ---
 
   // Seleção de closer via Chips da Sidebar
   closerChips.forEach(chip => {
@@ -515,14 +1189,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mudança de Data
   if (dateInput) {
     dateInput.addEventListener('change', () => {
+      isDataSaved = false;
       loadDayData();
     });
   }
 
-  // Atualização em Tempo Real nos Inputs Numéricos
-  [inputLeads, inputFollowups, inputProspeccoes, inputMeetingsScheduled, inputMeetingsHeld, inputSales].forEach(input => {
+  // Atualização em Tempo Real nos Inputs
+  allInputs.forEach(input => {
     if (input) {
       input.addEventListener('input', () => {
+        isDataSaved = false;
         updateDashboard();
       });
     }
@@ -531,9 +1207,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Botões Gerar Relatório PDF
   if (btnGeneratePdf) {
     btnGeneratePdf.addEventListener('click', () => {
-      saveCurrentReport(false);
-      updateDashboard();
-      window.print();
+      if (!validateCloserSelected()) return;
+      openConfirmModal('generate_pdf');
     });
   }
   if (navBtnPdf) {
@@ -545,10 +1220,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Botão Copiar WhatsApp
-  if (btnCopyWhatsapp) {
-    btnCopyWhatsapp.addEventListener('click', () => {
-      copyWhatsAppSummary();
+  // Eventos do Modal de Confirmação
+  if (btnCloseConfirmModal) {
+    btnCloseConfirmModal.addEventListener('click', closeConfirmModal);
+  }
+
+  if (btnCancelConfirm) {
+    btnCancelConfirm.addEventListener('click', closeConfirmModal);
+  }
+
+  if (confirmModal) {
+    confirmModal.addEventListener('click', (e) => {
+      if (e.target === confirmModal) {
+        closeConfirmModal();
+      }
+    });
+  }
+
+  if (btnExecuteConfirm) {
+    btnExecuteConfirm.addEventListener('click', () => {
+      const action = confirmCallback;
+      closeConfirmModal();
+      if (action) {
+        action();
+      }
     });
   }
 
@@ -583,5 +1278,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- INICIALIZAÇÃO ---
-  selectCloser('Muller');
+  // Inicia com valores zerados e sem closer pré-selecionado (obrigatório selecionar)
+  loadDayData();
 });

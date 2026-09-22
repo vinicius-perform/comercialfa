@@ -53,6 +53,9 @@ body {
   color: var(--text-dark);
   min-height: 100vh;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -60,8 +63,15 @@ body {
 /* Layout Geral */
 .app-layout {
   display: flex;
-  width: 100vw;
-  min-height: 100vh;
+  width: 100%;
+  max-width: 1220px;
+  min-height: 820px;
+  background: #080c14;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 35px 100px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+  position: relative;
 }
 
 /* ==========================================================================
@@ -156,6 +166,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .nav-link {
@@ -297,6 +309,7 @@ body {
 .user-info {
   display: flex;
   flex-direction: column;
+  gap: 1px;
 }
 
 .user-name {
@@ -1111,7 +1124,8 @@ input[type=number] {
   letter-spacing: 0.8px;
   color: var(--text-secondary);
   text-transform: uppercase;
-  border-bottom: 1px solid var(--border-card);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
 }
 
 .uifry-table td {
@@ -1168,6 +1182,46 @@ input[type=number] {
   opacity: 1;
 }
 
+.toast.toast-warning {
+  border-color: #ef4444;
+  background: #180d12;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 16px rgba(239, 68, 68, 0.25);
+  color: #fecaca;
+}
+
+.toast.toast-warning svg {
+  color: #ef4444;
+}
+
+/* Validação da Seleção de Closer */
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+.closers-grid.highlight-error {
+  animation: shakeError 0.45s ease-in-out;
+}
+
+.closers-grid.highlight-error .closer-btn {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3) !important;
+  color: #fca5a5 !important;
+}
+
+.closers-grid.highlight-error .closer-avatar {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #ef4444 !important;
+}
+
+.closer-tag.closer-tag-empty {
+  color: #fbbf24 !important;
+  background: rgba(251, 191, 36, 0.08) !important;
+  border: 1px dashed rgba(251, 191, 36, 0.4) !important;
+}
+
 /* ==========================================================================
    RESPONSIVO
    ========================================================================== */
@@ -1180,6 +1234,11 @@ input[type=number] {
 @media (max-width: 900px) {
   .app-layout {
     flex-direction: column;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    max-width: 100%;
+    min-height: 100vh;
   }
   .sidebar {
     width: 100%;
@@ -1205,10 +1264,10 @@ input[type=number] {
 }
 
 /* ==========================================================================
-   ENGINE DE IMPRESSÃO EXECUTIVA EM UMA ÚNICA PÁGINA (A4 PORTRAIT)
+   ENGINE DE IMPRESSÃO EXECUTIVA EM FORMATO HORIZONTAL (5:4 / LANDSCAPE)
    ========================================================================== */
 @page {
-  size: A4 portrait;
+  size: 250mm 200mm;
   margin: 0;
 }
 
@@ -1227,6 +1286,7 @@ input[type=number] {
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
+    display: block !important;
   }
 
   .sidebar, 
@@ -1247,6 +1307,8 @@ input[type=number] {
     padding: 1.2cm 1.6cm !important;
     max-width: 100% !important;
     width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
     gap: 12px !important;
     page-break-after: avoid !important;
@@ -1265,7 +1327,7 @@ input[type=number] {
   .print-brand {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
   }
 
   .print-logo-img {
@@ -1286,11 +1348,11 @@ input[type=number] {
     text-align: right;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
   }
 
   .print-title {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
     letter-spacing: 1px;
     color: var(--text-dark);
@@ -1338,6 +1400,7 @@ input[type=number] {
     gap: 10px !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+    margin: 0 !important;
   }
 
   /* Remove bordas de caixas para documento executivo */
@@ -1356,5 +1419,121 @@ input[type=number] {
 
   .closer-selector-segmented {
     display: none !important;
+  }
+
+  /* ==========================================================================
+     ESTILOS DE IMPRESSÃO: RELATÓRIO CONSOLIDADO MENSAL / PERÍODO
+     ========================================================================== */
+  body.print-mode-consolidated {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background-color: #07090e !important;
+  }
+
+  body.print-mode-consolidated .app-container {
+    display: none !important;
+  }
+
+  body.print-mode-consolidated #print-consolidated-report {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+    height: auto !important;
+    box-sizing: border-box !important;
+    padding: 10mm 12mm !important;
+    background-color: #07090e !important;
+    color: #ffffff !important;
+  }
+
+  .consolidated-print-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding-bottom: 10px !important;
+    border-bottom: 1.5px solid var(--accent-lime) !important;
+  }
+
+  .consolidated-kpis-row {
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .consolidated-kpi-box {
+    background: #0f1422 !important;
+    border: 1px solid #1a2336 !important;
+    border-radius: 6px !important;
+    padding: 8px 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+
+  .consolidated-print-table-section {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    margin-top: 4px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .consolidated-print-table-title {
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    color: var(--accent-lime) !important;
+    letter-spacing: 0.8px !important;
+    text-transform: uppercase !important;
+  }
+
+  .consolidated-print-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 9.5px !important;
+    border: 1px solid #1a2336 !important;
+    background: #0f1422 !important;
+    border-radius: 6px !important;
+  }
+
+  .consolidated-print-table th {
+    background: #151d30 !important;
+    padding: 6px 8px !important;
+    font-size: 8.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    color: #8da2bd !important;
+    text-transform: uppercase !important;
+    border-bottom: 1px solid #1f2c44 !important;
+    text-align: left !important;
+  }
+
+  .consolidated-print-table td {
+    padding: 5px 8px !important;
+    border-bottom: 1px solid #161e30 !important;
+    color: #d1dced !important;
+    font-family: var(--font-mono) !important;
+    font-size: 9.5px !important;
+  }
+
+  .consolidated-print-table .table-total-row td {
+    background: #182238 !important;
+    font-weight: 800 !important;
+    border-top: 1.5px solid var(--accent-lime) !important;
+    color: #ffffff !important;
+  }
+
+  .consolidated-print-footer {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding-top: 8px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    font-size: 8.5px !important;
+    color: #556677 !important;
+    margin-top: 4px !important;
   }
 }
