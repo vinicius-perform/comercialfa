@@ -688,7 +688,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (statDaysRemaining) statDaysRemaining.textContent = `${remainingDays} dias restantes`;
     if (statCurrentDailyPace) statCurrentDailyPace.textContent = `${formatNumberToMoney(dailyPace)} / dia`;
     if (statRequiredDailyPace) statRequiredDailyPace.textContent = `${formatNumberToMoney(requiredDailyPace)} / dia`;
-    if (statGoalGap) statGoalGap.textContent = formatNumberToMoney(goalGap);
+    const statGapStatus = document.getElementById('stat-gap-status');
+    const gapBox = document.querySelector('.gap-danger-box');
+    if (statGoalGap) {
+      if (goalGap <= 0) {
+        statGoalGap.textContent = 'Meta Batida! 🎯';
+        statGoalGap.classList.remove('highlight-red');
+        statGoalGap.classList.add('highlight-lime');
+        if (statGapStatus) statGapStatus.textContent = 'Superavit comercial';
+        if (gapBox) {
+          gapBox.style.background = 'rgba(91, 227, 54, 0.08)';
+          gapBox.style.borderColor = 'rgba(91, 227, 54, 0.3)';
+        }
+      } else {
+        statGoalGap.textContent = formatNumberToMoney(goalGap);
+        statGoalGap.classList.remove('highlight-lime');
+        statGoalGap.classList.add('highlight-red');
+        if (statGapStatus) statGapStatus.textContent = 'Faltam fechar';
+        if (gapBox) {
+          gapBox.style.background = '';
+          gapBox.style.borderColor = '';
+        }
+      }
+    }
 
     // Atualização do Funil Comercial Consolidado
     const grandLeads = Math.max(totalSdrLeads, totalCloserLeads, 1);

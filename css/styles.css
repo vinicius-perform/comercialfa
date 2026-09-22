@@ -968,6 +968,24 @@ body {
   letter-spacing: -0.01em;
 }
 
+/* Card de Gap para a Meta (Levemente Vermelho - Padrão Apple Alert) */
+.pacing-stat-box.gap-danger-box {
+  background: rgba(255, 59, 48, 0.05);
+  border-color: rgba(255, 59, 48, 0.22);
+}
+
+.pacing-stat-box.gap-danger-box .pacing-stat-label {
+  color: #dc2626;
+}
+
+.pacing-stat-val.highlight-red {
+  color: #dc2626;
+}
+
+.pacing-stat-box.gap-danger-box .pacing-stat-sub {
+  color: #b91c1c;
+}
+
 /* ==========================================================================
    BANNERS DE ACESSO RÁPIDO PARA SDRs E CLOSERS
    ========================================================================== */
