@@ -14,8 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Elementos do DOM: Seleção de Nome
   const teamNamesBox = document.getElementById('team-names-box');
-  const boxCustomName = document.getElementById('box-custom-name');
-  const inputCustomName = document.getElementById('input-custom-name');
 
   // Elementos de Data e Cliente
   const inputReportDate = document.getElementById('input-report-date');
@@ -178,24 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
       chip.addEventListener('click', () => {
         chips.forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
-
-        if (chip.dataset.name === 'outro') {
-          if (boxCustomName) boxCustomName.style.display = 'block';
-          if (inputCustomName) {
-            inputCustomName.focus();
-            currentName = inputCustomName.value.trim() || 'Membro Convidado';
-          }
-        } else {
-          if (boxCustomName) boxCustomName.style.display = 'none';
-          currentName = chip.dataset.name;
-        }
+        currentName = chip.dataset.name || 'Tales';
       });
-    });
-  }
-
-  if (inputCustomName) {
-    inputCustomName.addEventListener('input', (e) => {
-      currentName = e.target.value.trim() || 'Membro Convidado';
     });
   }
 

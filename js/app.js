@@ -225,7 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const clientFormId = document.getElementById('client-form-id');
   const clientName = document.getElementById('client-name');
   const clientSegment = document.getElementById('client-segment');
-  const clientResponsible = document.getElementById('client-responsible');
   const clientStatus = document.getElementById('client-status');
   const btnCloseClient = document.getElementById('btn-close-client');
   const btnCancelClient = document.getElementById('btn-cancel-client');
@@ -700,17 +699,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Se filtrou por um cliente específico
     if (selectedClientId !== 'all') {
-      const allClients = JSON.parse(localStorage.getItem('projects_clients_v2') || '[]');
-      const targetClient = allClients.find(c => c.id === selectedClientId);
-
-      monthCloserReports = monthCloserReports.filter(r => {
-        if (r.clientId) return r.clientId === selectedClientId;
-        return targetClient && targetClient.responsible === r.closer;
-      });
-      monthSdrReports = monthSdrReports.filter(r => {
-        if (r.clientId) return r.clientId === selectedClientId;
-        return targetClient && targetClient.responsible === r.sdr;
-      });
+      monthCloserReports = monthCloserReports.filter(r => r.clientId === selectedClientId);
+      monthSdrReports = monthSdrReports.filter(r => r.clientId === selectedClientId);
     }
 
     // Busca metas de planejamento para o mês e cliente selecionados
@@ -1845,8 +1835,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Relatórios associados ao cliente
       const reports = closerReports.filter(r => {
         if (!r.date || !r.date.startsWith(refMonth)) return false;
-        if (r.clientId) return r.clientId === c.id;
-        return c.responsible && r.closer === c.responsible;
+        return r.clientId === c.id;
       });
 
       const actualRev = reports.reduce((sum, r) => sum + parseMoneyToNumber(r.cashCollected), 0);
@@ -1887,8 +1876,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const q = projectsSearchQuery.trim().toLowerCase();
       filteredClients = filteredClients.filter(c => 
         (c.name && c.name.toLowerCase().includes(q)) || 
-        (c.segment && c.segment.toLowerCase().includes(q)) ||
-        (c.responsible && c.responsible.toLowerCase().includes(q))
+        (c.segment && c.segment.toLowerCase().includes(q))
       );
     }
 
@@ -2000,7 +1988,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ${stats.notes ? `<div style="font-size: 11px; color: var(--text-secondary); background: #fbfbfc; padding: 6px 10px; border-radius: 6px; border-left: 2px solid var(--accent-lime); font-style: italic;">“${stats.notes}”</div>` : ''}
 
         <div class="project-card-footer">
-          <span class="project-responsible-tag">Closer: <strong>${c.responsible || 'Geral'}</strong></span>
           <div class="project-card-actions">
             <button type="button" class="project-btn-action btn-client-dash" data-id="${c.id}" title="Ver métricas deste cliente no Dashboard">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2079,10 +2066,15 @@ document.addEventListener('DOMContentLoaded', () => {
           await populateTopBarFilters();
           await renderProjectsView();
           updateExecDashboard();
-          showToast(`Cliente "${client.name}" excluído.`);
+          showToast(`Cliente excluído com sucesso.`);
         }
       });
     });
+
+    const emptyAddBtn = projectsClientsContainer.querySelector('#btn-empty-add-client');
+    if (emptyAddBtn) {
+      emptyAddBtn.addEventListener('click', () => openClientModal());
+    }
   }
 
   // --- MODAL DE CLIENTE ---
@@ -2093,14 +2085,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (clientFormId) clientFormId.value = client.id;
       if (clientName) clientName.value = client.name || '';
       if (clientSegment) clientSegment.value = client.segment || '';
-      if (clientResponsible) clientResponsible.value = client.responsible || 'Tales';
       if (clientStatus) clientStatus.value = client.status || 'active';
     } else {
       if (modalClientTitle) modalClientTitle.textContent = 'Novo Cliente / Projeto';
       if (clientFormId) clientFormId.value = '';
       if (clientName) clientName.value = '';
       if (clientSegment) clientSegment.value = '';
-      if (clientResponsible) clientResponsible.value = 'Tales';
       if (clientStatus) clientStatus.value = 'active';
     }
     modalClient.classList.add('open');
@@ -2123,7 +2113,7 @@ document.addEventListener('DOMContentLoaded', () => {
       id,
       name: clientName.value.trim(),
       segment: clientSegment ? clientSegment.value.trim() : '',
-      responsible: clientResponsible ? clientResponsible.value : 'Tales',
+      responsible: '',
       status: clientStatus ? clientStatus.value : 'active'
     };
 
