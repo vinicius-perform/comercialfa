@@ -99,53 +99,30 @@ body {
 .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 4px;
+  padding: 4px 6px;
 }
 
-.brand-badge-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: var(--accent-lime);
+.sidebar-brand-link {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #11142d;
-  flex-shrink: 0;
-  box-shadow: 0 4px 14px var(--accent-lime-glow);
+  width: 100%;
+  text-decoration: none;
 }
 
-.brand-badge-icon svg {
-  width: 20px;
-  height: 20px;
+.sidebar-logo-img {
+  width: 100%;
+  max-width: 218px;
+  height: auto;
+  max-height: 48px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  transition: var(--transition);
 }
 
-.brand-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.brand-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--text-white);
-  letter-spacing: -0.5px;
-  line-height: 1.1;
-}
-
-.brand-trademark {
-  font-size: 10px;
-  vertical-align: super;
-  opacity: 0.6;
-}
-
-.brand-tagline {
-  font-size: 8.5px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
+.sidebar-logo-img:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
 }
 
 /* Seções da Sidebar */
