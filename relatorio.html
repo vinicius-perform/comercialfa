@@ -100,50 +100,14 @@
             <span class="field-hint" id="date-helper-text">Relatório referente ao dia selecionado.</span>
           </div>
 
-          <!-- ETAPA 4: MÉTRICAS DO DIA -->
-          <div class="form-section" id="section-general-fields">
+          <!-- ETAPA 4: MÉTRICA DE ESFORÇO E VOLUME DE LEADS -->
+          <div class="form-section" id="section-effort-leads">
             <div class="section-title-row">
               <span class="section-number">4</span>
-              <span class="section-title">MÉTRICAS DO DIA</span>
+              <span class="section-title">MÉTRICA DE ESFORÇO E VOLUME DE LEADS</span>
             </div>
 
-            <!-- KPI Cards de Resumo no Topo (Live) -->
-            <div class="report-kpi-grid">
-              <div class="report-kpi-card">
-                <span class="report-kpi-label">TOTAL VENDAS</span>
-                <div class="report-kpi-val-row">
-                  <span class="report-kpi-val" id="live-kpi-sales">0</span>
-                </div>
-                <span class="report-kpi-sub" id="live-kpi-sales-sub">0 nova(s)</span>
-              </div>
-
-              <div class="report-kpi-card">
-                <span class="report-kpi-label">VALOR CONTRATO</span>
-                <div class="report-kpi-val-row">
-                  <span class="report-kpi-val" id="live-kpi-contract">R$ 0,00</span>
-                </div>
-                <span class="report-kpi-sub">Contratos enviados</span>
-              </div>
-
-              <div class="report-kpi-card highlight-cash-card">
-                <span class="report-kpi-label badge-cash-label">CASH COLETADO</span>
-                <div class="report-kpi-val-row">
-                  <span class="report-kpi-val lime-text" id="live-kpi-cash">R$ 0,00</span>
-                </div>
-                <span class="report-kpi-sub lime-sub">Receita recebida</span>
-              </div>
-
-              <div class="report-kpi-card">
-                <span class="report-kpi-label">ESFORÇO ATIVO</span>
-                <div class="report-kpi-val-row">
-                  <span class="report-kpi-val" id="live-kpi-effort">0</span>
-                </div>
-                <span class="report-kpi-sub">Follow-ups + Prospecções</span>
-              </div>
-            </div>
-
-            <!-- SEÇÃO 1: MÉTRICA DE ESFORÇO E VOLUME DE LEADS -->
-            <div class="report-section-card">
+            <div class="report-section-card" style="margin-top: 12px; margin-bottom: 0;">
               <div class="report-section-header">
                 <div class="report-header-icon icon-clock">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -159,7 +123,7 @@
 
               <div class="report-fields-grid-3">
                 <div class="report-field-item">
-                  <label for="rep-leads" class="report-field-label">LEAD RECEBIDOS</label>
+                  <label for="rep-leads" class="report-field-label">LEADS RECEBIDOS</label>
                   <div class="report-input-row">
                     <span class="report-input-prefix">#</span>
                     <input type="number" id="rep-leads" class="report-clean-input" min="0" value="0" placeholder="0">
@@ -167,7 +131,7 @@
                 </div>
 
                 <div class="report-field-item">
-                  <label for="rep-followups" class="report-field-label">QUANTIDADE DE FOLLOW-UP FEITOS</label>
+                  <label for="rep-followups" class="report-field-label">QUANTIDADE DE FOLLOW-UPS FEITOS</label>
                   <div class="report-input-row">
                     <span class="report-input-prefix">#</span>
                     <input type="number" id="rep-followups" class="report-clean-input" min="0" value="0" placeholder="0">
@@ -175,7 +139,7 @@
                 </div>
 
                 <div class="report-field-item">
-                  <label for="rep-prospeccoes" class="report-field-label">QUANTAS PROSPECÇÃO NO DIA</label>
+                  <label for="rep-prospeccoes" class="report-field-label">QUANTAS PROSPECÇÕES NO DIA</label>
                   <div class="report-input-row">
                     <span class="report-input-prefix">#</span>
                     <input type="number" id="rep-prospeccoes" class="report-clean-input" min="0" value="0" placeholder="0">
@@ -183,9 +147,16 @@
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- SEÇÃO 2: PERFORMANCE COMERCIAL -->
-            <div class="report-section-card">
+          <!-- ETAPA 5: PERFORMANCE COMERCIAL -->
+          <div class="form-section" id="section-commercial-performance">
+            <div class="section-title-row">
+              <span class="section-number">5</span>
+              <span class="section-title">PERFORMANCE COMERCIAL</span>
+            </div>
+
+            <div class="report-section-card" style="margin-top: 12px; margin-bottom: 0;">
               <div class="report-section-header">
                 <div class="report-header-icon icon-chart">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -202,7 +173,7 @@
 
               <div class="report-fields-grid-3">
                 <div class="report-field-item">
-                  <label for="rep-scheduled" class="report-field-label">REUNIÃO AGENDADA</label>
+                  <label for="rep-scheduled" class="report-field-label">REUNIÕES AGENDADAS</label>
                   <div class="report-input-row">
                     <span class="report-input-prefix">#</span>
                     <input type="number" id="rep-scheduled" class="report-clean-input" min="0" value="0" placeholder="0">
@@ -210,7 +181,7 @@
                 </div>
 
                 <div class="report-field-item">
-                  <label for="rep-held" class="report-field-label">REUNIÃO REALIZADA</label>
+                  <label for="rep-held" class="report-field-label">REUNIÕES REALIZADAS</label>
                   <div class="report-input-row">
                     <span class="report-input-prefix">#</span>
                     <input type="number" id="rep-held" class="report-clean-input" min="0" value="0" placeholder="0">
@@ -218,7 +189,7 @@
                 </div>
 
                 <div class="report-field-item">
-                  <label for="rep-sales" class="report-field-label">QUANTAS VENDAS</label>
+                  <label for="rep-sales" class="report-field-label">QUANTIDADE DE VENDAS</label>
                   <div class="report-input-row">
                     <span class="report-input-prefix prefix-icon">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;">
@@ -253,6 +224,53 @@
                     <input type="text" id="rep-cash-collected" class="report-clean-input lime-input font-bold" placeholder="R$ 0,00" value="R$ 0,00">
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ETAPA 6: RESULTADO FINAL / RESUMO -->
+          <div class="form-section" id="section-final-result">
+            <div class="section-title-row">
+              <span class="section-number">6</span>
+              <span class="section-title">RESULTADO FINAL / RESUMO</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); margin: -4px 0 12px 0;">Resumo consolidado das métricas lançadas hoje (atualizado em tempo real):</p>
+
+            <div class="report-kpi-grid" style="margin-top: 10px; margin-bottom: 0;">
+              <!-- 6.1 Total de Vendas -->
+              <div class="report-kpi-card">
+                <span class="report-kpi-label">TOTAL DE VENDAS</span>
+                <div class="report-kpi-val-row">
+                  <span class="report-kpi-val" id="live-kpi-sales">0</span>
+                </div>
+                <span class="report-kpi-sub" id="live-kpi-sales-sub">0 nova(s)</span>
+              </div>
+
+              <!-- 6.2 Valor de Contrato -->
+              <div class="report-kpi-card">
+                <span class="report-kpi-label">VALOR DE CONTRATO</span>
+                <div class="report-kpi-val-row">
+                  <span class="report-kpi-val" id="live-kpi-contract">R$ 0,00</span>
+                </div>
+                <span class="report-kpi-sub">Contratos enviados / fechados</span>
+              </div>
+
+              <!-- 6.3 Cash Coletado -->
+              <div class="report-kpi-card highlight-cash-card">
+                <span class="report-kpi-label badge-cash-label">CASH COLETADO</span>
+                <div class="report-kpi-val-row">
+                  <span class="report-kpi-val lime-text" id="live-kpi-cash">R$ 0,00</span>
+                </div>
+                <span class="report-kpi-sub lime-sub">Receita recebida</span>
+              </div>
+
+              <!-- 6.4 Esforço Ativo -->
+              <div class="report-kpi-card">
+                <span class="report-kpi-label">ESFORÇO ATIVO</span>
+                <div class="report-kpi-val-row">
+                  <span class="report-kpi-val" id="live-kpi-effort">0</span>
+                </div>
+                <span class="report-kpi-sub">Follow-ups + Prospecções</span>
               </div>
             </div>
           </div>
