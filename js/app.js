@@ -751,7 +751,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span style="font-weight:700; color:${convRate > 0 ? '#10b981' : 'var(--text-secondary)'};">${convRate}%</span>
         </td>
         <td style="text-align: center;">
-          <span style="font-weight:800; color:${m.sales > 0 ? 'var(--text-dark)' : 'var(--text-secondary)'};">${isCloser ? m.sales : '—'}</span>
+          <span style="font-weight:700; color:${m.sales > 0 ? 'var(--text-dark)' : 'var(--text-secondary)'};">${isCloser ? m.sales : '—'}</span>
         </td>
         <td style="text-align: right;">${isCloser ? formatNumberToMoney(m.contracts) : '—'}</td>
         <td style="text-align: right;">
@@ -989,42 +989,42 @@ document.addEventListener('DOMContentLoaded', () => {
         printSdrBodyContent.innerHTML = `
           <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px;">
             <div style="background:#0f1422; border:1px solid #1a2336; padding:12px; border-radius:8px;">
-              <span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:800;">REUNIÕES AGENDADAS</span>
-              <div style="font-size:24px; font-weight:800; color:var(--accent-lime); font-family:var(--font-mono);">${scheduled}</div>
+              <span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.04em;">REUNIÕES AGENDADAS</span>
+              <div style="font-size:24px; font-weight:700; color:var(--accent-lime); font-family:var(--font-display); letter-spacing:-0.03em; font-variant-numeric:tabular-nums;">${scheduled}</div>
               <span style="font-size:10px; color:#cbd5e1;">${qualified} qualificadas no ICP</span>
             </div>
             <div style="background:#0f1422; border:1px solid #1a2336; padding:12px; border-radius:8px;">
-              <span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:800;">CONTATOS EFETIVOS</span>
-              <div style="font-size:24px; font-weight:800; color:#ffffff; font-family:var(--font-mono);">${contacts}</div>
+              <span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.04em;">CONTATOS EFETIVOS</span>
+              <div style="font-size:24px; font-weight:700; color:#ffffff; font-family:var(--font-display); letter-spacing:-0.03em; font-variant-numeric:tabular-nums;">${contacts}</div>
               <span style="font-size:10px; color:#cbd5e1;">${contactRate}% de conexão</span>
             </div>
             <div style="background:#0f1422; border:1px solid #1a2336; padding:12px; border-radius:8px;">
-              <span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:800;">TX. AGENDAMENTO</span>
-              <div style="font-size:24px; font-weight:800; color:var(--accent-lime); font-family:var(--font-mono);">${scheduleRate}%</div>
+              <span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.04em;">TX. AGENDAMENTO</span>
+              <div style="font-size:24px; font-weight:700; color:var(--accent-lime); font-family:var(--font-display); letter-spacing:-0.03em; font-variant-numeric:tabular-nums;">${scheduleRate}%</div>
               <span style="font-size:10px; color:#cbd5e1;">Agendadas / Conexões</span>
             </div>
             <div style="background:#0f1422; border:1px solid #1a2336; padding:12px; border-radius:8px;">
-              <span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:800;">PIPELINE GERADO</span>
-              <div style="font-size:22px; font-weight:800; color:#ffffff; font-family:var(--font-mono);">${pipeline}</div>
+              <span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.04em;">PIPELINE GERADO</span>
+              <div style="font-size:22px; font-weight:700; color:#ffffff; font-family:var(--font-display); letter-spacing:-0.03em; font-variant-numeric:tabular-nums;">${pipeline}</div>
               <span style="font-size:10px; color:#8da2bd;">Encaminhado aos Closers</span>
             </div>
           </div>
 
           <div style="background:#0f1422; border:1px solid #1a2336; padding:16px; border-radius:8px; margin-bottom: 12px;">
-            <span style="font-size:11px; font-weight:800; color:var(--accent-lime); letter-spacing:0.8px; text-transform:uppercase;">01 • ESFORÇO & VOLUME DE PROSPECÇÃO</span>
+            <span style="font-size:11px; font-weight:700; color:var(--accent-lime); letter-spacing:0.04em; text-transform:uppercase;">01 • ESFORÇO & VOLUME DE PROSPECÇÃO</span>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px;">
-              <div><span style="font-size:10px; color:#8da2bd;">LEADS ABORDADOS</span><div style="font-size:18px; font-weight:800; color:#ffffff;">${leads}</div></div>
-              <div><span style="font-size:10px; color:#8da2bd;">LIGAÇÕES FEITAS</span><div style="font-size:18px; font-weight:800; color:#ffffff;">${calls}</div></div>
-              <div><span style="font-size:10px; color:#8da2bd;">MENSAGENS WHATSAPP</span><div style="font-size:18px; font-weight:800; color:#ffffff;">${whatsapp}</div></div>
+              <div><span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.03em;">LEADS ABORDADOS</span><div style="font-size:18px; font-weight:700; color:#ffffff; font-variant-numeric:tabular-nums;">${leads}</div></div>
+              <div><span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.03em;">LIGAÇÕES FEITAS</span><div style="font-size:18px; font-weight:700; color:#ffffff; font-variant-numeric:tabular-nums;">${calls}</div></div>
+              <div><span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.03em;">MENSAGENS WHATSAPP</span><div style="font-size:18px; font-weight:700; color:#ffffff; font-variant-numeric:tabular-nums;">${whatsapp}</div></div>
             </div>
           </div>
 
           <div style="background:#0f1422; border:1px solid #1a2336; padding:16px; border-radius:8px;">
-            <span style="font-size:11px; font-weight:800; color:var(--accent-lime); letter-spacing:0.8px; text-transform:uppercase;">02 • CONVERSÃO & QUALIFICAÇÃO</span>
+            <span style="font-size:11px; font-weight:700; color:var(--accent-lime); letter-spacing:0.04em; text-transform:uppercase;">02 • CONVERSÃO & QUALIFICAÇÃO</span>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px;">
-              <div><span style="font-size:10px; color:#8da2bd;">REUNIÕES AGENDADAS</span><div style="font-size:18px; font-weight:800; color:var(--accent-lime);">${scheduled}</div></div>
-              <div><span style="font-size:10px; color:#8da2bd;">REUNIÕES QUALIFICADAS</span><div style="font-size:18px; font-weight:800; color:#ffffff;">${qualified}</div></div>
-              <div><span style="font-size:10px; color:#8da2bd;">NO-SHOWS (FALTAS)</span><div style="font-size:18px; font-weight:800; color:#f87171;">${noshow}</div></div>
+              <div><span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.03em;">REUNIÕES AGENDADAS</span><div style="font-size:18px; font-weight:700; color:var(--accent-lime); font-variant-numeric:tabular-nums;">${scheduled}</div></div>
+              <div><span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.03em;">REUNIÕES QUALIFICADAS</span><div style="font-size:18px; font-weight:700; color:#ffffff; font-variant-numeric:tabular-nums;">${qualified}</div></div>
+              <div><span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.03em;">NO-SHOWS (FALTAS)</span><div style="font-size:18px; font-weight:700; color:#f87171; font-variant-numeric:tabular-nums;">${noshow}</div></div>
             </div>
           </div>
         `;
