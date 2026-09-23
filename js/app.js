@@ -30,92 +30,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const currentMonthKey = `${yyyy}-${mm}`;
 
   // ============================================================
-  // SEED DE DADOS INICIAIS (Se não houver registros salvos)
   // ============================================================
-  function initializeSeedDataIfEmpty() {
-    const existingClosers = getStoredCloserReports();
-    if (existingClosers.length === 0) {
-      const seedCloserReports = [
-        {
-          id: `Tales_${yyyy}-${mm}-18`,
-          closer: 'Tales',
-          date: `${yyyy}-${mm}-18`,
-          leads: 18,
-          followups: 32,
-          prospeccoes: 15,
-          meetingsScheduled: 6,
-          meetingsHeld: 5,
-          sales: 2,
-          contractVal: 'R$ 24.000,00',
-          cashCollected: 'R$ 18.000,00',
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: `José_${yyyy}-${mm}-19`,
-          closer: 'José',
-          date: `${yyyy}-${mm}-19`,
-          leads: 14,
-          followups: 26,
-          prospeccoes: 12,
-          meetingsScheduled: 5,
-          meetingsHeld: 4,
-          sales: 1,
-          contractVal: 'R$ 15.000,00',
-          cashCollected: 'R$ 12.500,00',
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: `Elinaldo_${yyyy}-${mm}-20`,
-          closer: 'Elinaldo',
-          date: `${yyyy}-${mm}-20`,
-          leads: 16,
-          followups: 28,
-          prospeccoes: 14,
-          meetingsScheduled: 5,
-          meetingsHeld: 4,
-          sales: 2,
-          contractVal: 'R$ 20.000,00',
-          cashCollected: 'R$ 15.000,00',
-          updatedAt: new Date().toISOString()
-        }
-      ];
-      saveStoredCloserReports(seedCloserReports);
-    }
-
-    const existingSdrs = getStoredSdrReports();
-    if (existingSdrs.length === 0) {
-      const seedSdrReports = [
-        {
-          id: `SDR 1_${formattedToday}`,
-          sdr: 'SDR 1',
-          date: formattedToday,
-          leads: 45,
-          calls: 38,
-          whatsapp: 52,
-          contacts: 24,
-          scheduled: 7,
-          qualified: 5,
-          noshow: 1,
-          pipeline: 'R$ 55.000,00',
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: `SDR 2_${yyyy}-${mm}-21`,
-          sdr: 'SDR 2',
-          date: `${yyyy}-${mm}-21`,
-          leads: 40,
-          calls: 32,
-          whatsapp: 48,
-          contacts: 20,
-          scheduled: 5,
-          qualified: 4,
-          noshow: 0,
-          pipeline: 'R$ 40.000,00',
-          updatedAt: new Date().toISOString()
-        }
-      ];
-      saveStoredSdrReports(seedSdrReports);
-    }
+  // LIMPEZA AUTOMÁTICA DE DADOS FICTÍCIOS ANTERIORES DO CACHE
+  // ============================================================
+  if (!localStorage.getItem('fa_storage_cleaned_v3')) {
+    localStorage.removeItem(STORAGE_CLOSER_REPORTS);
+    localStorage.removeItem(STORAGE_SDR_REPORTS);
+    localStorage.removeItem('closerReports_v2');
+    localStorage.removeItem('sdrReports_v2');
+    localStorage.removeItem('projects_clients_v2');
+    localStorage.removeItem('projects_planning_v2');
+    localStorage.removeItem('fa_team_reports_unified_v1');
+    localStorage.setItem('fa_storage_cleaned_v3', 'true');
   }
 
   // ============================================================
@@ -1631,15 +1557,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Limpar Histórico
+  // Limpar Histórico do Banco de Dados e Cache
   if (btnClearHistory) {
-    btnClearHistory.addEventListener('click', () => {
-      if (confirm('Tem certeza de que deseja apagar todo o histórico de lançamentos?')) {
+    btnClearHistory.addEventListener('click', async () => {
+      if (confirm('Tem certeza de que deseja apagar todo o histórico de lançamentos do banco de dados e do painel?')) {
         localStorage.removeItem(STORAGE_CLOSER_REPORTS);
         localStorage.removeItem(STORAGE_SDR_REPORTS);
+        localStorage.removeItem('closerReports_v2');
+        localStorage.removeItem('sdrReports_v2');
+        localStorage.removeItem('fa_team_reports_unified_v1');
+
+        if (typeof dbClearAllReports === 'function') {
+          await dbClearAllReports();
+        }
+
         renderConsolidatedHistory();
         updateExecDashboard();
-        showToast('Histórico apagado com sucesso.');
+        showToast('Histórico do banco de dados apagado com sucesso.');
       }
     });
   }
@@ -1681,9 +1615,15 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem(STORAGE_MONEY_TABLE, newMoneyTable.toString());
       localStorage.setItem(STORAGE_WIN_RATE, newWinRate.toString());
 
+      if (typeof dbSaveSetting === 'function') {
+        dbSaveSetting('monthly_goal', newGoal);
+        dbSaveSetting('money_on_table', newMoneyTable);
+        dbSaveSetting('win_rate', newWinRate);
+      }
+
       closeSettingsModal();
       updateExecDashboard();
-      showToast('Configurações de Meta e Pipeline salvas com sucesso!');
+      showToast('Configurações de Meta e Pipeline salvas no banco de dados!');
     });
   }
 
@@ -2368,18 +2308,31 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
-  // INICIALIZAÇÃO DO SISTEMA
+  // INICIALIZAÇÃO DO SISTEMA & SINCRONIZAÇÃO COM O SUPABASE
   // ============================================================
-  // Limpa projetos demo do cache local conforme solicitado
-  try {
-    localStorage.setItem('projects_clients_v2', JSON.stringify([]));
-    localStorage.setItem('projects_planning_v2', JSON.stringify([]));
-  } catch (e) {}
+  async function loadDataFromSupabase() {
+    try {
+      if (typeof dbFetchSettings === 'function') await dbFetchSettings();
+      if (typeof dbFetchClients === 'function') await dbFetchClients();
+      if (typeof dbFetchPlannings === 'function') await dbFetchPlannings();
+      if (typeof dbFetchCloserReports === 'function') await dbFetchCloserReports();
+      if (typeof dbFetchSdrReports === 'function') await dbFetchSdrReports();
+    } catch (e) {
+      console.warn('[Supabase Sync] Falha ao sincronizar com o banco:', e);
+    }
 
-  initializeSeedDataIfEmpty();
+    populateTopBarFilters();
+    updateExecDashboard();
+    renderConsolidatedHistory();
+    renderCloserView(currentCloser);
+    renderSdrView(currentSdr);
+    renderProjectsList();
+  }
+
   populateTopBarFilters();
   populateMonthFilter();
   initSupabaseHealth();
+  loadDataFromSupabase();
 
   // Roteamento inicial por Hash
   const initialHash = window.location.hash.replace('#', '');

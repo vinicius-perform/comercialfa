@@ -83,36 +83,58 @@
       });
     }
 
-    // Submissão do formulário de autenticação
+    // Submissão do formulário de autenticação conectado ao Supabase
     if (authForm) {
-      authForm.addEventListener('submit', (e) => {
+      authForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const inputUser = (authLogin ? authLogin.value : '').trim();
         const inputPass = authPassword ? authPassword.value : '';
 
-        // Validação (login case-insensitive, senha case-sensitive)
-        if (inputUser.toLowerCase() === EXPECTED_USER.toLowerCase() && inputPass === EXPECTED_PASS) {
+        const submitBtn = document.getElementById('auth-submit-btn');
+        const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = `<span>Verificando no banco...</span>`;
+        }
+
+        let isValid = false;
+        try {
+          if (typeof window.dbVerifyCredentials === 'function') {
+            isValid = await window.dbVerifyCredentials(inputUser, inputPass);
+          } else {
+            isValid = inputUser.toLowerCase() === EXPECTED_USER.toLowerCase() && inputPass === EXPECTED_PASS;
+          }
+        } catch (err) {
+          isValid = inputUser.toLowerCase() === EXPECTED_USER.toLowerCase() && inputPass === EXPECTED_PASS;
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+          }
+        }
+
+        if (isValid) {
           // Sucesso
           if (authErrorBanner) authErrorBanner.style.display = 'none';
 
           if (authRemember && authRemember.checked) {
-            localStorage.setItem(AUTH_KEY, EXPECTED_USER);
+            localStorage.setItem(AUTH_KEY, inputUser.toLowerCase());
             sessionStorage.removeItem(AUTH_KEY);
           } else {
-            sessionStorage.setItem(AUTH_KEY, EXPECTED_USER);
+            sessionStorage.setItem(AUTH_KEY, inputUser.toLowerCase());
             localStorage.removeItem(AUTH_KEY);
           }
 
           unlockSystem();
 
           if (typeof window.showToast === 'function') {
-            window.showToast('Acesso autorizado! Bem-vindo ao Painel.');
+            window.showToast('Acesso autorizado pelo Supabase! Bem-vindo.');
           }
         } else {
           // Falha na autenticação
           if (authErrorBanner) {
-            authErrorText.textContent = 'Login ou senha incorretos. Verifique suas credenciais.';
+            authErrorText.textContent = 'Credenciais incorretas. Verifique seu login e senha.';
             authErrorBanner.style.display = 'flex';
           }
           if (authCard) {
