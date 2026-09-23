@@ -1299,35 +1299,102 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
-  // POVOAMENTO DE FILTROS DA TOPBAR (CLIENTES & MESES)
+  // POVOAMENTO DO FILTRO DE PROJETO (SEMPRE PUXA O PROJETO PRINCIPAL)
   // ============================================================
-  async function populateTopBarFilters() {
-    const clients = await dbFetchClients();
-    const primaryId = localStorage.getItem('fa_primary_project_id_v1');
+  let userManuallySelectedClient = false;
 
-    [dashFilterClient, closerClientSelect, sdrClientSelect].forEach(selectElem => {
-      if (!selectElem) return;
-      const isDash = (selectElem === dashFilterClient);
-      const currentVal = selectElem.value || (isDash ? 'all' : '');
+  function renderClientFilterOptions(clients, primaryId) {
+    if (!dashFilterClient) return;
 
-      selectElem.innerHTML = isDash
-        ? '<option value="all">🌐 Visão Consolidada (Todos os Clientes)</option>'
-        : '<option value="">🌐 Geral / Todos os Projetos</option>';
+    if (!Array.isArray(clients)) clients = [];
 
-      clients.forEach(c => {
-        const isPrimary = Boolean(primaryId && String(c.id) === String(primaryId));
-        const opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = isPrimary ? `⭐ ${c.name} (Principal)` : `${c.name} (${c.segment || 'Geral'})`;
-        selectElem.appendChild(opt);
-      });
+    // Localiza o projeto principal
+    let primaryClient = null;
+    if (primaryId) {
+      primaryClient = clients.find(c => String(c.id) === String(primaryId));
+    }
+    // Se não há ID definido mas há apenas 1 cliente, usa-o como principal
+    if (!primaryClient && clients.length === 1) {
+      primaryClient = clients[0];
+      primaryId = primaryClient.id;
+    }
 
-      if (Array.from(selectElem.options).some(o => o.value === currentVal)) {
-        selectElem.value = currentVal;
-      } else {
-        selectElem.value = isDash ? 'all' : '';
-      }
+    const previousVal = dashFilterClient.value;
+    dashFilterClient.innerHTML = '';
+
+    // 1. Projeto Principal como primeira opção destacada
+    if (primaryClient) {
+      const optPrimary = document.createElement('option');
+      optPrimary.value = primaryClient.id;
+      optPrimary.textContent = `⭐ ${primaryClient.name} (Projeto Principal)`;
+      dashFilterClient.appendChild(optPrimary);
+    }
+
+    // 2. Demais projetos cadastrados
+    clients.forEach(c => {
+      if (primaryClient && String(c.id) === String(primaryClient.id)) return;
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = `${c.name} (${c.segment || 'Geral'})`;
+      dashFilterClient.appendChild(opt);
     });
+
+    // 3. Opção de Visão Consolidada
+    const optAll = document.createElement('option');
+    optAll.value = 'all';
+    optAll.textContent = '🌐 Visão Consolidada (Todos os Clientes)';
+    dashFilterClient.appendChild(optAll);
+
+    // Seleção: Se o usuário NÃO trocou manualmente durante a sessão, PUXA SEMPRE O PRINCIPAL!
+    if (!userManuallySelectedClient && primaryClient) {
+      dashFilterClient.value = primaryClient.id;
+    } else if (previousVal && Array.from(dashFilterClient.options).some(o => o.value === previousVal)) {
+      dashFilterClient.value = previousVal;
+    } else if (primaryClient) {
+      dashFilterClient.value = primaryClient.id;
+    } else if (clients.length > 0) {
+      dashFilterClient.value = clients[0].id;
+    } else {
+      dashFilterClient.value = 'all';
+    }
+  }
+
+  function populateTopBarFiltersSync() {
+    try {
+      const cachedClients = JSON.parse(localStorage.getItem(STORAGE_CLIENTS_KEY) || '[]');
+      const cachedPrimary = localStorage.getItem('fa_primary_project_id_v1');
+      if (Array.isArray(cachedClients) && cachedClients.length > 0) {
+        renderClientFilterOptions(cachedClients, cachedPrimary);
+      }
+    } catch (e) {}
+  }
+
+  async function populateTopBarFilters(forcePrimary = false) {
+    if (forcePrimary) {
+      userManuallySelectedClient = false;
+    }
+
+    let clients = [];
+    try {
+      if (typeof dbFetchClients === 'function') {
+        clients = await dbFetchClients();
+      }
+    } catch (e) {}
+
+    if (!Array.isArray(clients) || clients.length === 0) {
+      try {
+        clients = JSON.parse(localStorage.getItem(STORAGE_CLIENTS_KEY) || '[]');
+      } catch (e) { clients = []; }
+    }
+
+    let primaryId = localStorage.getItem('fa_primary_project_id_v1');
+    if (!primaryId && typeof dbGetPrimaryProjectId === 'function') {
+      try {
+        primaryId = await dbGetPrimaryProjectId();
+      } catch (e) {}
+    }
+
+    renderClientFilterOptions(clients, primaryId);
   }
 
   function populateMonthFilter() {
@@ -1372,6 +1439,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (dashFilterClient) {
     dashFilterClient.addEventListener('change', () => {
+      userManuallySelectedClient = true;
       updateExecDashboard();
     });
   }
@@ -1711,7 +1779,12 @@ document.addEventListener('DOMContentLoaded', () => {
           localStorage.setItem('fa_primary_project_id_v1', cId);
         }
         await renderProjectsView();
-        showToast(`⭐ Projeto "${targetCli.name}" definido como Principal para os relatórios!`);
+        await populateTopBarFilters(true);
+        if (dashFilterClient) {
+          dashFilterClient.value = cId;
+          updateExecDashboard();
+        }
+        showToast(`⭐ Projeto "${targetCli.name}" definido como Principal para relatórios e dashboard!`);
       });
     });
 
@@ -1719,6 +1792,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.addEventListener('click', () => {
         const cId = btn.getAttribute('data-id');
         if (dashFilterClient) {
+          userManuallySelectedClient = true;
           dashFilterClient.value = cId;
         }
         showView('view-dashboard');
@@ -2093,17 +2167,19 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof dbFetchClients === 'function') await dbFetchClients();
       if (typeof dbFetchPlannings === 'function') await dbFetchPlannings();
       if (typeof dbFetchCloserReports === 'function') await dbFetchCloserReports();
+      if (typeof dbGetPrimaryProjectId === 'function') await dbGetPrimaryProjectId();
     } catch (e) {
       console.warn('[Supabase Sync] Falha ao sincronizar com o banco:', e);
     }
 
-    populateTopBarFilters();
+    await populateTopBarFilters();
     updateExecDashboard();
     renderConsolidatedHistory();
     renderProjectsView();
   }
 
-  populateTopBarFilters();
+  // 1. Executa imediatamente e sincronamente usando os dados em cache do localStorage
+  populateTopBarFiltersSync();
   populateMonthFilter();
   updateExecDashboard();
   renderConsolidatedHistory();
