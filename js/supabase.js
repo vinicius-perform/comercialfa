@@ -45,7 +45,7 @@ async function checkSupabaseHealth() {
 // ============================================================
 // 1. CLIENTES / PROJETOS (CRUD)
 // ============================================================
-const STORAGE_CLIENTS_KEY = 'projects_clients_v2';
+const STORAGE_CLIENTS_KEY = 'fa_prod_clients_v1';
 
 async function dbFetchClients() {
   if (supabaseClient) {
@@ -136,7 +136,7 @@ async function dbDeleteClient(clientId) {
 // ============================================================
 // 2. PLANEJAMENTO MENSAL POR CLIENTE (CRUD)
 // ============================================================
-const STORAGE_PLANNING_KEY = 'projects_planning_v2';
+const STORAGE_PLANNING_KEY = 'fa_prod_planning_v1';
 
 async function dbFetchPlannings(clientId = null) {
   if (supabaseClient) {
@@ -222,7 +222,7 @@ async function dbSavePlanning(planning) {
 // ============================================================
 // 3. RELATÓRIOS DOS CLOSERS (LEITURA, GRAVAÇÃO & EXCLUSÃO)
 // ============================================================
-const STORAGE_CLOSER_REPORTS = 'fa_closers_uifry_reports_v1';
+const STORAGE_CLOSER_REPORTS = 'fa_prod_closer_reports_v1';
 
 async function dbFetchCloserReports() {
   if (supabaseClient) {
@@ -249,7 +249,6 @@ async function dbFetchCloserReports() {
           updatedAt: r.updated_at
         }));
         localStorage.setItem(STORAGE_CLOSER_REPORTS, JSON.stringify(mapped));
-        localStorage.setItem('closerReports_v2', JSON.stringify(mapped));
         return mapped;
       }
     } catch (e) {
@@ -258,7 +257,7 @@ async function dbFetchCloserReports() {
   }
 
   try {
-    const raw = localStorage.getItem(STORAGE_CLOSER_REPORTS) || localStorage.getItem('closerReports_v2');
+    const raw = localStorage.getItem(STORAGE_CLOSER_REPORTS);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     return [];
@@ -277,7 +276,6 @@ async function dbSyncCloserReport(report) {
     if (idx >= 0) reports[idx] = report;
     else reports.unshift(report);
     localStorage.setItem(STORAGE_CLOSER_REPORTS, JSON.stringify(reports));
-    localStorage.setItem('closerReports_v2', JSON.stringify(reports));
   } catch (e) {}
 
   // Grava no Supabase Cloud
@@ -312,7 +310,6 @@ async function dbDeleteCloserReport(id) {
     reports = raw ? JSON.parse(raw) : [];
     reports = reports.filter(r => r.id !== id);
     localStorage.setItem(STORAGE_CLOSER_REPORTS, JSON.stringify(reports));
-    localStorage.setItem('closerReports_v2', JSON.stringify(reports));
   } catch (e) {}
 
   if (supabaseClient) {
@@ -327,7 +324,7 @@ async function dbDeleteCloserReport(id) {
 // ============================================================
 // 4. RELATÓRIOS DOS SDRS (LEITURA, GRAVAÇÃO & EXCLUSÃO)
 // ============================================================
-const STORAGE_SDR_REPORTS = 'fa_sdr_reports_v1';
+const STORAGE_SDR_REPORTS = 'fa_prod_sdr_reports_v1';
 
 async function dbFetchSdrReports() {
   if (supabaseClient) {
@@ -356,7 +353,6 @@ async function dbFetchSdrReports() {
           updatedAt: r.updated_at
         }));
         localStorage.setItem(STORAGE_SDR_REPORTS, JSON.stringify(mapped));
-        localStorage.setItem('sdrReports_v2', JSON.stringify(mapped));
         return mapped;
       }
     } catch (e) {
@@ -365,7 +361,7 @@ async function dbFetchSdrReports() {
   }
 
   try {
-    const raw = localStorage.getItem(STORAGE_SDR_REPORTS) || localStorage.getItem('sdrReports_v2');
+    const raw = localStorage.getItem(STORAGE_SDR_REPORTS);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     return [];
@@ -384,7 +380,6 @@ async function dbSyncSdrReport(report) {
     if (idx >= 0) reports[idx] = report;
     else reports.unshift(report);
     localStorage.setItem(STORAGE_SDR_REPORTS, JSON.stringify(reports));
-    localStorage.setItem('sdrReports_v2', JSON.stringify(reports));
   } catch (e) {}
 
   if (supabaseClient) {
@@ -419,7 +414,6 @@ async function dbDeleteSdrReport(id) {
     reports = raw ? JSON.parse(raw) : [];
     reports = reports.filter(r => r.id !== id);
     localStorage.setItem(STORAGE_SDR_REPORTS, JSON.stringify(reports));
-    localStorage.setItem('sdrReports_v2', JSON.stringify(reports));
   } catch (e) {}
 
   if (supabaseClient) {
@@ -434,8 +428,11 @@ async function dbDeleteSdrReport(id) {
 async function dbClearAllReports() {
   localStorage.removeItem(STORAGE_CLOSER_REPORTS);
   localStorage.removeItem(STORAGE_SDR_REPORTS);
+  localStorage.removeItem('fa_prod_team_reports_v1');
   localStorage.removeItem('closerReports_v2');
   localStorage.removeItem('sdrReports_v2');
+  localStorage.removeItem('fa_closers_uifry_reports_v1');
+  localStorage.removeItem('fa_sdr_reports_v1');
   localStorage.removeItem('fa_team_reports_unified_v1');
 
   if (supabaseClient) {
@@ -449,7 +446,7 @@ async function dbClearAllReports() {
 }
 
 // ============================================================
-// 5. CONFIGURAÇÕES GERAIS (METAS, PIPELINE, TAXA)
+// 5. CONFIGURAÇÕES GERAIS (METAS MENSAL)
 // ============================================================
 async function dbFetchSettings() {
   if (supabaseClient) {
@@ -458,8 +455,6 @@ async function dbFetchSettings() {
       if (!error && Array.isArray(data)) {
         data.forEach(item => {
           if (item.key === 'monthly_goal') localStorage.setItem('fa_monthly_goal_v1', item.value);
-          if (item.key === 'money_on_table') localStorage.setItem('fa_money_table_v1', item.value);
-          if (item.key === 'win_rate') localStorage.setItem('fa_win_rate_v1', item.value);
         });
         return data;
       }
@@ -472,8 +467,6 @@ async function dbFetchSettings() {
 
 async function dbSaveSetting(key, value) {
   if (key === 'monthly_goal') localStorage.setItem('fa_monthly_goal_v1', value);
-  if (key === 'money_on_table') localStorage.setItem('fa_money_table_v1', value);
-  if (key === 'win_rate') localStorage.setItem('fa_win_rate_v1', value);
 
   if (supabaseClient) {
     try {

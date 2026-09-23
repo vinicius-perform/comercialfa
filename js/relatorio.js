@@ -4,10 +4,10 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Chaves do LocalStorage
-  const STORAGE_CLOSER_REPORTS = 'closerReports_v2';
-  const STORAGE_SDR_REPORTS = 'sdrReports_v2';
-  const STORAGE_TEAM_REPORTS = 'teamReports_v1';
+  // Chaves do LocalStorage de Produção
+  const STORAGE_CLOSER_REPORTS = 'fa_prod_closer_reports_v1';
+  const STORAGE_SDR_REPORTS = 'fa_prod_sdr_reports_v1';
+  const STORAGE_TEAM_REPORTS = 'fa_prod_team_reports_v1';
 
   // Estado do Membro Ativo
   let currentName = 'Tales';
@@ -408,10 +408,10 @@ document.addEventListener('DOMContentLoaded', () => {
       console.warn('Erro ao salvar teamReports:', e);
     }
 
-    // 2. Sincroniza com closerReports_v2 (Alimenta métricas de receita, vendas e reuniões no Dashboard)
+    // 2. Sincroniza com closerReports (Alimenta métricas de receita, vendas e reuniões no Dashboard)
     try {
       let closerReports = [];
-      const rawC = localStorage.getItem(STORAGE_CLOSER_REPORTS) || localStorage.getItem('fa_closers_uifry_reports_v1');
+      const rawC = localStorage.getItem(STORAGE_CLOSER_REPORTS);
       closerReports = rawC ? JSON.parse(rawC) : [];
       const closerRecord = {
         id: reportId,
@@ -432,7 +432,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (idxC >= 0) closerReports[idxC] = closerRecord;
       else closerReports.unshift(closerRecord);
       localStorage.setItem(STORAGE_CLOSER_REPORTS, JSON.stringify(closerReports));
-      localStorage.setItem('fa_closers_uifry_reports_v1', JSON.stringify(closerReports));
 
       if (typeof dbSyncCloserReport === 'function') {
         dbSyncCloserReport(closerRecord);
@@ -441,10 +440,10 @@ document.addEventListener('DOMContentLoaded', () => {
       console.warn('Erro ao sincronizar com closerReports:', e);
     }
 
-    // 3. Sincroniza com sdrReports_v2 (Alimenta métricas de pipeline, contatos e reuniões agendadas)
+    // 3. Sincroniza com sdrReports (Alimenta métricas de pipeline, contatos e reuniões agendadas)
     try {
       let sdrReports = [];
-      const rawS = localStorage.getItem(STORAGE_SDR_REPORTS) || localStorage.getItem('fa_sdr_reports_v1');
+      const rawS = localStorage.getItem(STORAGE_SDR_REPORTS);
       sdrReports = rawS ? JSON.parse(rawS) : [];
       const sdrKey = data.name.startsWith('SDR') ? data.name : 'SDR 1';
       const customName = data.name.startsWith('SDR') ? '' : data.name;
@@ -455,21 +454,20 @@ document.addEventListener('DOMContentLoaded', () => {
         customName: customName,
         date: data.date,
         leads: data.leads,
-        calls: data.calls,
-        whatsapp: data.whatsapp,
-        contacts: data.contacts,
+        calls: data.calls || 0,
+        whatsapp: data.whatsapp || 0,
+        contacts: (data.followups || 0) + (data.prospeccoes || 0),
         scheduled: data.scheduled,
-        qualified: data.qualified,
-        noshow: data.noshow,
-        pipeline: data.pipeline,
-        pipelineVal: data.pipeline,
+        qualified: data.held || 0,
+        noshow: 0,
+        pipeline: data.contracts || 'R$ 0,00',
+        pipelineVal: data.contracts || 'R$ 0,00',
         updatedAt: updatedAt
       };
       const idxS = sdrReports.findIndex(r => r.id === reportId);
       if (idxS >= 0) sdrReports[idxS] = sdrRecord;
       else sdrReports.unshift(sdrRecord);
       localStorage.setItem(STORAGE_SDR_REPORTS, JSON.stringify(sdrReports));
-      localStorage.setItem('fa_sdr_reports_v1', JSON.stringify(sdrReports));
 
       if (typeof dbSyncSdrReport === 'function') {
         dbSyncSdrReport(sdrRecord);

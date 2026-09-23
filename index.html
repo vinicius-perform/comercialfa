@@ -11,8 +11,25 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
-    // Verificação instantânea de autenticação para evitar flash de tela
+    // Expurgo imediato e profilático de todas as chaves mock/antigas do LocalStorage
     (function() {
+      var legacyKeys = [
+        'fa_closers_uifry_reports_v1',
+        'closerReports_v2',
+        'fa_sdr_reports_v1',
+        'sdrReports_v2',
+        'projects_clients_v2',
+        'projects_planning_v2',
+        'fa_money_table_v1',
+        'money_on_table',
+        'fa_win_rate_v1',
+        'fa_team_reports_unified_v1',
+        'fa_storage_cleaned_v1',
+        'fa_storage_cleaned_v2',
+        'fa_storage_cleaned_v3'
+      ];
+      legacyKeys.forEach(function(k) { localStorage.removeItem(k); });
+
       var authUser = localStorage.getItem('fa_auth_user') || sessionStorage.getItem('fa_auth_user');
       if (authUser !== 'admin@fa') {
         document.documentElement.classList.add('auth-locked');
@@ -97,15 +114,12 @@
             <span class="sub-section-title">EQUIPE</span>
             <div class="closers-chips-list">
               <button type="button" class="closer-chip active" data-closer="Tales">
-                <span class="chip-avatar">T</span>
                 <span>Tales</span>
               </button>
               <button type="button" class="closer-chip" data-closer="José">
-                <span class="chip-avatar">J</span>
                 <span>José</span>
               </button>
               <button type="button" class="closer-chip" data-closer="Elinaldo">
-                <span class="chip-avatar">E</span>
                 <span>Elinaldo</span>
               </button>
             </div>
@@ -215,22 +229,23 @@
           </div>
 
           <div class="top-bar-right">
-            <!-- Botões Rápidos de Acesso direto para SDRs e Closers -->
-            <button type="button" class="btn-top-cta btn-cta-sdr" id="btn-quick-goto-sdr">
+            <!-- Botão Preencher Relatório Comercial (Link Oficial) -->
+            <a href="relatorio.html" target="_blank" class="btn-top-cta btn-cta-sdr" id="btn-quick-goto-sdr" style="text-decoration:none;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
               </svg>
-              <span>Gerar Relatório SDR</span>
-            </button>
+              <span>Preencher Relatório</span>
+            </a>
 
             <button type="button" class="btn-top-cta btn-cta-closer" id="btn-quick-goto-closer">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
               </svg>
-              <span>Hub Closers</span>
+              <span>Hub da Equipe</span>
             </button>
 
             <!-- Botão Copiar Link Geral da Equipe -->
@@ -242,7 +257,7 @@
               <span>Copiar Link da Equipe</span>
             </button>
 
-            <button type="button" class="btn-top-icon" id="btn-open-settings" title="Configurar Meta e Pipeline">
+            <button type="button" class="btn-top-icon" id="btn-open-settings" title="Configurar Meta Mensal">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -299,28 +314,7 @@
             </div>
           </div>
 
-          <!-- Card 3: Dinheiro na Mesa (Pipeline Quente) -->
-          <div class="kpi-card card-white">
-            <div class="kpi-card-top">
-              <div class="kpi-badge-icon badge-orange">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-              </div>
-              <span class="kpi-tag-status orange-tag" id="exec-table-tag">Em negociação</span>
-            </div>
-            <span class="kpi-card-subtitle">DINHEIRO NA MESA</span>
-            <div class="kpi-card-value-row">
-              <span class="kpi-card-big-value dark-text highlight-orange" id="exec-money-on-table">R$ 45.000,00</span>
-            </div>
-            <div class="kpi-card-footer-info">
-              <span>Pipeline ativo</span>
-              <button type="button" class="btn-inline-link" id="btn-edit-table-money">Ajustar</button>
-            </div>
-          </div>
-
-          <!-- Card 4: Projeção de Faturamento até o Fim do Mês (Forecast) -->
+          <!-- Card 3: Projeção de Faturamento até o Fim do Mês (Forecast) -->
           <div class="kpi-card card-dark-secondary">
             <div class="kpi-card-top">
               <div class="kpi-badge-icon badge-lime-outline">
@@ -1387,12 +1381,12 @@
   </div>
 
   <!-- ============================================================
-       MODAL: CONFIGURAÇÃO DE META MENSAL & DINHEIRO NA MESA
+       MODAL: CONFIGURAÇÃO DE META MENSAL
        ============================================================ -->
   <div class="modal-backdrop" id="modal-settings">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 class="modal-title">Configurar Metas & Pipeline</h3>
+        <h3 class="modal-title">Configurar Meta Mensal</h3>
         <button type="button" class="modal-close-btn" id="btn-close-settings">✕</button>
       </div>
 
@@ -1405,29 +1399,11 @@
           </div>
           <span class="modal-hint">A meta financeira mensal utilizada no cálculo de Pacing e Projeção.</span>
         </div>
-
-        <div class="modal-field" style="margin-top: 16px;">
-          <label for="setting-money-table" class="field-label">DINHEIRO NA MESA ATUAL (PIPELINE ABERTO)</label>
-          <div class="uifry-input-box">
-            <span class="field-prefix">$</span>
-            <input type="text" id="setting-money-table" class="uifry-input font-bold" value="R$ 45.000,00">
-          </div>
-          <span class="modal-hint">Valor total estimado de contratos e propostas em negociação com os Closers.</span>
-        </div>
-
-        <div class="modal-field" style="margin-top: 16px;">
-          <label for="setting-close-rate" class="field-label">TAXA ESTIMADA DE FECHAMENTO DO PIPELINE (%)</label>
-          <div class="uifry-input-box">
-            <span class="field-prefix">%</span>
-            <input type="number" id="setting-close-rate" class="uifry-input" min="5" max="100" value="30">
-          </div>
-          <span class="modal-hint">Percentual histórico de conversão do dinheiro na mesa em receita líquida.</span>
-        </div>
       </div>
 
       <div class="modal-footer">
         <button type="button" class="btn-uifry-sec" id="btn-cancel-settings">Cancelar</button>
-        <button type="button" class="btn-uifry-lime" id="btn-save-settings">Salvar Configurações</button>
+        <button type="button" class="btn-uifry-lime" id="btn-save-settings">Salvar Meta</button>
       </div>
     </div>
   </div>
@@ -1508,12 +1484,12 @@
         </div>
 
         <!-- Grade de Metas do Mês -->
-        <div class="planning-fields-grid">
+        <div class="planning-fields-grid" style="grid-template-columns: repeat(3, 1fr);">
           <div class="modal-field">
             <label for="plan-revenue-goal" class="field-label">META DE FATURAMENTO (R$) *</label>
             <div class="uifry-input-box lime-highlight-box">
               <span class="field-prefix lime-color">$</span>
-              <input type="text" id="plan-revenue-goal" class="uifry-input font-bold" value="R$ 50.000,00" required>
+              <input type="text" id="plan-revenue-goal" class="uifry-input font-bold" value="R$ 0,00" required>
             </div>
             <span class="modal-hint">Receita líquida total esperada no mês.</span>
           </div>
@@ -1521,7 +1497,7 @@
           <div class="modal-field">
             <label for="plan-sales-goal" class="field-label">META DE VENDAS (UNIDADES)</label>
             <div class="uifry-input-box">
-              <input type="number" id="plan-sales-goal" class="uifry-input font-bold" min="0" value="5">
+              <input type="number" id="plan-sales-goal" class="uifry-input font-bold" min="0" value="0">
             </div>
             <span class="modal-hint">Número de contratos fechados.</span>
           </div>
@@ -1529,26 +1505,17 @@
           <div class="modal-field">
             <label for="plan-meetings-goal" class="field-label">META DE REUNIÕES</label>
             <div class="uifry-input-box">
-              <input type="number" id="plan-meetings-goal" class="uifry-input font-bold" min="0" value="15">
+              <input type="number" id="plan-meetings-goal" class="uifry-input font-bold" min="0" value="0">
             </div>
             <span class="modal-hint">Reuniões qualificadas realizadas.</span>
-          </div>
-
-          <div class="modal-field">
-            <label for="plan-money-table" class="field-label">DINHEIRO NA MESA PREVISTO (R$)</label>
-            <div class="uifry-input-box">
-              <span class="field-prefix">$</span>
-              <input type="text" id="plan-money-table" class="uifry-input" value="R$ 25.000,00">
-            </div>
-            <span class="modal-hint">Pipeline estimado em negociação.</span>
           </div>
         </div>
 
         <!-- Preview de Métricas Derivadas -->
         <div class="planning-kpi-preview" style="display: flex; gap: 14px; margin-top: 10px; background: #f8f9fa; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; color: var(--text-secondary); flex-wrap: wrap;">
-          <span>Ticket Médio Projetado: <strong id="plan-preview-ticket" style="color: var(--text-dark); font-weight: 700;">R$ 10.000,00</strong></span>
+          <span>Ticket Médio Projetado: <strong id="plan-preview-ticket" style="color: var(--text-dark); font-weight: 700;">R$ 0,00</strong></span>
           <span>•</span>
-          <span>Conversão Reunião ➔ Venda: <strong id="plan-preview-conv" style="color: var(--text-dark); font-weight: 700;">33%</strong></span>
+          <span>Conversão Reunião ➔ Venda: <strong id="plan-preview-conv" style="color: var(--text-dark); font-weight: 700;">0%</strong></span>
         </div>
 
         <div class="modal-field" style="margin-top: 14px;">

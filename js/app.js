@@ -14,12 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSdr = 'SDR 1';
   let currentView = 'view-dashboard';
 
-  // Chaves do LocalStorage
-  const STORAGE_CLOSER_REPORTS = 'fa_closers_uifry_reports_v1';
-  const STORAGE_SDR_REPORTS = 'fa_sdr_reports_v1';
+  // Chaves do LocalStorage de Produção
+  const STORAGE_CLOSER_REPORTS = 'fa_prod_closer_reports_v1';
+  const STORAGE_SDR_REPORTS = 'fa_prod_sdr_reports_v1';
+  const STORAGE_CLIENTS_KEY = 'fa_prod_clients_v1';
+  const STORAGE_PLANNING_KEY = 'fa_prod_planning_v1';
   const STORAGE_GOAL = 'fa_monthly_goal_v1';
-  const STORAGE_MONEY_TABLE = 'fa_money_table_v1';
-  const STORAGE_WIN_RATE = 'fa_win_rate_v1';
 
   // Data atual padrão (YYYY-MM-DD)
   const today = new Date();
@@ -30,19 +30,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const currentMonthKey = `${yyyy}-${mm}`;
 
   // ============================================================
-  // ============================================================
   // LIMPEZA AUTOMÁTICA DE DADOS FICTÍCIOS ANTERIORES DO CACHE
   // ============================================================
-  if (!localStorage.getItem('fa_storage_cleaned_v3')) {
-    localStorage.removeItem(STORAGE_CLOSER_REPORTS);
-    localStorage.removeItem(STORAGE_SDR_REPORTS);
-    localStorage.removeItem('closerReports_v2');
-    localStorage.removeItem('sdrReports_v2');
-    localStorage.removeItem('projects_clients_v2');
-    localStorage.removeItem('projects_planning_v2');
-    localStorage.removeItem('fa_team_reports_unified_v1');
-    localStorage.setItem('fa_storage_cleaned_v3', 'true');
-  }
+  const legacyKeysToPurge = [
+    'fa_closers_uifry_reports_v1',
+    'closerReports_v2',
+    'fa_sdr_reports_v1',
+    'sdrReports_v2',
+    'projects_clients_v2',
+    'projects_planning_v2',
+    'fa_money_table_v1',
+    'money_on_table',
+    'fa_win_rate_v1',
+    'fa_team_reports_unified_v1',
+    'fa_storage_cleaned_v1',
+    'fa_storage_cleaned_v2',
+    'fa_storage_cleaned_v3'
+  ];
+  legacyKeysToPurge.forEach(k => localStorage.removeItem(k));
 
   // ============================================================
   // ELEMENTOS DO DOM
@@ -87,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const execContractsTotal = document.getElementById('exec-contracts-total');
   const execContractsCount = document.getElementById('exec-contracts-count');
   const execContractsAvg = document.getElementById('exec-contracts-avg');
-  const execMoneyOnTable = document.getElementById('exec-money-on-table');
   const execProjectionTotal = document.getElementById('exec-projection-total');
   const execProjectionMetaPct = document.getElementById('exec-projection-meta-pct');
   
@@ -166,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const planRevenueGoal = document.getElementById('plan-revenue-goal');
   const planSalesGoal = document.getElementById('plan-sales-goal');
   const planMeetingsGoal = document.getElementById('plan-meetings-goal');
-  const planMoneyTable = document.getElementById('plan-money-table');
   const planNotes = document.getElementById('plan-notes');
   const planPreviewTicket = document.getElementById('plan-preview-ticket');
   const planPreviewConv = document.getElementById('plan-preview-conv');
@@ -265,11 +268,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSaveSettings = document.getElementById('btn-save-settings');
   const btnNavQuickConfig = document.getElementById('nav-btn-quick-config');
   const btnOpenGoalModal = document.getElementById('btn-open-goal-modal');
-  const btnEditTableMoney = document.getElementById('btn-edit-table-money');
 
   const settingMonthlyGoal = document.getElementById('setting-monthly-goal');
-  const settingMoneyTable = document.getElementById('setting-money-table');
-  const settingCloseRate = document.getElementById('setting-close-rate');
 
   // ============================================================
   // FUNÇÕES DE UTILIDADE E FORMATAÇÃO
@@ -375,28 +375,17 @@ document.addEventListener('DOMContentLoaded', () => {
   setupCurrencyInput(inputCashCollected);
   setupCurrencyInput(inputSdrPipeline);
   setupCurrencyInput(settingMonthlyGoal);
-  setupCurrencyInput(settingMoneyTable);
   setupCurrencyInput(planRevenueGoal);
-  setupCurrencyInput(planMoneyTable);
 
   // ============================================================
   // LOCAL STORAGE HELPERS
   // ============================================================
   function getStoredCloserReports() {
     try {
-      const data1 = localStorage.getItem(STORAGE_CLOSER_REPORTS);
-      const data2 = localStorage.getItem('closerReports_v2');
-      const r1 = data1 ? JSON.parse(data1) : [];
-      const r2 = data2 ? JSON.parse(data2) : [];
-      
-      const map = new Map();
-      r1.forEach(r => map.set(r.id, r));
-      r2.forEach(r => {
-        const existing = map.get(r.id) || {};
-        map.set(r.id, { ...existing, ...r });
-      });
-
-      return Array.from(map.values()).filter(r => r.closer !== 'Muller');
+      const data = localStorage.getItem(STORAGE_CLOSER_REPORTS);
+      if (!data) return [];
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed.filter(r => r.closer !== 'Muller') : [];
     } catch (e) {
       console.error('Erro ao ler relatórios dos closers', e);
       return [];
@@ -406,7 +395,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveStoredCloserReports(reports) {
     try {
       localStorage.setItem(STORAGE_CLOSER_REPORTS, JSON.stringify(reports));
-      localStorage.setItem('closerReports_v2', JSON.stringify(reports));
 
       // Sincroniza com Supabase Cloud se disponível
       if (typeof dbSyncCloserReport === 'function' && Array.isArray(reports)) {
@@ -419,19 +407,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function getStoredSdrReports() {
     try {
-      const data1 = localStorage.getItem(STORAGE_SDR_REPORTS);
-      const data2 = localStorage.getItem('sdrReports_v2');
-      const r1 = data1 ? JSON.parse(data1) : [];
-      const r2 = data2 ? JSON.parse(data2) : [];
-
-      const map = new Map();
-      r1.forEach(r => map.set(r.id, r));
-      r2.forEach(r => {
-        const existing = map.get(r.id) || {};
-        map.set(r.id, { ...existing, ...r });
-      });
-
-      return Array.from(map.values());
+      const data = localStorage.getItem(STORAGE_SDR_REPORTS);
+      if (!data) return [];
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : [];
     } catch (e) {
       console.error('Erro ao ler relatórios dos SDRs', e);
       return [];
@@ -441,7 +420,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveStoredSdrReports(reports) {
     try {
       localStorage.setItem(STORAGE_SDR_REPORTS, JSON.stringify(reports));
-      localStorage.setItem('sdrReports_v2', JSON.stringify(reports));
 
       // Sincroniza com Supabase Cloud se disponível
       if (typeof dbSyncSdrReport === 'function' && Array.isArray(reports)) {
@@ -455,16 +433,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function getMonthlyGoal() {
     const val = localStorage.getItem(STORAGE_GOAL);
     return val ? parseFloat(val) : 100000;
-  }
-
-  function getMoneyOnTable() {
-    const val = localStorage.getItem(STORAGE_MONEY_TABLE);
-    return val ? parseFloat(val) : 45000;
-  }
-
-  function getPipelineWinRate() {
-    const val = localStorage.getItem(STORAGE_WIN_RATE);
-    return val ? parseFloat(val) : 30;
   }
 
   // ============================================================
@@ -632,26 +600,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Busca metas de planejamento para o mês e cliente selecionados
     let goal = 0;
-    let tableMoney = 0;
-    const plannings = JSON.parse(localStorage.getItem('projects_planning_v2') || '[]');
+    const plannings = JSON.parse(localStorage.getItem(STORAGE_PLANNING_KEY) || '[]');
 
     if (selectedClientId !== 'all') {
       const plan = plannings.find(p => p.client_id === selectedClientId && p.year_month === selectedMonth);
       if (plan) {
         goal = Number(plan.revenue_goal) || 0;
-        tableMoney = Number(plan.money_on_table) || 0;
       } else {
         goal = getMonthlyGoal();
-        tableMoney = getMoneyOnTable();
       }
     } else {
       const monthPlans = plannings.filter(p => p.year_month === selectedMonth);
       if (monthPlans.length > 0) {
         goal = monthPlans.reduce((sum, p) => sum + (Number(p.revenue_goal) || 0), 0);
-        tableMoney = monthPlans.reduce((sum, p) => sum + (Number(p.money_on_table) || 0), 0);
       } else {
         goal = getMonthlyGoal();
-        tableMoney = getMoneyOnTable();
       }
     }
 
@@ -693,8 +656,6 @@ document.addEventListener('DOMContentLoaded', () => {
       totalSdrPipeline += parseMoneyToNumber(r.pipeline || r.pipelineVal);
     });
 
-    const effectiveTableMoney = tableMoney + (totalSdrPipeline > 0 ? totalSdrPipeline * 0.5 : 0);
-
     // Cálculos de Projeção & Run-Rate
     const dailyPace = passedDays > 0 ? (totalRevenue / passedDays) : 0;
     let runRateTotal = 0;
@@ -711,13 +672,12 @@ document.addEventListener('DOMContentLoaded', () => {
       requiredDailyPace = 0;
     } else {
       runRateTotal = dailyPace * totalDaysInMonth;
-      const tableForecastBonus = effectiveTableMoney * (winRate / 100);
-      projectedTotal = totalRevenue + (dailyPace * remainingDays) + tableForecastBonus;
+      projectedTotal = totalRevenue + (dailyPace * remainingDays);
       projectionGoalPct = goal > 0 ? Math.round((projectedTotal / goal) * 100) : 0;
       requiredDailyPace = remainingDays > 0 ? (goalGap / remainingDays) : 0;
     }
 
-    // Atualização dos 4 Cards Executivos Superiores
+    // Atualização dos 3 Cards Executivos Superiores
     if (execRevenueTotal) execRevenueTotal.textContent = formatNumberToMoney(totalRevenue);
     if (execRevenuePct) execRevenuePct.textContent = `${goalPct}% da meta`;
     if (execRevenueSalesCount) execRevenueSalesCount.textContent = `${totalSales} vendas fechadas`;
@@ -729,7 +689,6 @@ document.addEventListener('DOMContentLoaded', () => {
       execContractsAvg.textContent = `Ticket médio: ${formatNumberToMoney(avg)}`;
     }
 
-    if (execMoneyOnTable) execMoneyOnTable.textContent = formatNumberToMoney(effectiveTableMoney);
     if (execProjectionTotal) execProjectionTotal.textContent = formatNumberToMoney(projectedTotal);
     if (execProjectionMetaPct) {
       if (isPastMonth) {
@@ -745,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (execMonthDisplay) {
       if (selectedClientId !== 'all') {
-        const allClients = JSON.parse(localStorage.getItem('projects_clients_v2') || '[]');
+        const allClients = JSON.parse(localStorage.getItem(STORAGE_CLIENTS_KEY) || '[]');
         const targetClient = allClients.find(c => c.id === selectedClientId);
         execMonthDisplay.textContent = `${targetClient ? targetClient.name : 'Cliente'} • ${selectedMonthName} ${selY}`;
       } else {
@@ -823,8 +782,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Atualização do Funil Comercial Consolidado
-    const grandLeads = Math.max(totalSdrLeads, totalCloserLeads, 1);
-    const grandContacts = Math.max(totalSdrContacts, totalCloserEffort, 1);
+    const grandLeads = Math.max(totalSdrLeads, totalCloserLeads);
+    const grandContacts = Math.max(totalSdrContacts, totalCloserEffort);
     const grandScheduled = Math.max(totalSdrScheduled, totalMeetingsScheduled);
     const grandHeld = totalMeetingsHeld;
     const grandSales = totalSales;
@@ -861,7 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!execRankingTableBody) return;
     execRankingTableBody.innerHTML = '';
 
-    // Agrega Closers
+    // Agrega Membros Comerciais (Tales, José, Elinaldo)
     const closerData = {};
     closersList.forEach(c => {
       closerData[c] = { name: c, role: 'Closer', effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0 };
@@ -878,19 +837,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Agrega SDRs
+    // Agrega SDRs apenas se houver relatórios ativos
     const sdrData = {};
-    sdrsList.forEach(s => {
-      sdrData[s] = { name: s, role: 'SDR', effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0, pipeline: 0 };
-    });
-
-    sdrReports.forEach(r => {
-      if (sdrData[r.sdr]) {
+    if (Array.isArray(sdrReports) && sdrReports.length > 0) {
+      sdrReports.forEach(r => {
+        if (!r.sdr) return;
+        if (!sdrData[r.sdr]) {
+          sdrData[r.sdr] = { name: r.customName || r.sdr, role: 'SDR', effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0, pipeline: 0 };
+        }
         sdrData[r.sdr].effort += parseInt(r.contacts, 10) || 0;
         sdrData[r.sdr].scheduled += parseInt(r.scheduled, 10) || 0;
-        sdrData[r.sdr].pipeline += parseMoneyToNumber(r.pipeline);
-      }
-    });
+        sdrData[r.sdr].pipeline += parseMoneyToNumber(r.pipeline || r.pipelineVal);
+      });
+    }
 
     const members = [...Object.values(closerData), ...Object.values(sdrData)];
     members.sort((a, b) => b.cash - a.cash || b.sales - a.sales || b.scheduled - a.scheduled);
@@ -905,7 +864,6 @@ document.addEventListener('DOMContentLoaded', () => {
       tr.innerHTML = `
         <td>
           <div style="display:flex; align-items:center; gap:8px;">
-            <span class="chip-avatar" style="width:26px; height:26px; font-size:11px; background:${isCloser ? 'rgba(98, 230, 36, 0.2)' : 'rgba(56, 189, 248, 0.2)'}; color:${isCloser ? 'var(--accent-lime)' : '#38bdf8'};">${m.name.charAt(0)}</span>
             <strong style="color:var(--text-dark);">${m.name}</strong>
           </div>
         </td>
@@ -1579,12 +1537,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
-  // MODAL DE CONFIGURAÇÃO DE METAS & DINHEIRO NA MESA
+  // MODAL DE CONFIGURAÇÃO DE META MENSAL
   // ============================================================
   function openSettingsModal() {
     if (settingMonthlyGoal) settingMonthlyGoal.value = formatNumberToMoney(getMonthlyGoal());
-    if (settingMoneyTable) settingMoneyTable.value = formatNumberToMoney(getMoneyOnTable());
-    if (settingCloseRate) settingCloseRate.value = getPipelineWinRate();
     if (modalSettings) modalSettings.classList.add('open');
   }
 
@@ -1592,7 +1548,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modalSettings) modalSettings.classList.remove('open');
   }
 
-  [btnOpenSettings, btnNavQuickConfig, btnOpenGoalModal, btnEditTableMoney].forEach(btn => {
+  [btnOpenSettings, btnNavQuickConfig, btnOpenGoalModal].forEach(btn => {
     if (btn) btn.addEventListener('click', openSettingsModal);
   });
 
@@ -1608,22 +1564,16 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnSaveSettings) {
     btnSaveSettings.addEventListener('click', () => {
       const newGoal = parseMoneyToNumber(settingMonthlyGoal.value);
-      const newMoneyTable = parseMoneyToNumber(settingMoneyTable.value);
-      const newWinRate = parseFloat(settingCloseRate.value) || 30;
 
       localStorage.setItem(STORAGE_GOAL, newGoal.toString());
-      localStorage.setItem(STORAGE_MONEY_TABLE, newMoneyTable.toString());
-      localStorage.setItem(STORAGE_WIN_RATE, newWinRate.toString());
 
       if (typeof dbSaveSetting === 'function') {
         dbSaveSetting('monthly_goal', newGoal);
-        dbSaveSetting('money_on_table', newMoneyTable);
-        dbSaveSetting('win_rate', newWinRate);
       }
 
       closeSettingsModal();
       updateExecDashboard();
-      showToast('Configurações de Meta e Pipeline salvas no banco de dados!');
+      showToast('Meta mensal atualizada com sucesso!');
     });
   }
 
@@ -1672,7 +1622,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Adiciona meses com planejamento
-    const plannings = JSON.parse(localStorage.getItem('projects_planning_v2') || '[]');
+    const plannings = JSON.parse(localStorage.getItem(STORAGE_PLANNING_KEY) || '[]');
     plannings.forEach(p => {
       if (p.year_month) months.add(p.year_month);
     });
@@ -1770,7 +1720,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const plannedRev = plan ? Number(plan.revenue_goal) || 0 : 0;
       const plannedSales = plan ? Number(plan.sales_goal) || 0 : 0;
       const plannedMeetings = plan ? Number(plan.meetings_goal) || 0 : 0;
-      const moneyTable = plan ? Number(plan.money_on_table) || 0 : 0;
       const notes = plan ? (plan.notes || '') : '';
 
       // Relatórios associados ao cliente
@@ -1780,6 +1729,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const actualRev = reports.reduce((sum, r) => sum + parseMoneyToNumber(r.cashCollected), 0);
+      const actualContracts = reports.reduce((sum, r) => sum + parseMoneyToNumber(r.contractVal), 0);
       const actualSales = reports.reduce((sum, r) => sum + (parseInt(r.sales, 10) || 0), 0);
       const actualMeetings = reports.reduce((sum, r) => sum + (parseInt(r.meetingsHeld, 10) || 0), 0);
 
@@ -1790,7 +1740,7 @@ document.addEventListener('DOMContentLoaded', () => {
         plannedRev,
         plannedSales,
         plannedMeetings,
-        moneyTable,
+        actualContracts,
         notes,
         actualRev,
         actualSales,
@@ -1872,7 +1822,7 @@ document.addEventListener('DOMContentLoaded', () => {
         plannedRev: 0,
         plannedSales: 0,
         plannedMeetings: 0,
-        moneyTable: 0,
+        actualContracts: 0,
         notes: '',
         actualRev: 0,
         actualSales: 0,
@@ -1911,8 +1861,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="p-card-stat-val">${stats.actualSales} / ${stats.plannedSales} un</span>
           </div>
           <div class="p-card-stat">
-            <span class="p-card-stat-label">DINHEIRO NA MESA</span>
-            <span class="p-card-stat-val">${formatNumberToMoney(stats.moneyTable)}</span>
+            <span class="p-card-stat-label">CONTRATOS ENVIADOS</span>
+            <span class="p-card-stat-val">${formatNumberToMoney(stats.actualContracts)}</span>
           </div>
         </div>
 
@@ -2153,20 +2103,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadPlanningValuesForMonth(clientId, monthKey) {
-    const plannings = JSON.parse(localStorage.getItem('projects_planning_v2') || '[]');
+    const plannings = JSON.parse(localStorage.getItem(STORAGE_PLANNING_KEY) || '[]');
     const plan = plannings.find(p => p.client_id === clientId && p.year_month === monthKey);
 
     if (plan) {
       if (planRevenueGoal) planRevenueGoal.value = formatNumberToMoney(Number(plan.revenue_goal) || 0);
-      if (planSalesGoal) planSalesGoal.value = plan.sales_goal ?? 5;
-      if (planMeetingsGoal) planMeetingsGoal.value = plan.meetings_goal ?? 15;
-      if (planMoneyTable) planMoneyTable.value = formatNumberToMoney(Number(plan.money_on_table) || 0);
+      if (planSalesGoal) planSalesGoal.value = plan.sales_goal ?? 0;
+      if (planMeetingsGoal) planMeetingsGoal.value = plan.meetings_goal ?? 0;
       if (planNotes) planNotes.value = plan.notes || '';
     } else {
-      if (planRevenueGoal) planRevenueGoal.value = 'R$ 50.000,00';
-      if (planSalesGoal) planSalesGoal.value = 5;
-      if (planMeetingsGoal) planMeetingsGoal.value = 15;
-      if (planMoneyTable) planMoneyTable.value = 'R$ 25.000,00';
+      if (planRevenueGoal) planRevenueGoal.value = 'R$ 0,00';
+      if (planSalesGoal) planSalesGoal.value = 0;
+      if (planMeetingsGoal) planMeetingsGoal.value = 0;
       if (planNotes) planNotes.value = '';
     }
 
@@ -2175,7 +2123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderPlanningHistoryTable(clientId) {
     if (!planningHistoryTableBody) return;
-    const plannings = JSON.parse(localStorage.getItem('projects_planning_v2') || '[]');
+    const plannings = JSON.parse(localStorage.getItem(STORAGE_PLANNING_KEY) || '[]');
     const clientPlans = plannings.filter(p => p.client_id === clientId).sort((a,b) => b.year_month.localeCompare(a.year_month));
     const closerReports = getStoredCloserReports();
 
@@ -2248,7 +2196,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const revGoal = parseMoneyToNumber(planRevenueGoal.value);
     const salesGoal = parseInt(planSalesGoal.value, 10) || 0;
     const meetingsGoal = parseInt(planMeetingsGoal.value, 10) || 0;
-    const moneyTable = parseMoneyToNumber(planMoneyTable.value);
     const notes = planNotes ? planNotes.value.trim() : '';
 
     await dbSavePlanning({
@@ -2257,7 +2204,6 @@ document.addEventListener('DOMContentLoaded', () => {
       revenue_goal: revGoal,
       sales_goal: salesGoal,
       meetings_goal: meetingsGoal,
-      money_on_table: moneyTable,
       notes: notes
     });
 
@@ -2284,14 +2230,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!clientId) return;
       const currentMonth = planningMonthPicker ? planningMonthPicker.value : currentMonthKey;
       const prevMonth = getPreviousYearMonth(currentMonth);
-      const plannings = JSON.parse(localStorage.getItem('projects_planning_v2') || '[]');
+      const plannings = JSON.parse(localStorage.getItem(STORAGE_PLANNING_KEY) || '[]');
       const prevPlan = plannings.find(p => p.client_id === clientId && p.year_month === prevMonth);
 
       if (prevPlan) {
         if (planRevenueGoal) planRevenueGoal.value = formatNumberToMoney(Number(prevPlan.revenue_goal) || 0);
-        if (planSalesGoal) planSalesGoal.value = prevPlan.sales_goal ?? 5;
-        if (planMeetingsGoal) planMeetingsGoal.value = prevPlan.meetings_goal ?? 15;
-        if (planMoneyTable) planMoneyTable.value = formatNumberToMoney(Number(prevPlan.money_on_table) || 0);
+        if (planSalesGoal) planSalesGoal.value = prevPlan.sales_goal ?? 0;
+        if (planMeetingsGoal) planMeetingsGoal.value = prevPlan.meetings_goal ?? 0;
         if (planNotes && prevPlan.notes) planNotes.value = prevPlan.notes;
         updatePlanningKpiPreview();
         showToast(`Metas de ${prevMonth} copiadas com sucesso!`);

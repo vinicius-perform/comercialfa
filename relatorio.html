@@ -10,6 +10,26 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/relatorio.css">
+  <script>
+    (function() {
+      var legacyKeys = [
+        'fa_closers_uifry_reports_v1',
+        'closerReports_v2',
+        'fa_sdr_reports_v1',
+        'sdrReports_v2',
+        'projects_clients_v2',
+        'projects_planning_v2',
+        'fa_money_table_v1',
+        'money_on_table',
+        'fa_win_rate_v1',
+        'fa_team_reports_unified_v1',
+        'fa_storage_cleaned_v1',
+        'fa_storage_cleaned_v2',
+        'fa_storage_cleaned_v3'
+      ];
+      legacyKeys.forEach(function(k) { localStorage.removeItem(k); });
+    })();
+  </script>
   <!-- html2canvas para exportação de Imagem em alta resolução -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
