@@ -440,41 +440,6 @@ document.addEventListener('DOMContentLoaded', () => {
       console.warn('Erro ao sincronizar com closerReports:', e);
     }
 
-    // 3. Sincroniza com sdrReports (Alimenta métricas de pipeline, contatos e reuniões agendadas)
-    try {
-      let sdrReports = [];
-      const rawS = localStorage.getItem(STORAGE_SDR_REPORTS);
-      sdrReports = rawS ? JSON.parse(rawS) : [];
-      const sdrKey = data.name.startsWith('SDR') ? data.name : 'SDR 1';
-      const customName = data.name.startsWith('SDR') ? '' : data.name;
-      const sdrRecord = {
-        id: reportId,
-        sdr: sdrKey,
-        clientId: data.clientId || null,
-        customName: customName,
-        date: data.date,
-        leads: data.leads,
-        calls: data.calls || 0,
-        whatsapp: data.whatsapp || 0,
-        contacts: (data.followups || 0) + (data.prospeccoes || 0),
-        scheduled: data.scheduled,
-        qualified: data.held || 0,
-        noshow: 0,
-        pipeline: data.contracts || 'R$ 0,00',
-        pipelineVal: data.contracts || 'R$ 0,00',
-        updatedAt: updatedAt
-      };
-      const idxS = sdrReports.findIndex(r => r.id === reportId);
-      if (idxS >= 0) sdrReports[idxS] = sdrRecord;
-      else sdrReports.unshift(sdrRecord);
-      localStorage.setItem(STORAGE_SDR_REPORTS, JSON.stringify(sdrReports));
-
-      if (typeof dbSyncSdrReport === 'function') {
-        dbSyncSdrReport(sdrRecord);
-      }
-    } catch (e) {
-      console.warn('Erro ao sincronizar com sdrReports:', e);
-    }
   }
 
   // ============================================================

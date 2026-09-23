@@ -26,7 +26,9 @@
         'fa_team_reports_unified_v1',
         'fa_storage_cleaned_v1',
         'fa_storage_cleaned_v2',
-        'fa_storage_cleaned_v3'
+        'fa_storage_cleaned_v3',
+        'fa_storage_cleaned_v4',
+        'fa_prod_sdr_reports_v1'
       ];
       legacyKeys.forEach(function(k) { localStorage.removeItem(k); });
 
@@ -84,21 +86,7 @@
       <div class="sidebar-group">
         <span class="sidebar-group-title">RELATÓRIOS DA EQUIPE</span>
         <nav class="sidebar-nav">
-          <!-- Hub SDRs (NOVO LINK DE DESTAQUE) -->
-          <a href="#sdrs" class="nav-link" data-view="view-sdrs" id="nav-sdrs">
-            <span class="nav-icon-box sdr-icon-box">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
-            </span>
-            <span class="nav-label">Hub SDRs</span>
-            <span class="nav-badge-pill">Relatórios</span>
-          </a>
-
-          <!-- Hub Closers -->
+          <!-- Hub Comercial -->
           <a href="#closers" class="nav-link" data-view="view-closers" id="nav-closers">
             <span class="nav-icon-box closer-icon-box">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -106,7 +94,7 @@
                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
               </svg>
             </span>
-            <span class="nav-label">Hub Closers</span>
+            <span class="nav-label">Hub Comercial</span>
           </a>
 
           <!-- Sub-seletor rápido da Equipe -->
@@ -595,325 +583,6 @@
       </section>
 
       <!-- ==========================================================
-           VIEW 3: HUB DOS SDRs (Prospecção & Qualificação)
-           ========================================================== -->
-      <section id="view-sdrs" class="app-view">
-        <!-- Top Bar SDR -->
-        <header class="top-bar">
-          <div class="top-bar-left">
-            <h1 class="page-title">Hub dos SDRs</h1>
-            <span class="closer-active-pill" id="header-sdr-pill">
-              <span class="pulse-dot"></span>
-              <span id="header-sdr-name">SDR 1</span>
-            </span>
-          </div>
-
-          <div class="top-bar-right">
-            <div class="date-pill-widget">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-              <input type="date" id="sdr-report-date" class="date-pill-input">
-            </div>
-
-            <div class="topbar-filter-chip">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-              </svg>
-              <select id="sdr-client-select" class="topbar-filter-select">
-                <option value="">🌐 Geral / Todos os Projetos</option>
-              </select>
-            </div>
-
-            <button type="button" class="btn-top-cta btn-cta-closer" id="btn-sdr-to-dashboard">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
-              </svg>
-              <span>Voltar ao Dashboard</span>
-            </button>
-          </div>
-        </header>
-
-        <!-- 3 KPIs do SDR no topo -->
-        <section class="kpi-three-grid">
-          <!-- Card 1: Reuniões Agendadas -->
-          <div class="kpi-card card-dark-hero">
-            <div class="kpi-card-top">
-              <div class="kpi-badge-icon badge-lime">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                </svg>
-              </div>
-              <span class="kpi-tag-status lime-tag" id="sdr-scheduled-badge">Hoje</span>
-            </div>
-            <span class="kpi-card-subtitle">REUNIÕES AGENDADAS</span>
-            <div class="kpi-card-value-row">
-              <span class="kpi-card-big-value highlight-lime" id="sdr-kpi-scheduled">0</span>
-              <span class="kpi-card-badge-pill" id="sdr-kpi-qualified-sub">0 qualificadas</span>
-            </div>
-          </div>
-
-          <!-- Card 2: Contatos Efetivos (Conexões) -->
-          <div class="kpi-card card-white">
-            <div class="kpi-card-top">
-              <div class="kpi-badge-icon badge-gray">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                </svg>
-              </div>
-              <span class="kpi-tag-status gray-tag" id="sdr-kpi-contact-rate">0% conexão</span>
-            </div>
-            <span class="kpi-card-subtitle">CONTATOS EFETIVOS</span>
-            <div class="kpi-card-value-row">
-              <span class="kpi-card-big-value dark-text" id="sdr-kpi-contacts">0</span>
-            </div>
-          </div>
-
-          <!-- Card 3: Pipeline / Dinheiro Gerado -->
-          <div class="kpi-card card-white">
-            <div class="kpi-card-top">
-              <div class="kpi-badge-icon badge-black">
-                <span class="badge-dollar-sym">$</span>
-              </div>
-              <span class="kpi-tag-status lime-tag">Pipeline SDR</span>
-            </div>
-            <span class="kpi-card-subtitle">PIPELINE GERADO</span>
-            <div class="kpi-card-value-row">
-              <span class="kpi-card-big-value dark-text highlight-green" id="sdr-kpi-pipeline">R$ 0,00</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Grid Central do SDR: Formulário (65%) e Activity / Ações (35%) -->
-        <section class="dashboard-middle-grid">
-          <!-- Coluna Esquerda: Formulário de Lançamento do SDR -->
-          <div class="grid-col-left">
-            <div class="white-box-card">
-              <div class="box-card-header">
-                <div class="header-left-title">
-                  <h2 class="box-card-title">Lançamento de Prospecção do SDR</h2>
-                  <p class="box-card-desc">Registre as métricas diárias de esforço, conexões e reuniões agendadas</p>
-                </div>
-
-                <!-- Seletor do SDR -->
-                <div class="closer-selector-segmented" id="sdr-segmented-selector">
-                  <button type="button" class="segmented-btn active" data-sdr="SDR 1">SDR 1</button>
-                  <button type="button" class="segmented-btn" data-sdr="SDR 2">SDR 2</button>
-                  <button type="button" class="segmented-btn" data-sdr="SDR 3">SDR 3</button>
-                  <button type="button" class="segmented-btn" data-sdr="SDR 4">SDR 4</button>
-                </div>
-              </div>
-
-              <!-- Seção 01: Esforço & Prospecção -->
-              <div class="form-subsection">
-                <div class="subsection-header">
-                  <span class="subsection-badge">01</span>
-                  <span class="subsection-title">MÉTRICAS DE ESFORÇO & PROSPECÇÃO</span>
-                </div>
-
-                <div class="fields-row-3">
-                  <div class="field-control">
-                    <label for="input-sdr-leads" class="field-label">LEADS ABORDADOS</label>
-                    <div class="uifry-input-box">
-                      <span class="field-prefix">#</span>
-                      <input type="number" id="input-sdr-leads" class="uifry-input" min="0" placeholder="0" value="0">
-                    </div>
-                  </div>
-
-                  <div class="field-control">
-                    <label for="input-sdr-calls" class="field-label">LIGAÇÕES FEITAS</label>
-                    <div class="uifry-input-box">
-                      <span class="field-prefix">#</span>
-                      <input type="number" id="input-sdr-calls" class="uifry-input" min="0" placeholder="0" value="0">
-                    </div>
-                  </div>
-
-                  <div class="field-control">
-                    <label for="input-sdr-whatsapp" class="field-label">WHATSAPP / MENSAGENS</label>
-                    <div class="uifry-input-box">
-                      <span class="field-prefix">#</span>
-                      <input type="number" id="input-sdr-whatsapp" class="uifry-input" min="0" placeholder="0" value="0">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="fields-row-2" style="margin-top: 14px;">
-                  <div class="field-control">
-                    <label for="input-sdr-contacts" class="field-label highlight-label">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                      </svg>
-                      CONTATOS EFETIVOS (CONEXÕES)
-                    </label>
-                    <div class="uifry-input-box lime-highlight-box">
-                      <span class="field-prefix lime-color">✓</span>
-                      <input type="number" id="input-sdr-contacts" class="uifry-input font-bold" min="0" placeholder="0" value="0">
-                    </div>
-                  </div>
-
-                  <div class="field-control">
-                    <label for="input-sdr-name-custom" class="field-label">NOME DO SDR (OPCIONAL)</label>
-                    <div class="uifry-input-box">
-                      <span class="field-prefix">👤</span>
-                      <input type="text" id="input-sdr-name-custom" class="uifry-input" placeholder="Ex: Lucas SDR">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Seção 02: Qualificação & Agendamento -->
-              <div class="form-subsection">
-                <div class="subsection-header">
-                  <span class="subsection-badge">02</span>
-                  <span class="subsection-title">QUALIFICAÇÃO & REUNIÕES AGENDADAS</span>
-                </div>
-
-                <div class="fields-row-3">
-                  <div class="field-control">
-                    <label for="input-sdr-scheduled" class="field-label highlight-label">REUNIÕES AGENDADAS</label>
-                    <div class="uifry-input-box lime-highlight-box">
-                      <span class="field-prefix lime-color">📅</span>
-                      <input type="number" id="input-sdr-scheduled" class="uifry-input font-bold" min="0" placeholder="0" value="0">
-                    </div>
-                  </div>
-
-                  <div class="field-control">
-                    <label for="input-sdr-qualified" class="field-label">REUNIÕES QUALIFICADAS (ICP)</label>
-                    <div class="uifry-input-box">
-                      <span class="field-prefix">⭐</span>
-                      <input type="number" id="input-sdr-qualified" class="uifry-input" min="0" placeholder="0" value="0">
-                    </div>
-                  </div>
-
-                  <div class="field-control">
-                    <label for="input-sdr-noshow" class="field-label">NO-SHOW (FALTAS)</label>
-                    <div class="uifry-input-box">
-                      <span class="field-prefix">✖</span>
-                      <input type="number" id="input-sdr-noshow" class="uifry-input" min="0" placeholder="0" value="0">
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Pipeline Estimado -->
-                <div class="fields-row-1" style="margin-top: 14px;">
-                  <div class="field-control">
-                    <label for="input-sdr-pipeline" class="field-label">PIPELINE GERADO ESTIMADO (R$ ENCAMINHADO AOS CLOSERS)</label>
-                    <div class="uifry-input-box">
-                      <span class="field-prefix">$</span>
-                      <input type="text" id="input-sdr-pipeline" class="uifry-input font-bold" placeholder="R$ 0,00" value="R$ 0,00">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Coluna Direita: Activity do SDR + Ações Executivas -->
-          <div class="grid-col-right">
-            <!-- Círculos de Activity do SDR -->
-            <div class="white-box-card">
-              <h2 class="box-card-title">Eficiência do SDR</h2>
-
-              <div class="uifry-bubbles-stage">
-                <!-- Bolha Verde-Limão: Taxa de Agendamento -->
-                <div class="bubble-circle bubble-lime">
-                  <span class="bubble-val" id="sdr-bubble-schedule-rate">0%</span>
-                  <span class="bubble-sub">Tx. Agendamento</span>
-                </div>
-
-                <!-- Bolha Branca: Taxa de Conexão -->
-                <div class="bubble-circle bubble-white">
-                  <span class="bubble-val" id="sdr-bubble-contact-rate">0%</span>
-                  <span class="bubble-sub">Tx. Conexão</span>
-                </div>
-
-                <!-- Bolha Escura: Total Esforço -->
-                <div class="bubble-circle bubble-dark">
-                  <span class="bubble-val" id="sdr-bubble-effort">0</span>
-                  <span class="bubble-sub">Atividades</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card de Ações Executivas do SDR -->
-            <div class="white-box-card actions-box-card">
-              <!-- BOTÃO DE DESTAQUE: GERAR RELATÓRIO DO SDR EM PDF -->
-              <button type="button" class="btn-uifry-lime" id="btn-generate-sdr-pdf">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                </svg>
-                <span id="btn-sdr-pdf-label">GERAR RELATÓRIO DO SDR (PDF)</span>
-              </button>
-
-              <div class="actions-secondary-row">
-                <button type="button" class="btn-uifry-sec" id="btn-save-sdr-report">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                  </svg>
-                  <span>Salvar</span>
-                </button>
-
-                <button type="button" class="btn-uifry-sec" id="btn-reset-sdr-form">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="1 4 1 10 7 10"></polyline>
-                    <polyline points="23 20 23 14 17 14"></polyline>
-                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
-                  </svg>
-                  <span>Limpar</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Histórico dos Relatórios dos SDRs -->
-        <section class="white-box-card" style="margin-top: 18px;">
-          <div class="box-card-header">
-            <div class="header-left-title">
-              <h2 class="box-card-title">Histórico de Relatórios dos SDRs</h2>
-              <p class="box-card-desc">Registros salvos de prospecção e agendamento</p>
-            </div>
-            <button type="button" class="btn-uifry-sec" id="btn-export-sdr-csv" style="padding: 6px 12px; font-size: 11.5px;">Exportar CSV SDR</button>
-          </div>
-
-          <div class="table-responsive-box">
-            <table class="uifry-table">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>SDR</th>
-                  <th>Leads</th>
-                  <th>Ligações</th>
-                  <th>WhatsApp</th>
-                  <th>Contatos Efetivos</th>
-                  <th>Tx. Conexão</th>
-                  <th>Reuniões Agendadas</th>
-                  <th>Reuniões Qualificadas</th>
-                  <th>Pipeline Gerado</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="sdr-history-table-body">
-                <!-- Preenchido via app.js -->
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </section>
-
-      <!-- ==========================================================
            VIEW 3: HUB DE FECHAMENTO (Tales, José, Elinaldo)
            ========================================================== -->
       <section id="view-closers" class="app-view">
@@ -1302,24 +971,13 @@
               <label class="filter-label">Membro:</label>
               <select id="history-filter-member" class="uifry-select">
                 <option value="all">Toda a Equipe</option>
-                <option value="Tales">Tales (Closer)</option>
-                <option value="José">José (Closer)</option>
-                <option value="Elinaldo">Elinaldo (Closer)</option>
-                <option value="SDR 1">SDR 1</option>
-                <option value="SDR 2">SDR 2</option>
-                <option value="SDR 3">SDR 3</option>
-                <option value="SDR 4">SDR 4</option>
+                <option value="Tales">Tales</option>
+                <option value="José">José</option>
+                <option value="Elinaldo">Elinaldo</option>
               </select>
             </div>
 
-            <div class="filter-group">
-              <label class="filter-label">Tipo:</label>
-              <select id="history-filter-type" class="uifry-select">
-                <option value="all">Todos os Relatórios</option>
-                <option value="closer">Apenas Closers</option>
-                <option value="sdr">Apenas SDRs</option>
-              </select>
-            </div>
+
           </div>
         </div>
 
@@ -1349,33 +1007,6 @@
         </div>
       </section>
 
-      <!-- ==========================================================
-           CABEÇALHO & ÁREA DE IMPRESSÃO A4 DO SDR (PDF SDR)
-           ========================================================== -->
-      <div id="print-sdr-report" class="print-sdr-container">
-        <div class="print-header">
-          <div class="print-brand">
-            <img src="assets/logo.png" alt="FAZENDO ACONTECER™" class="print-logo-img">
-            <span class="print-brand-sub">MÓDULO DE PROSPECÇÃO • SDR</span>
-          </div>
-          <div class="print-meta">
-            <span class="print-title">RELATÓRIO DIÁRIO DE PROSPECÇÃO</span>
-            <div class="print-details">
-              <span id="print-sdr-name">SDR: <strong>SDR 1</strong></span>
-              <span class="print-separator">•</span>
-              <span id="print-sdr-date">Data: <strong>22/09/2026</strong></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="print-sdr-body" id="print-sdr-body-content">
-          <!-- Renderizado via app.js -->
-        </div>
-
-        <div class="print-footer-tag">
-          <span>Fazendo Acontecer™ • Hub Comercial • Documento Executivo de Performance</span>
-        </div>
-      </div>
 
     </main>
   </div>

@@ -8,15 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // CONFIGURAÇÃO, CONSTANTES & ESTADO GLOBAL
   // ============================================================
   const closersList = ['Tales', 'José', 'Elinaldo'];
-  const sdrsList = ['SDR 1', 'SDR 2', 'SDR 3', 'SDR 4'];
   
   let currentCloser = 'Tales';
-  let currentSdr = 'SDR 1';
   let currentView = 'view-dashboard';
 
   // Chaves do LocalStorage de Produção
   const STORAGE_CLOSER_REPORTS = 'fa_prod_closer_reports_v1';
-  const STORAGE_SDR_REPORTS = 'fa_prod_sdr_reports_v1';
   const STORAGE_CLIENTS_KEY = 'fa_prod_clients_v1';
   const STORAGE_PLANNING_KEY = 'fa_prod_planning_v1';
   const STORAGE_GOAL = 'fa_monthly_goal_v1';
@@ -37,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'closerReports_v2',
     'fa_sdr_reports_v1',
     'sdrReports_v2',
+    'fa_prod_sdr_reports_v1',
     'projects_clients_v2',
     'projects_planning_v2',
     'fa_money_table_v1',
@@ -45,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'fa_team_reports_unified_v1',
     'fa_storage_cleaned_v1',
     'fa_storage_cleaned_v2',
-    'fa_storage_cleaned_v3'
+    'fa_storage_cleaned_v3',
+    'fa_storage_cleaned_v4'
   ];
   legacyKeysToPurge.forEach(k => localStorage.removeItem(k));
 
@@ -56,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const views = {
     'view-dashboard': document.getElementById('view-dashboard'),
     'view-projects': document.getElementById('view-projects'),
-    'view-sdrs': document.getElementById('view-sdrs'),
     'view-closers': document.getElementById('view-closers'),
     'view-history': document.getElementById('view-history')
   };
@@ -65,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const navLinks = {
     'view-dashboard': document.getElementById('nav-dashboard'),
     'view-projects': document.getElementById('nav-projects'),
-    'view-sdrs': document.getElementById('nav-sdrs'),
     'view-closers': document.getElementById('nav-closers'),
     'view-history': document.getElementById('nav-history')
   };
@@ -73,12 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const closerChips = document.querySelectorAll('.closer-chip');
 
   // Botões de navegação rápida
-  const btnQuickGotoSdr = document.getElementById('btn-quick-goto-sdr');
   const btnQuickGotoCloser = document.getElementById('btn-quick-goto-closer');
   const btnCopyTeamLink = document.getElementById('btn-copy-team-link');
-  const bannerGoSdr = document.getElementById('banner-go-sdr');
   const bannerGoCloser = document.getElementById('banner-go-closer');
-  const btnSdrToDashboard = document.getElementById('btn-sdr-to-dashboard');
   const btnCloserToDashboard = document.getElementById('btn-closer-to-dashboard');
 
   // Toast Container
@@ -178,44 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCancelPlanning = document.getElementById('btn-cancel-planning');
   const btnSavePlanning = document.getElementById('btn-save-planning');
 
-  // --- ELEMENTOS DO HUB DE SDRs ---
-  const sdrReportDate = document.getElementById('sdr-report-date');
-  if (sdrReportDate) sdrReportDate.value = formattedToday;
-
-  const headerSdrName = document.getElementById('header-sdr-name');
-  const sdrSegmentedBtns = document.querySelectorAll('#sdr-segmented-selector .segmented-btn');
-
-  const sdrKpiScheduled = document.getElementById('sdr-kpi-scheduled');
-  const sdrKpiQualifiedSub = document.getElementById('sdr-kpi-qualified-sub');
-  const sdrKpiContacts = document.getElementById('sdr-kpi-contacts');
-  const sdrKpiContactRate = document.getElementById('sdr-kpi-contact-rate');
-  const sdrKpiPipeline = document.getElementById('sdr-kpi-pipeline');
-
-  const inputSdrLeads = document.getElementById('input-sdr-leads');
-  const inputSdrCalls = document.getElementById('input-sdr-calls');
-  const inputSdrWhatsapp = document.getElementById('input-sdr-whatsapp');
-  const inputSdrContacts = document.getElementById('input-sdr-contacts');
-  const inputSdrNameCustom = document.getElementById('input-sdr-name-custom');
-  const inputSdrScheduled = document.getElementById('input-sdr-scheduled');
-  const inputSdrQualified = document.getElementById('input-sdr-qualified');
-  const inputSdrNoshow = document.getElementById('input-sdr-noshow');
-  const inputSdrPipeline = document.getElementById('input-sdr-pipeline');
-
-  const sdrBubbleScheduleRate = document.getElementById('sdr-bubble-schedule-rate');
-  const sdrBubbleContactRate = document.getElementById('sdr-bubble-contact-rate');
-  const sdrBubbleEffort = document.getElementById('sdr-bubble-effort');
-
-  const btnGenerateSdrPdf = document.getElementById('btn-generate-sdr-pdf');
-  const btnSaveSdrReport = document.getElementById('btn-save-sdr-report');
-  const btnResetSdrForm = document.getElementById('btn-reset-sdr-form');
-  const sdrHistoryTableBody = document.getElementById('sdr-history-table-body');
-  const btnExportSdrCsv = document.getElementById('btn-export-sdr-csv');
-
-  // Área de impressão SDR
-  const printSdrReport = document.getElementById('print-sdr-report');
-  const printSdrName = document.getElementById('print-sdr-name');
-  const printSdrDate = document.getElementById('print-sdr-date');
-  const printSdrBodyContent = document.getElementById('print-sdr-body-content');
 
   // --- ELEMENTOS DO HUB DE CLOSERS ---
   const dateInput = document.getElementById('report-date');
@@ -373,7 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setupCurrencyInput(inputContractVal);
   setupCurrencyInput(inputCashCollected);
-  setupCurrencyInput(inputSdrPipeline);
   setupCurrencyInput(settingMonthlyGoal);
   setupCurrencyInput(planRevenueGoal);
 
@@ -478,9 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updateExecDashboard();
     } else if (viewId === 'view-projects') {
       renderProjectsView();
-    } else if (viewId === 'view-sdrs') {
-      loadSdrDayData();
-      renderSdrHistory();
+
     } else if (viewId === 'view-closers') {
       loadDayData();
     } else if (viewId === 'view-history') {
@@ -499,9 +452,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Atalhos de navegação no Dashboard
-  if (btnQuickGotoSdr) {
-    btnQuickGotoSdr.addEventListener('click', () => showView('view-sdrs'));
-  }
   if (btnQuickGotoCloser) {
     btnQuickGotoCloser.addEventListener('click', () => showView('view-closers'));
   }
@@ -528,15 +478,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-  if (bannerGoSdr) {
-    bannerGoSdr.addEventListener('click', () => showView('view-sdrs'));
-  }
+
   if (bannerGoCloser) {
     bannerGoCloser.addEventListener('click', () => showView('view-closers'));
   }
-  if (btnSdrToDashboard) {
-    btnSdrToDashboard.addEventListener('click', () => showView('view-dashboard'));
-  }
+
   if (btnCloserToDashboard) {
     btnCloserToDashboard.addEventListener('click', () => showView('view-dashboard'));
   }
@@ -590,12 +536,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const sdrReports = getStoredSdrReports();
 
     let monthCloserReports = closerReports.filter(r => (r.date || '').startsWith(selectedMonth));
-    let monthSdrReports = sdrReports.filter(r => (r.date || '').startsWith(selectedMonth));
 
     // Se filtrou por um cliente específico
     if (selectedClientId !== 'all') {
       monthCloserReports = monthCloserReports.filter(r => r.clientId === selectedClientId);
-      monthSdrReports = monthSdrReports.filter(r => r.clientId === selectedClientId);
     }
 
     // Busca metas de planejamento para o mês e cliente selecionados
@@ -643,18 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
       totalCloserEffort += (parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0);
     });
 
-    // Totais de SDRs
-    let totalSdrLeads = 0;
-    let totalSdrContacts = 0;
-    let totalSdrScheduled = 0;
-    let totalSdrPipeline = 0;
 
-    monthSdrReports.forEach(r => {
-      totalSdrLeads += parseInt(r.leads, 10) || 0;
-      totalSdrContacts += parseInt(r.contacts, 10) || 0;
-      totalSdrScheduled += parseInt(r.scheduled, 10) || 0;
-      totalSdrPipeline += parseMoneyToNumber(r.pipeline || r.pipelineVal);
-    });
 
     // Cálculos de Projeção & Run-Rate
     const dailyPace = passedDays > 0 ? (totalRevenue / passedDays) : 0;
@@ -782,9 +715,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Atualização do Funil Comercial Consolidado
-    const grandLeads = Math.max(totalSdrLeads, totalCloserLeads);
-    const grandContacts = Math.max(totalSdrContacts, totalCloserEffort);
-    const grandScheduled = Math.max(totalSdrScheduled, totalMeetingsScheduled);
+    const grandLeads = totalCloserLeads;
+    const grandContacts = totalCloserEffort;
+    const grandScheduled = totalMeetingsScheduled;
     const grandHeld = totalMeetingsHeld;
     const grandSales = totalSales;
 
@@ -812,54 +745,39 @@ document.addEventListener('DOMContentLoaded', () => {
       funnelConvSales.textContent = `${rate}%`;
     }
 
-    renderExecRankingTable(monthCloserReports, monthSdrReports);
+    renderExecRankingTable(monthCloserReports);
   }
 
-  // Tabela de Ranking Executivo da Equipe
-  function renderExecRankingTable(closerReports, sdrReports) {
+  // Tabela de Ranking Executivo da Equipe Comercial
+  function renderExecRankingTable(closerReports) {
     if (!execRankingTableBody) return;
     execRankingTableBody.innerHTML = '';
 
-    // Agrega Membros Comerciais (Tales, José, Elinaldo)
+    // Membros Oficiais da Equipe Comercial (Tales, José, Elinaldo)
     const closerData = {};
     closersList.forEach(c => {
-      closerData[c] = { name: c, role: 'Closer', effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0 };
+      closerData[c] = { name: c, role: 'Comercial', effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0 };
     });
 
-    closerReports.forEach(r => {
-      if (closerData[r.closer]) {
-        closerData[r.closer].effort += (parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0);
-        closerData[r.closer].scheduled += parseInt(r.meetingsScheduled, 10) || 0;
-        closerData[r.closer].held += parseInt(r.meetingsHeld, 10) || 0;
-        closerData[r.closer].sales += parseInt(r.sales, 10) || 0;
-        closerData[r.closer].contracts += parseMoneyToNumber(r.contractVal);
-        closerData[r.closer].cash += parseMoneyToNumber(r.cashCollected);
-      }
-    });
-
-    // Agrega SDRs apenas se houver relatórios ativos
-    const sdrData = {};
-    if (Array.isArray(sdrReports) && sdrReports.length > 0) {
-      sdrReports.forEach(r => {
-        if (!r.sdr) return;
-        if (!sdrData[r.sdr]) {
-          sdrData[r.sdr] = { name: r.customName || r.sdr, role: 'SDR', effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0, pipeline: 0 };
+    if (Array.isArray(closerReports)) {
+      closerReports.forEach(r => {
+        if (closerData[r.closer]) {
+          closerData[r.closer].effort += (parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0);
+          closerData[r.closer].scheduled += parseInt(r.meetingsScheduled, 10) || 0;
+          closerData[r.closer].held += parseInt(r.meetingsHeld, 10) || 0;
+          closerData[r.closer].sales += parseInt(r.sales, 10) || 0;
+          closerData[r.closer].contracts += parseMoneyToNumber(r.contractVal);
+          closerData[r.closer].cash += parseMoneyToNumber(r.cashCollected);
         }
-        sdrData[r.sdr].effort += parseInt(r.contacts, 10) || 0;
-        sdrData[r.sdr].scheduled += parseInt(r.scheduled, 10) || 0;
-        sdrData[r.sdr].pipeline += parseMoneyToNumber(r.pipeline || r.pipelineVal);
       });
     }
 
-    const members = [...Object.values(closerData), ...Object.values(sdrData)];
+    const members = Object.values(closerData);
     members.sort((a, b) => b.cash - a.cash || b.sales - a.sales || b.scheduled - a.scheduled);
 
     members.forEach(m => {
       const tr = document.createElement('tr');
-      const isCloser = m.role === 'Closer';
-      const convRate = isCloser 
-        ? (m.held > 0 ? Math.round((m.sales / m.held) * 100) : 0)
-        : (m.effort > 0 ? Math.round((m.scheduled / m.effort) * 100) : 0);
+      const convRate = m.held > 0 ? Math.round((m.sales / m.held) * 100) : 0;
 
       tr.innerHTML = `
         <td>
@@ -868,308 +786,60 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </td>
         <td>
-          <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; background:${isCloser ? '#f4f5f6' : 'rgba(56, 189, 248, 0.1)'}; color:${isCloser ? 'var(--text-dark)' : '#0284c7'};">${m.role}</span>
+          <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; background:#f4f5f6; color:var(--text-dark);">${m.role}</span>
         </td>
         <td style="text-align: center;">${m.effort}</td>
-        <td style="text-align: center;">${isCloser ? `${m.scheduled} / ${m.held}` : `${m.scheduled} agend.`}</td>
+        <td style="text-align: center;">${m.scheduled} / ${m.held}</td>
         <td style="text-align: center;">
           <span style="font-weight:700; color:${convRate > 0 ? '#10b981' : 'var(--text-secondary)'};">${convRate}%</span>
         </td>
         <td style="text-align: center;">
-          <span style="font-weight:700; color:${m.sales > 0 ? 'var(--text-dark)' : 'var(--text-secondary)'};">${isCloser ? m.sales : '—'}</span>
+          <span style="font-weight:700; color:${m.sales > 0 ? 'var(--text-dark)' : 'var(--text-secondary)'};">${m.sales}</span>
         </td>
-        <td style="text-align: right;">${isCloser ? formatNumberToMoney(m.contracts) : '—'}</td>
+        <td style="text-align: right;">${formatNumberToMoney(m.contracts)}</td>
         <td style="text-align: right;">
-          <strong style="color:${isCloser ? '#10b981' : '#38bdf8'};">${isCloser ? formatNumberToMoney(m.cash) : formatNumberToMoney(m.pipeline)}</strong>
+          <strong style="color:#10b981;">${formatNumberToMoney(m.cash)}</strong>
         </td>
       `;
       execRankingTableBody.appendChild(tr);
     });
   }
 
-  // ============================================================
-  // HUB DOS SDRs • LÓGICA & EMISSÃO DE PDF A4
-  // ============================================================
-  function selectSdr(sdrName) {
-    currentSdr = sdrName;
-
-    sdrSegmentedBtns.forEach(btn => {
-      if (btn.dataset.sdr === sdrName) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-
-    if (headerSdrName) headerSdrName.textContent = sdrName;
-    loadSdrDayData();
-  }
-
-  sdrSegmentedBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      selectSdr(btn.dataset.sdr);
-    });
-  });
-
-  if (sdrReportDate) {
-    sdrReportDate.addEventListener('change', () => {
-      loadSdrDayData();
-    });
-  }
-
-  function updateSdrDashboard() {
-    const leads = Math.max(0, parseInt(inputSdrLeads.value, 10) || 0);
-    const calls = Math.max(0, parseInt(inputSdrCalls.value, 10) || 0);
-    const whatsapp = Math.max(0, parseInt(inputSdrWhatsapp.value, 10) || 0);
-    const contacts = Math.max(0, parseInt(inputSdrContacts.value, 10) || 0);
-    const scheduled = Math.max(0, parseInt(inputSdrScheduled.value, 10) || 0);
-    const qualified = Math.max(0, parseInt(inputSdrQualified.value, 10) || 0);
-    const formattedPipeline = formatMoneyString(inputSdrPipeline.value);
-
-    const contactRate = leads > 0 ? Math.min(100, Math.round((contacts / leads) * 100)) : 0;
-    const scheduleRate = contacts > 0 ? Math.min(100, Math.round((scheduled / contacts) * 100)) : 0;
-    const totalActivities = calls + whatsapp + contacts;
-
-    if (sdrKpiScheduled) sdrKpiScheduled.textContent = scheduled;
-    if (sdrKpiQualifiedSub) sdrKpiQualifiedSub.textContent = `${qualified} qualificada(s)`;
-    if (sdrKpiContacts) sdrKpiContacts.textContent = contacts;
-    if (sdrKpiContactRate) sdrKpiContactRate.textContent = `${contactRate}% conexão`;
-    if (sdrKpiPipeline) sdrKpiPipeline.textContent = formattedPipeline;
-
-    if (sdrBubbleScheduleRate) sdrBubbleScheduleRate.textContent = `${scheduleRate}%`;
-    if (sdrBubbleContactRate) sdrBubbleContactRate.textContent = `${contactRate}%`;
-    if (sdrBubbleEffort) sdrBubbleEffort.textContent = totalActivities;
-  }
-
-  [inputSdrLeads, inputSdrCalls, inputSdrWhatsapp, inputSdrContacts, inputSdrScheduled, inputSdrQualified, inputSdrNoshow, inputSdrPipeline].forEach(input => {
-    if (input) {
-      input.addEventListener('input', updateSdrDashboard);
-    }
-  });
-
-  function loadSdrDayData() {
-    const selectedDate = sdrReportDate ? sdrReportDate.value : formattedToday;
-    const reports = getStoredSdrReports();
-    const entry = reports.find(r => r.sdr === currentSdr && r.date === selectedDate);
-
-    if (entry) {
-      inputSdrLeads.value = entry.leads ?? 0;
-      inputSdrCalls.value = entry.calls ?? 0;
-      inputSdrWhatsapp.value = entry.whatsapp ?? 0;
-      inputSdrContacts.value = entry.contacts ?? 0;
-      inputSdrScheduled.value = entry.scheduled ?? 0;
-      inputSdrQualified.value = entry.qualified ?? 0;
-      inputSdrNoshow.value = entry.noshow ?? 0;
-      inputSdrPipeline.value = formatMoneyString(entry.pipeline);
-      if (inputSdrNameCustom) inputSdrNameCustom.value = entry.customName || '';
-      if (sdrClientSelect) sdrClientSelect.value = entry.clientId || '';
-    } else {
-      inputSdrLeads.value = 0;
-      inputSdrCalls.value = 0;
-      inputSdrWhatsapp.value = 0;
-      inputSdrContacts.value = 0;
-      inputSdrScheduled.value = 0;
-      inputSdrQualified.value = 0;
-      inputSdrNoshow.value = 0;
-      inputSdrPipeline.value = 'R$ 0,00';
-      if (inputSdrNameCustom) inputSdrNameCustom.value = '';
-      if (sdrClientSelect) sdrClientSelect.value = '';
-    }
-
-    updateSdrDashboard();
-  }
-
-  function saveSdrReport(showFeedback = true) {
-    const selectedDate = sdrReportDate ? sdrReportDate.value : formattedToday;
-    const customName = inputSdrNameCustom ? inputSdrNameCustom.value.trim() : '';
-
-    const newRecord = {
-      id: `${currentSdr}_${selectedDate}`,
-      sdr: currentSdr,
-      clientId: sdrClientSelect ? sdrClientSelect.value || null : null,
-      customName: customName,
-      date: selectedDate,
-      leads: parseInt(inputSdrLeads.value, 10) || 0,
-      calls: parseInt(inputSdrCalls.value, 10) || 0,
-      whatsapp: parseInt(inputSdrWhatsapp.value, 10) || 0,
-      contacts: parseInt(inputSdrContacts.value, 10) || 0,
-      scheduled: parseInt(inputSdrScheduled.value, 10) || 0,
-      qualified: parseInt(inputSdrQualified.value, 10) || 0,
-      noshow: parseInt(inputSdrNoshow.value, 10) || 0,
-      pipeline: formatMoneyString(inputSdrPipeline.value),
-      updatedAt: new Date().toISOString()
-    };
-
-    let reports = getStoredSdrReports();
-    const existingIndex = reports.findIndex(r => r.id === newRecord.id);
-
-    if (existingIndex >= 0) {
-      reports[existingIndex] = newRecord;
-    } else {
-      reports.unshift(newRecord);
-    }
-
-    saveStoredSdrReports(reports);
-    renderSdrHistory();
-    updateExecDashboard();
-
-    if (showFeedback) {
-      showToast(`Relatório de ${currentSdr} salvo com sucesso!`);
-    }
-  }
-
-  if (btnSaveSdrReport) {
-    btnSaveSdrReport.addEventListener('click', () => saveSdrReport(true));
-  }
-
-  if (btnResetSdrForm) {
-    btnResetSdrForm.addEventListener('click', () => {
-      inputSdrLeads.value = 0;
-      inputSdrCalls.value = 0;
-      inputSdrWhatsapp.value = 0;
-      inputSdrContacts.value = 0;
-      inputSdrScheduled.value = 0;
-      inputSdrQualified.value = 0;
-      inputSdrNoshow.value = 0;
-      inputSdrPipeline.value = 'R$ 0,00';
-      if (inputSdrNameCustom) inputSdrNameCustom.value = '';
-      updateSdrDashboard();
-      showToast('Campos do SDR resetados.');
-    });
-  }
-
-  function renderSdrHistory() {
-    if (!sdrHistoryTableBody) return;
-    const reports = getStoredSdrReports();
-    sdrHistoryTableBody.innerHTML = '';
-
-    if (reports.length === 0) {
-      sdrHistoryTableBody.innerHTML = `
-        <tr>
-          <td colspan="11" style="text-align:center; padding: 24px; color: var(--text-secondary);">
-            Nenhum relatório de SDR salvo no histórico ainda.
-          </td>
-        </tr>
-      `;
-      return;
-    }
-
-    reports.forEach(r => {
-      const contactRate = r.leads > 0 ? Math.round((r.contacts / r.leads) * 100) : 0;
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><strong>${formatDateBR(r.date)}</strong></td>
-        <td><span style="font-weight:700; color:var(--text-dark);">${r.customName ? `${r.customName} (${r.sdr})` : r.sdr}</span></td>
-        <td>${r.leads}</td>
-        <td>${r.calls}</td>
-        <td>${r.whatsapp}</td>
-        <td><strong>${r.contacts}</strong></td>
-        <td><span class="tbl-pill-badge">${contactRate}%</span></td>
-        <td><strong style="color:#10b981;">${r.scheduled}</strong></td>
-        <td>${r.qualified}</td>
-        <td><strong style="color:var(--text-dark);">${r.pipeline}</strong></td>
-        <td>
-          <button type="button" class="btn-uifry-sec btn-load-sdr-entry" data-sdr="${r.sdr}" data-date="${r.date}" style="padding: 4px 8px; font-size: 11px;">
-            Carregar
-          </button>
-        </td>
-      `;
-      sdrHistoryTableBody.appendChild(tr);
-    });
-
-    document.querySelectorAll('.btn-load-sdr-entry').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const s = btn.dataset.sdr;
-        const d = btn.dataset.date;
-        if (sdrReportDate) sdrReportDate.value = d;
-        selectSdr(s);
-        showToast(`Registro de ${s} (${formatDateBR(d)}) carregado!`);
+  // Exportação CSV do Ranking Comercial
+  if (btnExportExecCsv) {
+    btnExportExecCsv.addEventListener('click', () => {
+      const closerReports = getStoredCloserReports();
+      const closerData = {};
+      closersList.forEach(c => {
+        closerData[c] = { name: c, role: 'Comercial', effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0 };
       });
-    });
-  }
 
-  // Geração de PDF do SDR em formato A4 perfeito
-  if (btnGenerateSdrPdf) {
-    btnGenerateSdrPdf.addEventListener('click', () => {
-      saveSdrReport(false);
+      closerReports.forEach(r => {
+        if (closerData[r.closer]) {
+          closerData[r.closer].effort += (parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0);
+          closerData[r.closer].scheduled += parseInt(r.meetingsScheduled, 10) || 0;
+          closerData[r.closer].held += parseInt(r.meetingsHeld, 10) || 0;
+          closerData[r.closer].sales += parseInt(r.sales, 10) || 0;
+          closerData[r.closer].contracts += parseMoneyToNumber(r.contractVal);
+          closerData[r.closer].cash += parseMoneyToNumber(r.cashCollected);
+        }
+      });
 
-      const selectedDate = sdrReportDate ? sdrReportDate.value : formattedToday;
-      const displayName = inputSdrNameCustom && inputSdrNameCustom.value.trim() 
-        ? inputSdrNameCustom.value.trim().toUpperCase() 
-        : currentSdr.toUpperCase();
+      const members = Object.values(closerData);
+      members.sort((a, b) => b.cash - a.cash || b.sales - a.sales || b.scheduled - a.scheduled);
 
-      const leads = parseInt(inputSdrLeads.value, 10) || 0;
-      const calls = parseInt(inputSdrCalls.value, 10) || 0;
-      const whatsapp = parseInt(inputSdrWhatsapp.value, 10) || 0;
-      const contacts = parseInt(inputSdrContacts.value, 10) || 0;
-      const scheduled = parseInt(inputSdrScheduled.value, 10) || 0;
-      const qualified = parseInt(inputSdrQualified.value, 10) || 0;
-      const noshow = parseInt(inputSdrNoshow.value, 10) || 0;
-      const pipeline = formatMoneyString(inputSdrPipeline.value);
+      let csv = 'Membro,Funcao,Esforco_Contatos,Reunioes_Agendadas,Reunioes_Realizadas,Tx_Conversao,Vendas,Contratos,Cash_Coletado\n';
+      members.forEach(m => {
+        const convRate = m.held > 0 ? Math.round((m.sales / m.held) * 100) : 0;
+        csv += `"${m.name}","${m.role}",${m.effort},${m.scheduled},${m.held},"${convRate}%",${m.sales},"${formatNumberToMoney(m.contracts)}","${formatNumberToMoney(m.cash)}"\n`;
+      });
 
-      const contactRate = leads > 0 ? Math.round((contacts / leads) * 100) : 0;
-      const scheduleRate = contacts > 0 ? Math.round((scheduled / contacts) * 100) : 0;
-
-      if (printSdrName) printSdrName.innerHTML = `SDR: <strong>${displayName}</strong>`;
-      if (printSdrDate) printSdrDate.innerHTML = `Data: <strong>${formatDateBR(selectedDate)}</strong>`;
-
-      if (printSdrBodyContent) {
-        printSdrBodyContent.innerHTML = `
-          <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px;">
-            <div style="background:#0f1422; border:1px solid #1a2336; padding:12px; border-radius:8px;">
-              <span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.04em;">REUNIÕES AGENDADAS</span>
-              <div style="font-size:24px; font-weight:700; color:var(--accent-lime); font-family:var(--font-display); letter-spacing:-0.03em; font-variant-numeric:tabular-nums;">${scheduled}</div>
-              <span style="font-size:10px; color:#cbd5e1;">${qualified} qualificadas no ICP</span>
-            </div>
-            <div style="background:#0f1422; border:1px solid #1a2336; padding:12px; border-radius:8px;">
-              <span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.04em;">CONTATOS EFETIVOS</span>
-              <div style="font-size:24px; font-weight:700; color:#ffffff; font-family:var(--font-display); letter-spacing:-0.03em; font-variant-numeric:tabular-nums;">${contacts}</div>
-              <span style="font-size:10px; color:#cbd5e1;">${contactRate}% de conexão</span>
-            </div>
-            <div style="background:#0f1422; border:1px solid #1a2336; padding:12px; border-radius:8px;">
-              <span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.04em;">TX. AGENDAMENTO</span>
-              <div style="font-size:24px; font-weight:700; color:var(--accent-lime); font-family:var(--font-display); letter-spacing:-0.03em; font-variant-numeric:tabular-nums;">${scheduleRate}%</div>
-              <span style="font-size:10px; color:#cbd5e1;">Agendadas / Conexões</span>
-            </div>
-            <div style="background:#0f1422; border:1px solid #1a2336; padding:12px; border-radius:8px;">
-              <span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.04em;">PIPELINE GERADO</span>
-              <div style="font-size:22px; font-weight:700; color:#ffffff; font-family:var(--font-display); letter-spacing:-0.03em; font-variant-numeric:tabular-nums;">${pipeline}</div>
-              <span style="font-size:10px; color:#8da2bd;">Encaminhado aos Closers</span>
-            </div>
-          </div>
-
-          <div style="background:#0f1422; border:1px solid #1a2336; padding:16px; border-radius:8px; margin-bottom: 12px;">
-            <span style="font-size:11px; font-weight:700; color:var(--accent-lime); letter-spacing:0.04em; text-transform:uppercase;">01 • ESFORÇO & VOLUME DE PROSPECÇÃO</span>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px;">
-              <div><span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.03em;">LEADS ABORDADOS</span><div style="font-size:18px; font-weight:700; color:#ffffff; font-variant-numeric:tabular-nums;">${leads}</div></div>
-              <div><span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.03em;">LIGAÇÕES FEITAS</span><div style="font-size:18px; font-weight:700; color:#ffffff; font-variant-numeric:tabular-nums;">${calls}</div></div>
-              <div><span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.03em;">MENSAGENS WHATSAPP</span><div style="font-size:18px; font-weight:700; color:#ffffff; font-variant-numeric:tabular-nums;">${whatsapp}</div></div>
-            </div>
-          </div>
-
-          <div style="background:#0f1422; border:1px solid #1a2336; padding:16px; border-radius:8px;">
-            <span style="font-size:11px; font-weight:700; color:var(--accent-lime); letter-spacing:0.04em; text-transform:uppercase;">02 • CONVERSÃO & QUALIFICAÇÃO</span>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px;">
-              <div><span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.03em;">REUNIÕES AGENDADAS</span><div style="font-size:18px; font-weight:700; color:var(--accent-lime); font-variant-numeric:tabular-nums;">${scheduled}</div></div>
-              <div><span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.03em;">REUNIÕES QUALIFICADAS</span><div style="font-size:18px; font-weight:700; color:#ffffff; font-variant-numeric:tabular-nums;">${qualified}</div></div>
-              <div><span style="font-size:10px; color:#8da2bd; text-transform:uppercase; font-weight:600; letter-spacing:0.03em;">NO-SHOWS (FALTAS)</span><div style="font-size:18px; font-weight:700; color:#f87171; font-variant-numeric:tabular-nums;">${noshow}</div></div>
-            </div>
-          </div>
-        `;
-      }
-
-      document.body.classList.add('print-mode-sdr');
-
-      const cleanupSdrPrint = () => {
-        document.body.classList.remove('print-mode-sdr');
-        window.removeEventListener('afterprint', cleanupSdrPrint);
-      };
-      window.addEventListener('afterprint', cleanupSdrPrint);
-
-      setTimeout(() => {
-        window.print();
-        setTimeout(() => document.body.classList.remove('print-mode-sdr'), 1500);
-      }, 100);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `comercial_fa_ranking_${formattedToday}.csv`;
+      link.click();
+      showToast('Ranking da equipe exportado em CSV!');
     });
   }
 
@@ -1363,58 +1033,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
-  // HISTÓRICO CONSOLIDADO (Closers & SDRs)
+  // HISTÓRICO COMERCIAL CONSOLIDADO
   // ============================================================
   function renderConsolidatedHistory() {
     if (!historyTableBody) return;
     const closerReports = getStoredCloserReports();
-    const sdrReports = getStoredSdrReports();
-
     const selectedMember = historyFilterMember ? historyFilterMember.value : 'all';
-    const selectedType = historyFilterType ? historyFilterType.value : 'all';
 
     let allEntries = [];
 
-    if (selectedType === 'all' || selectedType === 'closer') {
-      closerReports.forEach(r => {
-        allEntries.push({
-          date: r.date,
-          name: r.closer,
-          role: 'Closer',
-          leads: r.leads,
-          followups: (parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0),
-          scheduled: r.meetingsScheduled,
-          held: r.meetingsHeld,
-          sales: r.sales,
-          contracts: r.contractVal,
-          cash: r.cashCollected,
-          type: 'closer'
-        });
+    closerReports.forEach(r => {
+      allEntries.push({
+        date: r.date,
+        name: r.closer,
+        role: 'Comercial',
+        leads: r.leads || 0,
+        followups: (parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0),
+        scheduled: r.meetingsScheduled || 0,
+        held: r.meetingsHeld || 0,
+        sales: r.sales || 0,
+        contracts: r.contractVal || 'R$ 0,00',
+        cash: r.cashCollected || 'R$ 0,00'
       });
-    }
-
-    if (selectedType === 'all' || selectedType === 'sdr') {
-      sdrReports.forEach(r => {
-        allEntries.push({
-          date: r.date,
-          name: r.customName ? `${r.customName} (${r.sdr})` : r.sdr,
-          rawSdr: r.sdr,
-          role: 'SDR',
-          leads: r.leads,
-          followups: r.contacts,
-          scheduled: r.scheduled,
-          held: '—',
-          sales: '—',
-          contracts: '—',
-          cash: r.pipeline,
-          type: 'sdr'
-        });
-      });
-    }
+    });
 
     // Filtro por membro
     if (selectedMember !== 'all') {
-      allEntries = allEntries.filter(e => e.name.includes(selectedMember) || e.rawSdr === selectedMember);
+      allEntries = allEntries.filter(e => e.name === selectedMember);
     }
 
     allEntries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -1429,7 +1074,7 @@ document.addEventListener('DOMContentLoaded', () => {
       historyTableBody.innerHTML = `
         <tr>
           <td colspan="11" style="text-align:center; padding: 28px; color: var(--text-secondary);">
-            Nenhum registro encontrado com os filtros selecionados.
+            Nenhum registro comercial encontrado com os filtros selecionados.
           </td>
         </tr>
       `;
@@ -1437,25 +1082,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     allEntries.forEach(entry => {
-      const isCloser = entry.type === 'closer';
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td><strong>${formatDateBR(entry.date)}</strong></td>
         <td><strong style="color:var(--text-dark);">${entry.name}</strong></td>
         <td>
-          <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; background:${isCloser ? '#f4f5f6' : 'rgba(56, 189, 248, 0.1)'}; color:${isCloser ? 'var(--text-dark)' : '#0284c7'};">
+          <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; background:#f4f5f6; color:var(--text-dark);">
             ${entry.role}
           </span>
         </td>
-        <td>${entry.leads}</td>
-        <td>${entry.followups}</td>
-        <td>${entry.scheduled}</td>
-        <td>${entry.held}</td>
-        <td><strong style="color:${entry.sales > 0 ? '#10b981' : 'inherit'};">${entry.sales}</strong></td>
-        <td>${entry.contracts}</td>
-        <td><strong style="color:${isCloser ? 'var(--text-dark)' : '#0284c7'};">${entry.cash}</strong></td>
+        <td style="text-align: center;">${entry.leads}</td>
+        <td style="text-align: center;">${entry.followups}</td>
+        <td style="text-align: center;">${entry.scheduled}</td>
+        <td style="text-align: center;">${entry.held}</td>
+        <td style="text-align: center;"><strong style="color:${entry.sales > 0 ? '#10b981' : 'inherit'};">${entry.sales}</strong></td>
+        <td style="text-align: right;">${entry.contracts}</td>
+        <td style="text-align: right;"><strong style="color:#10b981;">${entry.cash}</strong></td>
         <td>
-          <button type="button" class="btn-uifry-sec btn-quick-load-history" data-type="${entry.type}" data-name="${entry.rawSdr || entry.name}" data-date="${entry.date}" style="padding: 4px 8px; font-size: 11px;">
+          <button type="button" class="btn-uifry-sec btn-quick-load-history" data-name="${entry.name}" data-date="${entry.date}" style="padding: 4px 8px; font-size: 11px;">
             Carregar
           </button>
         </td>
@@ -1465,19 +1109,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.btn-quick-load-history').forEach(btn => {
       btn.addEventListener('click', () => {
-        const type = btn.dataset.type;
         const name = btn.dataset.name;
         const d = btn.dataset.date;
-
-        if (type === 'closer') {
-          showView('view-closers');
-          if (dateInput) dateInput.value = d;
-          selectCloser(name);
-        } else {
-          showView('view-sdrs');
-          if (sdrReportDate) sdrReportDate.value = d;
-          selectSdr(name);
-        }
+        showView('view-closers');
+        if (dateInput) dateInput.value = d;
+        selectCloser(name);
         showToast(`Registro de ${name} (${formatDateBR(d)}) carregado!`);
       });
     });
@@ -1486,24 +1122,16 @@ document.addEventListener('DOMContentLoaded', () => {
   if (historyFilterMember) {
     historyFilterMember.addEventListener('change', renderConsolidatedHistory);
   }
-  if (historyFilterType) {
-    historyFilterType.addEventListener('change', renderConsolidatedHistory);
-  }
 
-  // Exportar CSV Consolidado
+  // Exportar CSV do Histórico Comercial
   if (btnExportCsv) {
     btnExportCsv.addEventListener('click', () => {
       const closerReports = getStoredCloserReports();
-      const sdrReports = getStoredSdrReports();
 
-      let csv = 'Data,Membro,Papel,Leads,Followups_Conexoes,Reunioes_Agendadas,Reunioes_Realizadas,Vendas,Contratos,Cash_Pipeline\n';
+      let csv = 'Data,Membro,Papel,Leads,Followups_Prospeccoes,Reunioes_Agendadas,Reunioes_Realizadas,Vendas,Contratos,Cash_Coletado\n';
 
       closerReports.forEach(r => {
-        csv += `"${formatDateBR(r.date)}","${r.closer}","Closer",${r.leads ?? 0},${(parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0)},${r.meetingsScheduled ?? 0},${r.meetingsHeld ?? 0},${r.sales ?? 0},"${formatMoneyString(r.contractVal)}","${formatMoneyString(r.cashCollected)}"\n`;
-      });
-
-      sdrReports.forEach(r => {
-        csv += `"${formatDateBR(r.date)}","${r.customName || r.sdr}","SDR",${r.leads ?? 0},${r.contacts ?? 0},${r.scheduled ?? 0},0,0,"R$ 0,00","${formatMoneyString(r.pipeline)}"\n`;
+        csv += `"${formatDateBR(r.date)}","${r.closer}","Comercial",${r.leads ?? 0},${(parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0)},${r.meetingsScheduled ?? 0},${r.meetingsHeld ?? 0},${r.sales ?? 0},"${formatMoneyString(r.contractVal)}","${formatMoneyString(r.cashCollected)}"\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -1511,7 +1139,7 @@ document.addEventListener('DOMContentLoaded', () => {
       link.href = URL.createObjectURL(blob);
       link.download = `comercial_fa_historico_${formattedToday}.csv`;
       link.click();
-      showToast('Histórico consolidado exportado em CSV!');
+      showToast('Histórico comercial exportado em CSV!');
     });
   }
 
@@ -1520,7 +1148,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btnClearHistory.addEventListener('click', async () => {
       if (confirm('Tem certeza de que deseja apagar todo o histórico de lançamentos do banco de dados e do painel?')) {
         localStorage.removeItem(STORAGE_CLOSER_REPORTS);
-        localStorage.removeItem(STORAGE_SDR_REPORTS);
         localStorage.removeItem('closerReports_v2');
         localStorage.removeItem('sdrReports_v2');
         localStorage.removeItem('fa_team_reports_unified_v1');
@@ -2261,7 +1888,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof dbFetchClients === 'function') await dbFetchClients();
       if (typeof dbFetchPlannings === 'function') await dbFetchPlannings();
       if (typeof dbFetchCloserReports === 'function') await dbFetchCloserReports();
-      if (typeof dbFetchSdrReports === 'function') await dbFetchSdrReports();
     } catch (e) {
       console.warn('[Supabase Sync] Falha ao sincronizar com o banco:', e);
     }
@@ -2269,8 +1895,6 @@ document.addEventListener('DOMContentLoaded', () => {
     populateTopBarFilters();
     updateExecDashboard();
     renderConsolidatedHistory();
-    renderCloserView(currentCloser);
-    renderSdrView(currentSdr);
     renderProjectsList();
   }
 
@@ -2281,9 +1905,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Roteamento inicial por Hash
   const initialHash = window.location.hash.replace('#', '');
-  if (initialHash === 'sdrs') {
-    showView('view-sdrs');
-  } else if (initialHash === 'closers') {
+  if (initialHash === 'sdrs' || initialHash === 'closers') {
     showView('view-closers');
   } else if (initialHash === 'projects') {
     showView('view-projects');
@@ -2294,5 +1916,4 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   selectCloser('Tales');
-  selectSdr('SDR 1');
 });
