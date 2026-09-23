@@ -442,6 +442,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof renderConsolidatedHistory === 'function') {
         renderConsolidatedHistory();
       }
+      if (typeof renderProjectsView === 'function') {
+        renderProjectsView();
+      }
       showToast('Novos dados de relatório recebidos da equipe!');
     }
   });
@@ -450,14 +453,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // DASHBOARD EXECUTIVO GERAL • CÁLCULOS, ANDAMENTO & PROJEÇÃO
   // ============================================================
   function updateExecDashboard() {
-    const selectedClientId = dashFilterClient ? dashFilterClient.value : 'all';
-    const selectedMonth = dashFilterMonth ? dashFilterMonth.value : currentMonthKey;
+    try {
+      const selectedClientId = dashFilterClient ? dashFilterClient.value : 'all';
+      const selectedMonth = dashFilterMonth ? dashFilterMonth.value : currentMonthKey;
 
-    // Extrai ano e mês selecionados
-    const [selY, selM] = (selectedMonth || currentMonthKey).split('-').map(Number);
-    const totalDaysInMonth = new Date(selY, selM, 0).getDate();
-    const isCurrentMonth = (selectedMonth === currentMonthKey);
-    const isPastMonth = (selectedMonth < currentMonthKey);
+      // Extrai ano e mês selecionados
+      const [selY, selM] = (selectedMonth || currentMonthKey).split('-').map(Number);
+      const totalDaysInMonth = new Date(selY, selM, 0).getDate();
+      const isCurrentMonth = (selectedMonth === currentMonthKey);
+      const isPastMonth = (selectedMonth < currentMonthKey);
 
     let passedDays = 0;
     let remainingDays = 0;
@@ -477,12 +481,8 @@ document.addEventListener('DOMContentLoaded', () => {
       timeElapsedPct = 0;
     }
 
-    const winRate = getPipelineWinRate();
-
     // Carrega registros
     const closerReports = getStoredCloserReports();
-    const sdrReports = getStoredSdrReports();
-
     let monthCloserReports = closerReports.filter(r => (r.date || '').startsWith(selectedMonth));
 
     // Se filtrou por um cliente específico
@@ -694,6 +694,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     renderExecRankingTable(monthCloserReports);
+    } catch (e) {
+      console.error('[Dashboard] Erro ao atualizar dashboard:', e);
+    }
   }
 
   // Tabela de Ranking Executivo da Equipe Comercial
@@ -954,6 +957,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   async function populateTopBarFilters() {
     const clients = await dbFetchClients();
+    const primaryId = localStorage.getItem('fa_primary_project_id_v1');
 
     [dashFilterClient, closerClientSelect, sdrClientSelect].forEach(selectElem => {
       if (!selectElem) return;
@@ -965,9 +969,10 @@ document.addEventListener('DOMContentLoaded', () => {
         : '<option value="">🌐 Geral / Todos os Projetos</option>';
 
       clients.forEach(c => {
+        const isPrimary = Boolean(primaryId && String(c.id) === String(primaryId));
         const opt = document.createElement('option');
         opt.value = c.id;
-        opt.textContent = `${c.name} (${c.segment || 'Geral'})`;
+        opt.textContent = isPrimary ? `⭐ ${c.name} (Principal)` : `${c.name} (${c.segment || 'Geral'})`;
         selectElem.appendChild(opt);
       });
 
