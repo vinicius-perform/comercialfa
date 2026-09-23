@@ -159,6 +159,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnEditAgain = document.getElementById('btn-edit-again');
   const btnConfirmSave = document.getElementById('btn-confirm-save');
 
+  // Modal de Confirmação para Relatório Duplicado / Adicional
+  const modalDuplicateConfirm = document.getElementById('modal-duplicate-confirm');
+  const duplicateCountText = document.getElementById('duplicate-count-text');
+  const duplicateMemberName = document.getElementById('duplicate-member-name');
+  const duplicateDateText = document.getElementById('duplicate-date-text');
+  const btnCancelDuplicate = document.getElementById('btn-cancel-duplicate');
+  const btnProceedDuplicate = document.getElementById('btn-proceed-duplicate');
+
   // Tela de Sucesso & Exportação
   const formContainer = document.getElementById('form-container');
   const successScreen = document.getElementById('success-screen');
@@ -358,12 +366,57 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
+  // CONTAGEM DE RELATÓRIOS EXISTENTES (MESMA PESSOA & DATA)
+  // ============================================================
+  function getExistingReportsCount(name, date) {
+    try {
+      const rawC = localStorage.getItem(STORAGE_CLOSER_REPORTS);
+      const closerReports = rawC ? JSON.parse(rawC) : [];
+      const rawT = localStorage.getItem(STORAGE_TEAM_REPORTS);
+      const teamReports = rawT ? JSON.parse(rawT) : [];
+
+      const matchIds = new Set();
+      closerReports.forEach(r => {
+        const rName = r ? (r.closer || r.name || r.member) : '';
+        if (r && String(rName).trim().toLowerCase() === String(name).trim().toLowerCase() && r.date === date) {
+          matchIds.add(r.id);
+        }
+      });
+      teamReports.forEach(t => {
+        const tName = t.closer || t.name || t.member;
+        if (t && String(tName).trim().toLowerCase() === String(name).trim().toLowerCase() && t.date === date) {
+          matchIds.add(t.id);
+        }
+      });
+
+      return matchIds.size;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // ============================================================
   // MODAL DE CONFERÊNCIA ("CONFIRMAR SE TÁ TUDO CORRETO")
   // ============================================================
   function openReviewModal() {
     pendingReportData = gatherCurrentReportData();
 
+    const existingCount = getExistingReportsCount(pendingReportData.name, pendingReportData.date);
+    let duplicateBanner = '';
+    if (existingCount > 0) {
+      duplicateBanner = `
+        <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 12.5px; color: #fcd34d; display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 18px;">⚠️</span>
+          <div>
+            <strong>Atenção:</strong> Já existe(m) <strong>${existingCount} relatório(s)</strong> registrado(s) para ${pendingReportData.name} nesta mesma data.
+            <div style="font-size: 11px; opacity: 0.85; margin-top: 2px;">Ao confirmar, você criará um lançamento adicional e os valores serão somados ao projeto.</div>
+          </div>
+        </div>
+      `;
+    }
+
     let html = `
+      ${duplicateBanner}
       <div class="review-info-badge">
         <div>
           <span style="color:var(--text-muted); font-size:10px; text-transform:uppercase;">MEMBRO DA EQUIPE:</span>
@@ -450,7 +503,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveReportToStorage(data) {
     if (!data) return;
 
-    const reportId = `${data.name}_${data.date}`;
+    // Garante ID único com timestamp caso já exista relatório desta pessoa nesta data
+    const rawC = localStorage.getItem(STORAGE_CLOSER_REPORTS);
+    const closerReportsList = rawC ? JSON.parse(rawC) : [];
+    const baseId = `${data.name}_${data.date}`;
+    const idTaken = closerReportsList.some(r => r.id === baseId);
+    const reportId = idTaken ? `${data.name}_${data.date}_${Date.now()}` : baseId;
     const updatedAt = new Date().toISOString();
 
     // 1. Registro Geral da Equipe
@@ -610,19 +668,54 @@ document.addEventListener('DOMContentLoaded', () => {
     cardMetricsContainer.innerHTML = metricsHtml;
   }
 
+  function executeSaveReport() {
+    if (!pendingReportData) return;
+    saveReportToStorage(pendingReportData);
+    populateExportCard(pendingReportData);
+
+    if (modalDuplicateConfirm) modalDuplicateConfirm.classList.remove('open');
+    if (modalReview) modalReview.classList.remove('open');
+    formContainer.style.display = 'none';
+    successScreen.style.display = 'block';
+
+    successMessageText.textContent = `Relatório de ${pendingReportData.name} (${formatDateBR(pendingReportData.date)}) registrado com sucesso!`;
+    showToast('Relatório salvo com sucesso!');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   if (btnConfirmSave) {
     btnConfirmSave.addEventListener('click', () => {
       if (!pendingReportData) return;
-      saveReportToStorage(pendingReportData);
-      populateExportCard(pendingReportData);
 
-      modalReview.classList.remove('open');
-      formContainer.style.display = 'none';
-      successScreen.style.display = 'block';
+      const existingCount = getExistingReportsCount(pendingReportData.name, pendingReportData.date);
+      if (existingCount > 0) {
+        if (duplicateCountText) duplicateCountText.textContent = `${existingCount} relatório(s)`;
+        if (duplicateMemberName) duplicateMemberName.textContent = pendingReportData.name;
+        if (duplicateDateText) duplicateDateText.textContent = formatDateBR(pendingReportData.date);
+        if (modalDuplicateConfirm) modalDuplicateConfirm.classList.add('open');
+      } else {
+        executeSaveReport();
+      }
+    });
+  }
 
-      successMessageText.textContent = `Relatório de ${pendingReportData.name} (${formatDateBR(pendingReportData.date)}) registrado com sucesso!`;
-      showToast('Relatório salvo com sucesso!');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (btnProceedDuplicate) {
+    btnProceedDuplicate.addEventListener('click', () => {
+      executeSaveReport();
+    });
+  }
+
+  if (btnCancelDuplicate) {
+    btnCancelDuplicate.addEventListener('click', () => {
+      if (modalDuplicateConfirm) modalDuplicateConfirm.classList.remove('open');
+    });
+  }
+
+  if (modalDuplicateConfirm) {
+    modalDuplicateConfirm.addEventListener('click', (e) => {
+      if (e.target === modalDuplicateConfirm) {
+        modalDuplicateConfirm.classList.remove('open');
+      }
     });
   }
 

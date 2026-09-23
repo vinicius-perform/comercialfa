@@ -351,6 +351,46 @@
     </div>
 
     <!-- ============================================================
+         MODAL DE CONFIRMAÇÃO PARA RELATÓRIO DUPLICADO / ADICIONAL
+         ============================================================ -->
+    <div class="modal-backdrop" id="modal-duplicate-confirm" style="z-index: 1050;">
+      <div class="modal-card" style="max-width: 480px; border: 1.5px solid rgba(245, 158, 11, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.6);">
+        <div class="modal-card-header">
+          <div class="modal-header-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title" style="color: #f59e0b;">Relatório Já Existente Para Esta Data</h3>
+            <p class="modal-subtitle">Confirmação de lançamento adicional</p>
+          </div>
+        </div>
+
+        <div class="modal-card-body" style="padding-top: 10px;">
+          <p style="font-size: 13.5px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;">
+            Atenção: Já existe(m) <strong id="duplicate-count-text" style="color: #ffffff;">1 relatório</strong> registrado por <strong id="duplicate-member-name" style="color: #ffffff;">Tales</strong> para a data de <strong id="duplicate-date-text" style="color: #a3e635;">23/09/2026</strong>.
+          </p>
+          <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 12px 14px; font-size: 12.5px; color: #fcd34d; line-height: 1.45;">
+            ⚠️ <strong>Tem certeza de que deseja gerar um novo relatório para esta mesma data?</strong><br>
+            Ao confirmar, este novo relatório será registrado de forma independente e seus resultados serão somados ao projeto no painel geral.
+          </div>
+        </div>
+
+        <div class="modal-card-actions" style="margin-top: 18px; display: flex; gap: 10px; justify-content: flex-end;">
+          <button type="button" class="btn-apple-secondary" id="btn-cancel-duplicate">
+            <span>Cancelar / Revisar</span>
+          </button>
+          <button type="button" class="btn-apple-primary" id="btn-proceed-duplicate" style="background: #f59e0b; border-color: #f59e0b; color: #000; font-weight: 700;">
+            <span>Sim, Gerar Relatório Adicional</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
          TELA DE SUCESSO & EXPORTAÇÃO (PDF / IMAGEM PNG)
          ============================================================ -->
     <div class="portal-main success-container" id="success-screen" style="display: none;">
