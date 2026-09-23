@@ -498,6 +498,45 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
+/* Aviso de Projeto Principal / Selecionado */
+.primary-badge-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  line-height: 1.4;
+  animation: fadeIn 0.25s ease;
+  transition: all 0.2s ease;
+}
+
+.primary-badge-notice.is-primary {
+  background: rgba(91, 227, 54, 0.08);
+  border: 1px solid rgba(91, 227, 54, 0.28);
+  color: var(--accent-lime);
+}
+
+.primary-badge-notice.is-primary strong {
+  color: #ffffff;
+}
+
+.primary-badge-notice.is-custom {
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  color: var(--accent-cyan);
+}
+
+.primary-badge-notice.is-custom strong {
+  color: #ffffff;
+}
+
+.primary-badge-notice .p-notice-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
 /* ==========================================================================
    BOTÕES DE AÇÃO
    ========================================================================== */

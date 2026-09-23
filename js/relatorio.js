@@ -20,20 +20,104 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSetToday = document.getElementById('btn-set-today');
   const displayTodayText = document.getElementById('display-today-text');
   const selectClientId = document.getElementById('report-client-id');
+  const primaryBadgeNotice = document.getElementById('primary-badge-notice');
+  const primaryBadgeName = document.getElementById('primary-badge-name');
 
-  // Carrega clientes cadastrados no seletor
-  if (selectClientId && typeof dbFetchClients === 'function') {
-    dbFetchClients().then(clients => {
-      if (Array.isArray(clients)) {
-        clients.forEach(c => {
-          const opt = document.createElement('option');
-          opt.value = c.id;
-          opt.textContent = `${c.name} (${c.segment || 'Geral'})`;
-          selectClientId.appendChild(opt);
-        });
-      }
-    }).catch(err => console.warn('Erro ao buscar clientes no portal:', err));
+  // ============================================================
+  // CARREGAMENTO DO PROJETO PRINCIPAL E CLIENTES NO SELETOR
+  // ============================================================
+  function showPrimaryNotice(name, isPrimary) {
+    if (!primaryBadgeNotice) return;
+    if (isPrimary) {
+      primaryBadgeNotice.className = 'primary-badge-notice is-primary';
+      primaryBadgeNotice.innerHTML = `<span class="p-notice-icon">⭐</span><span>Projeto Principal puxado automaticamente: <strong>${name}</strong></span>`;
+    } else {
+      primaryBadgeNotice.className = 'primary-badge-notice is-custom';
+      primaryBadgeNotice.innerHTML = `<span class="p-notice-icon">🏢</span><span>Projeto Selecionado: <strong>${name}</strong></span>`;
+    }
+    primaryBadgeNotice.style.display = 'flex';
   }
+
+  function hidePrimaryNotice() {
+    if (primaryBadgeNotice) primaryBadgeNotice.style.display = 'none';
+  }
+
+  async function initProjectSelector() {
+    if (!selectClientId) return;
+
+    function renderClientOptions(clients, primaryId) {
+      selectClientId.innerHTML = '<option value="">🌐 Projeto Geral / Fazendo Acontecer™</option>';
+
+      if (!Array.isArray(clients) || clients.length === 0) {
+        hidePrimaryNotice();
+        return;
+      }
+
+      let primaryClient = null;
+
+      clients.forEach(c => {
+        const isPrimary = Boolean(primaryId && String(c.id) === String(primaryId));
+        if (isPrimary) primaryClient = c;
+
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.setAttribute('data-clean-name', c.name);
+        opt.textContent = isPrimary ? `⭐ ${c.name} (Projeto Principal)` : `${c.name} (${c.segment || 'Geral'})`;
+        selectClientId.appendChild(opt);
+      });
+
+      // Puxa automaticamente o projeto principal
+      if (primaryClient) {
+        selectClientId.value = primaryClient.id;
+        showPrimaryNotice(primaryClient.name, true);
+      } else if (clients.length === 1) {
+        selectClientId.value = clients[0].id;
+        showPrimaryNotice(clients[0].name, false);
+      } else {
+        hidePrimaryNotice();
+      }
+    }
+
+    // 1. Renderiza imediatamente com dados locais para resposta instantânea
+    try {
+      const cachedClients = JSON.parse(localStorage.getItem(STORAGE_CLIENTS_KEY || 'fa_prod_clients_v1') || '[]');
+      const cachedPrimary = localStorage.getItem('fa_primary_project_id_v1');
+      if (cachedClients.length > 0) {
+        renderClientOptions(cachedClients, cachedPrimary);
+      }
+    } catch (e) {}
+
+    // 2. Sincroniza em segundo plano com o Supabase
+    try {
+      const [remoteClients, remotePrimary] = await Promise.all([
+        typeof dbFetchClients === 'function' ? dbFetchClients() : Promise.resolve([]),
+        typeof dbGetPrimaryProjectId === 'function' ? dbGetPrimaryProjectId() : Promise.resolve(localStorage.getItem('fa_primary_project_id_v1'))
+      ]);
+
+      if (Array.isArray(remoteClients) && remoteClients.length > 0) {
+        renderClientOptions(remoteClients, remotePrimary);
+      }
+    } catch (err) {
+      console.warn('Erro ao carregar clientes e projeto principal no portal:', err);
+    }
+
+    // 3. Listener para quando o usuário alterar a seleção manualmente
+    selectClientId.addEventListener('change', () => {
+      const selectedVal = selectClientId.value;
+      const currentPrimaryId = localStorage.getItem('fa_primary_project_id_v1');
+
+      if (!selectedVal) {
+        hidePrimaryNotice();
+      } else {
+        const opt = selectClientId.options[selectClientId.selectedIndex];
+        const cleanName = opt ? (opt.getAttribute('data-clean-name') || opt.textContent.replace(/^⭐\s*/, '').replace(/\s*\(Projeto Principal\)$/, '')) : '';
+        const isPrimary = Boolean(currentPrimaryId && String(selectedVal) === String(currentPrimaryId));
+        showPrimaryNotice(cleanName, isPrimary);
+      }
+    });
+  }
+
+  initProjectSelector();
 
   // Inputs das Métricas Gerais (Exatamente os 8 campos solicitados)
   const inputRepLeads = document.getElementById('rep-leads');
@@ -235,7 +319,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let clientLabel = '🌐 Geral / Fazendo Acontecer™';
     if (selectClientId && selectClientId.selectedIndex >= 0) {
       const opt = selectClientId.options[selectClientId.selectedIndex];
-      if (opt && opt.value) clientLabel = opt.textContent;
+      if (opt && opt.value) {
+        clientLabel = opt.getAttribute('data-clean-name') || opt.textContent.replace(/^⭐\s*/, '').replace(/\s*\(Projeto Principal\)$/, '');
+      }
     }
 
     return {

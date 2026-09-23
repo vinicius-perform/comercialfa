@@ -1151,6 +1151,49 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    // Identifica e valida o Projeto Principal
+    let primaryProjectId = localStorage.getItem('fa_primary_project_id_v1');
+    if (typeof dbGetPrimaryProjectId === 'function') {
+      const remotePrimary = await dbGetPrimaryProjectId();
+      if (remotePrimary) primaryProjectId = remotePrimary;
+    }
+
+    // Se existem clientes mas nenhum foi marcado como principal, define o primeiro ativo
+    if (!primaryProjectId && clients.length > 0) {
+      const defaultPrimary = clients.find(c => c.status === 'active') || clients[0];
+      if (defaultPrimary) {
+        primaryProjectId = defaultPrimary.id;
+        if (typeof dbSetPrimaryProjectId === 'function') {
+          dbSetPrimaryProjectId(primaryProjectId);
+        } else {
+          localStorage.setItem('fa_primary_project_id_v1', primaryProjectId);
+        }
+      }
+    }
+
+    // Se o ID salvo não existe mais na lista de clientes, limpa ou redefine
+    if (primaryProjectId && !clients.some(c => String(c.id) === String(primaryProjectId))) {
+      primaryProjectId = clients.length > 0 ? clients[0].id : null;
+      if (primaryProjectId) {
+        if (typeof dbSetPrimaryProjectId === 'function') dbSetPrimaryProjectId(primaryProjectId);
+      } else {
+        localStorage.removeItem('fa_primary_project_id_v1');
+      }
+    }
+
+    // Atualiza indicador de Projeto Principal na barra superior
+    const projectsPrimaryPill = document.getElementById('projects-primary-pill');
+    const projectsPrimaryName = document.getElementById('projects-primary-name');
+    if (projectsPrimaryPill && projectsPrimaryName) {
+      const primaryClientObj = clients.find(c => String(c.id) === String(primaryProjectId));
+      if (primaryClientObj) {
+        projectsPrimaryName.textContent = primaryClientObj.name;
+        projectsPrimaryPill.style.display = 'inline-flex';
+      } else {
+        projectsPrimaryPill.style.display = 'none';
+      }
+    }
+
     // Renderiza Cards
     projectsClientsContainer.innerHTML = '';
     if (clients.length === 0) {
@@ -1202,14 +1245,18 @@ document.addEventListener('DOMContentLoaded', () => {
         pct: 0
       };
 
+      const isPrimary = Boolean(primaryProjectId && String(c.id) === String(primaryProjectId));
       const card = document.createElement('div');
-      card.className = 'project-card';
+      card.className = `project-card ${isPrimary ? 'is-primary-card' : ''}`;
       card.dataset.clientId = c.id;
 
       card.innerHTML = `
         <div class="project-card-header">
           <div class="project-card-title-box">
-            <h3 class="project-card-name">${c.name}</h3>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <h3 class="project-card-name">${c.name}</h3>
+              ${isPrimary ? '<span class="badge-primary-project" title="Projeto Principal definido para novos relatórios">⭐ Principal</span>' : ''}
+            </div>
             <span class="project-card-segment">${c.segment || 'Segmento B2B'}</span>
           </div>
           <span class="project-status-pill status-${c.status || 'active'}">
@@ -1252,6 +1299,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         <div class="project-card-footer">
           <div class="project-card-actions">
+            <button type="button" class="project-btn-action btn-set-primary ${isPrimary ? 'is-active' : ''}" data-id="${c.id}" title="${isPrimary ? 'Projeto Principal atual (selecionado automaticamente nos relatórios)' : 'Definir como Projeto Principal para novos relatórios'}">
+              <svg viewBox="0 0 24 24" fill="${isPrimary ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              <span>${isPrimary ? 'Principal' : 'Tornar Principal'}</span>
+            </button>
             <button type="button" class="project-btn-action btn-client-dash" data-id="${c.id}" title="Ver métricas deste cliente no Dashboard">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -1291,6 +1344,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Eventos dos botões dos cards
+    projectsClientsContainer.querySelectorAll('.btn-set-primary').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const cId = btn.getAttribute('data-id');
+        const targetCli = clients.find(c => String(c.id) === String(cId));
+        if (!targetCli) return;
+
+        btn.disabled = true;
+        if (typeof dbSetPrimaryProjectId === 'function') {
+          await dbSetPrimaryProjectId(cId);
+        } else {
+          localStorage.setItem('fa_primary_project_id_v1', cId);
+        }
+        await renderProjectsView();
+        showToast(`⭐ Projeto "${targetCli.name}" definido como Principal para os relatórios!`);
+      });
+    });
+
     projectsClientsContainer.querySelectorAll('.btn-client-dash').forEach(btn => {
       btn.addEventListener('click', () => {
         const cId = btn.getAttribute('data-id');
@@ -1326,6 +1396,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const client = clients.find(c => c.id === cId);
         if (client && confirm(`Deseja realmente excluir o cliente "${client.name}"?`)) {
           await dbDeleteClient(cId);
+          const currentPrimary = localStorage.getItem('fa_primary_project_id_v1');
+          if (String(currentPrimary) === String(cId)) {
+            if (typeof dbSetPrimaryProjectId === 'function') {
+              await dbSetPrimaryProjectId('');
+            } else {
+              localStorage.removeItem('fa_primary_project_id_v1');
+            }
+          }
           await populateTopBarFilters();
           await renderProjectsView();
           updateExecDashboard();
@@ -1343,18 +1421,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- MODAL DE CLIENTE ---
   function openClientModal(client = null) {
     if (!modalClient) return;
+    const clientIsPrimary = document.getElementById('client-is-primary');
+    const currentPrimary = localStorage.getItem('fa_primary_project_id_v1');
+
     if (client) {
       if (modalClientTitle) modalClientTitle.textContent = 'Editar Cliente / Projeto';
       if (clientFormId) clientFormId.value = client.id;
       if (clientName) clientName.value = client.name || '';
       if (clientSegment) clientSegment.value = client.segment || '';
       if (clientStatus) clientStatus.value = client.status || 'active';
+      if (clientIsPrimary) clientIsPrimary.checked = Boolean(currentPrimary && String(client.id) === String(currentPrimary));
     } else {
       if (modalClientTitle) modalClientTitle.textContent = 'Novo Cliente / Projeto';
       if (clientFormId) clientFormId.value = '';
       if (clientName) clientName.value = '';
       if (clientSegment) clientSegment.value = '';
       if (clientStatus) clientStatus.value = 'active';
+      const hasClients = Boolean(localStorage.getItem(STORAGE_CLIENTS_KEY) && JSON.parse(localStorage.getItem(STORAGE_CLIENTS_KEY) || '[]').length > 0);
+      if (clientIsPrimary) clientIsPrimary.checked = !hasClients;
     }
     modalClient.classList.add('open');
     if (clientName) clientName.focus();
@@ -1381,6 +1465,28 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     await dbSaveClient(newClient);
+
+    // Salva ou remove o status de Projeto Principal
+    const clientIsPrimary = document.getElementById('client-is-primary');
+    if (clientIsPrimary) {
+      if (clientIsPrimary.checked) {
+        if (typeof dbSetPrimaryProjectId === 'function') {
+          await dbSetPrimaryProjectId(id);
+        } else {
+          localStorage.setItem('fa_primary_project_id_v1', id);
+        }
+      } else {
+        const currentPrimary = localStorage.getItem('fa_primary_project_id_v1');
+        if (String(currentPrimary) === String(id)) {
+          if (typeof dbSetPrimaryProjectId === 'function') {
+            await dbSetPrimaryProjectId('');
+          } else {
+            localStorage.removeItem('fa_primary_project_id_v1');
+          }
+        }
+      }
+    }
+
     closeClientModal();
     await populateTopBarFilters();
     await renderProjectsView();
@@ -1640,7 +1746,7 @@ document.addEventListener('DOMContentLoaded', () => {
     populateTopBarFilters();
     updateExecDashboard();
     renderConsolidatedHistory();
-    renderProjectsList();
+    renderProjectsView();
   }
 
   populateTopBarFilters();

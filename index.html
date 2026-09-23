@@ -483,6 +483,10 @@
               <span class="pulse-dot"></span>
               <span id="projects-active-count">Carregando clientes...</span>
             </span>
+            <span class="primary-project-header-pill" id="projects-primary-pill" style="display: none;">
+              <span class="p-star-icon">⭐</span>
+              <span>Principal: <strong id="projects-primary-name">-</strong></span>
+            </span>
           </div>
 
           <div class="top-bar-right">
@@ -679,6 +683,16 @@
               <option value="paused">⚪ Pausado / Em Espera</option>
             </select>
           </div>
+        </div>
+
+        <div class="modal-field" style="margin-top: 14px; padding: 10px 12px; background: #f8fafc; border: 1px solid var(--border-card); border-radius: var(--radius-sm);">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-dark); cursor: pointer; user-select: none;">
+            <input type="checkbox" id="client-is-primary" style="width: 16px; height: 16px; accent-color: #10b981; cursor: pointer;">
+            <span>⭐ Definir como Projeto Principal para os relatórios</span>
+          </label>
+          <span style="display: block; font-size: 11px; color: var(--text-secondary); margin-top: 4px; margin-left: 24px;">
+            Este projeto será selecionado automaticamente quando o formulário de relatórios for aberto.
+          </span>
         </div>
       </div>
 

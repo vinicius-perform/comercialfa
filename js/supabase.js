@@ -446,7 +446,7 @@ async function dbClearAllReports() {
 }
 
 // ============================================================
-// 5. CONFIGURAÇÕES GERAIS (METAS MENSAL)
+// 5. CONFIGURAÇÕES GERAIS (METAS MENSAL & PROJETO PRINCIPAL)
 // ============================================================
 async function dbFetchSettings() {
   if (supabaseClient) {
@@ -455,6 +455,7 @@ async function dbFetchSettings() {
       if (!error && Array.isArray(data)) {
         data.forEach(item => {
           if (item.key === 'monthly_goal') localStorage.setItem('fa_monthly_goal_v1', item.value);
+          if (item.key === 'primary_project_id') localStorage.setItem('fa_primary_project_id_v1', item.value);
         });
         return data;
       }
@@ -466,7 +467,8 @@ async function dbFetchSettings() {
 }
 
 async function dbSaveSetting(key, value) {
-  if (key === 'monthly_goal') localStorage.setItem('fa_monthly_goal_v1', value);
+  if (key === 'monthly_goal') localStorage.setItem('fa_monthly_goal_v1', String(value));
+  if (key === 'primary_project_id') localStorage.setItem('fa_primary_project_id_v1', String(value));
 
   if (supabaseClient) {
     try {
@@ -476,6 +478,37 @@ async function dbSaveSetting(key, value) {
     }
   }
 }
+
+async function dbGetPrimaryProjectId() {
+  let cached = localStorage.getItem('fa_primary_project_id_v1');
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient
+        .from('system_settings')
+        .select('value')
+        .eq('key', 'primary_project_id')
+        .maybeSingle();
+      if (!error && data && data.value) {
+        localStorage.setItem('fa_primary_project_id_v1', data.value);
+        return data.value;
+      }
+    } catch (e) {
+      console.warn('[Supabase] Falha ao consultar primary_project_id:', e);
+    }
+  }
+  return cached || null;
+}
+
+async function dbSetPrimaryProjectId(clientId) {
+  const cleanId = clientId ? String(clientId) : '';
+  if (cleanId) {
+    localStorage.setItem('fa_primary_project_id_v1', cleanId);
+  } else {
+    localStorage.removeItem('fa_primary_project_id_v1');
+  }
+  await dbSaveSetting('primary_project_id', cleanId);
+}
+
 
 // ============================================================
 // 6. VERIFICAÇÃO DE CREDENCIAIS DE LOGIN NO SUPABASE
@@ -552,6 +585,8 @@ window.dbDeleteSdrReport = dbDeleteSdrReport;
 window.dbClearAllReports = dbClearAllReports;
 window.dbFetchSettings = dbFetchSettings;
 window.dbSaveSetting = dbSaveSetting;
+window.dbGetPrimaryProjectId = dbGetPrimaryProjectId;
+window.dbSetPrimaryProjectId = dbSetPrimaryProjectId;
 window.dbVerifyCredentials = dbVerifyCredentials;
 
 window.checkSupabaseHealth = checkSupabaseHealth;
