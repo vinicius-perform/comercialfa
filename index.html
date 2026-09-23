@@ -153,6 +153,14 @@
                   <option value="all">🌐 Visão Consolidada (Todos os Clientes)</option>
                 </select>
               </div>
+
+              <!-- Botão Ver Resultado em Tela Cheia -->
+              <button type="button" class="btn-topbar-fullscreen" id="btn-topbar-fullscreen" title="Ver Resultado em Tela Cheia (Modo Apresentação / TV)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:14px;height:14px;">
+                  <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                </svg>
+                <span>Tela Cheia</span>
+              </button>
             </div>
           </div>
         </header>
@@ -162,7 +170,7 @@
              ============================================================ -->
         <section class="kpi-four-grid">
           <!-- Card 1: Faturamento Realizado (Hero Escuro) -->
-          <div class="kpi-card card-dark-hero">
+          <div class="kpi-card card-dark-hero" id="card-hero-faturamento" style="cursor: pointer;" title="Clique para ver resultado em Tela Cheia">
             <div class="kpi-card-top">
               <div class="kpi-badge-icon badge-lime">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -170,7 +178,15 @@
                   <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                 </svg>
               </div>
-              <span class="kpi-tag-status lime-tag" id="exec-revenue-pct">0% da meta</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="kpi-tag-status lime-tag" id="exec-revenue-pct">0% da meta</span>
+                <button type="button" class="btn-fullscreen-toggle" id="btn-open-fullscreen" title="Ver Resultado em Tela Cheia">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:12px;height:12px;">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                  </svg>
+                  <span>Tela Cheia</span>
+                </button>
+              </div>
             </div>
             <span class="kpi-card-subtitle">FATURAMENTO REALIZADO</span>
             <div class="kpi-card-value-row">
@@ -896,6 +912,158 @@
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             <span>Baixar Imagem (PNG)</span>
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODO TELA CHEIA: APRESENTAÇÃO DE FATURAMENTO & RESULTADOS (TV / WAR ROOM)
+       ============================================================ -->
+  <div class="fullscreen-overlay" id="fullscreen-overlay" style="display: none;">
+    <div class="fs-backdrop-glow"></div>
+
+    <!-- Header da Tela Cheia -->
+    <header class="fs-header">
+      <div class="fs-brand">
+        <img src="assets/logo-sidebar.png" alt="FAZENDO ACONTECER™" class="fs-logo">
+        <div>
+          <span class="fs-brand-title">PAINEL COMERCIAL EXECUTIVO</span>
+          <div class="fs-live-badge">
+            <span class="fs-live-dot"></span>
+            <span>RESULTADOS EM TEMPO REAL</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projeto Selecionado -->
+      <div class="fs-project-badge" id="fs-project-name">
+        ⭐ Projeto Principal
+      </div>
+
+      <!-- Ações e Relógio -->
+      <div class="fs-header-right">
+        <div class="fs-clock" id="fs-live-clock">
+          Carregando horário...
+        </div>
+        <button type="button" class="fs-action-btn" id="btn-fs-toggle-native" title="Alternar Fullscreen Nativo da Tela">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:14px;height:14px;">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+          <span>Expandir</span>
+        </button>
+        <button type="button" class="fs-action-btn fs-close-btn" id="btn-close-fullscreen" title="Fechar Tela Cheia (ESC)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          <span>Sair (ESC)</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Conteúdo da Tela Cheia -->
+    <div class="fs-content">
+      <!-- HERO PRINCIPAL: FATURAMENTO REALIZADO -->
+      <div class="fs-hero-card">
+        <div class="fs-hero-header">
+          <div class="fs-hero-tag">
+            <span class="fs-tag-icon">💰</span>
+            <span>FATURAMENTO REALIZADO NO MÊS</span>
+          </div>
+          <div class="fs-pct-pill" id="fs-revenue-pct">
+            0% DA META
+          </div>
+        </div>
+
+        <!-- Valor Gigante com Glow Neon -->
+        <div class="fs-big-value" id="fs-revenue-total">
+          R$ 0,00
+        </div>
+
+        <!-- Barra de Progresso com Glow -->
+        <div class="fs-progress-wrapper">
+          <div class="fs-progress-bar-bg">
+            <div class="fs-progress-bar-fill" id="fs-progress-fill" style="width: 0%;"></div>
+          </div>
+          <div class="fs-progress-markers">
+            <span>0%</span>
+            <span>25%</span>
+            <span>50%</span>
+            <span>75%</span>
+            <span>100% (META ALCANÇADA)</span>
+          </div>
+        </div>
+
+        <!-- Detalhes da Meta Financeira -->
+        <div class="fs-hero-footer">
+          <div class="fs-footer-stat">
+            <span class="fs-stat-label">META DO MÊS</span>
+            <strong class="fs-stat-val" id="fs-goal-total">R$ 100.000,00</strong>
+          </div>
+          <div class="fs-footer-stat">
+            <span class="fs-stat-label">RESTANTE / GAP</span>
+            <strong class="fs-stat-val" id="fs-gap-total" style="color: #fcd34d;">R$ 0,00</strong>
+          </div>
+          <div class="fs-footer-stat">
+            <span class="fs-stat-label">VENDAS FECHADAS</span>
+            <strong class="fs-stat-val" id="fs-sales-count" style="color: #5be336;">0 fechadas</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRID INFERIOR COM 4 PILARES COMERCIAIS -->
+      <div class="fs-pillars-grid">
+        <!-- Pilar 1: Contratos Enviados -->
+        <div class="fs-pillar-card">
+          <div class="fs-pillar-top">
+            <div class="fs-pillar-icon" style="color:#60a5fa; background:rgba(96,165,250,0.12);">
+              📄
+            </div>
+            <span class="fs-pillar-pill" id="fs-contracts-count">0 emitido(s)</span>
+          </div>
+          <span class="fs-pillar-title">CONTRATOS ENVIADOS</span>
+          <div class="fs-pillar-value" id="fs-contracts-total">R$ 0,00</div>
+          <div class="fs-pillar-sub" id="fs-contracts-avg">Ticket médio: R$ 0,00</div>
+        </div>
+
+        <!-- Pilar 2: Projeção Final (Run-Rate Forecast) -->
+        <div class="fs-pillar-card">
+          <div class="fs-pillar-top">
+            <div class="fs-pillar-icon" style="color:#a3e635; background:rgba(163,230,53,0.12);">
+              📈
+            </div>
+            <span class="fs-pillar-pill" id="fs-projection-meta-pct">0% da meta</span>
+          </div>
+          <span class="fs-pillar-title">PROJEÇÃO FINAL DO MÊS</span>
+          <div class="fs-pillar-value highlight-lime" id="fs-projection-total">R$ 0,00</div>
+          <div class="fs-pillar-sub">Estimativa calculada no ritmo atual</div>
+        </div>
+
+        <!-- Pilar 3: Andamento & Pacing do Mês -->
+        <div class="fs-pillar-card">
+          <div class="fs-pillar-top">
+            <div class="fs-pillar-icon" style="color:#f59e0b; background:rgba(245,158,11,0.12);">
+              ⚡
+            </div>
+            <span class="fs-pillar-pill" id="fs-pacing-status">Calculando...</span>
+          </div>
+          <span class="fs-pillar-title">RITMO COMERCIAL (PACING)</span>
+          <div class="fs-pillar-value" id="fs-pacing-days">Dia X do mês</div>
+          <div class="fs-pillar-sub" id="fs-pacing-sub">Tempo decorrido do mês</div>
+        </div>
+
+        <!-- Pilar 4: Reuniões & Conversão de Vendas -->
+        <div class="fs-pillar-card">
+          <div class="fs-pillar-top">
+            <div class="fs-pillar-icon" style="color:#c084fc; background:rgba(192,132,252,0.12);">
+              🎯
+            </div>
+            <span class="fs-pillar-pill" id="fs-conv-rate">0% conversão</span>
+          </div>
+          <span class="fs-pillar-title">REUNIÕES & CONVERSÃO</span>
+          <div class="fs-pillar-value" id="fs-meetings-total">0 reuniões</div>
+          <div class="fs-pillar-sub" id="fs-meetings-sub">0 agendadas • 0 realizadas</div>
         </div>
       </div>
     </div>

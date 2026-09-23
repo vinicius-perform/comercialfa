@@ -3486,3 +3486,423 @@ html.auth-locked .auth-overlay {
   color: #64748b;
 }
 
+/* ==========================================================================
+   TELA CHEIA / MODO APRESENTAÇÃO (WAR ROOM / TV DE VENDAS)
+   ========================================================================== */
+
+/* Botões de acionamento no card de Faturamento e Topbar */
+.btn-fullscreen-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-fullscreen-toggle:hover {
+  background: rgba(91, 227, 54, 0.22);
+  border-color: rgba(91, 227, 54, 0.5);
+  color: var(--accent-lime);
+  transform: translateY(-1px);
+}
+
+.btn-topbar-fullscreen {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  color: var(--text-dark);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.btn-topbar-fullscreen:hover {
+  background: var(--text-dark);
+  color: #ffffff;
+  border-color: var(--text-dark);
+  transform: translateY(-1px);
+}
+
+/* Overlay Principal de Tela Cheia */
+.fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: #080c14;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif);
+  animation: fsFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fsFadeIn {
+  from { opacity: 0; transform: scale(0.985); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Efeito de iluminação de fundo / ambient glow */
+.fs-backdrop-glow {
+  position: fixed;
+  top: -15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 500px;
+  background: radial-gradient(ellipse at center, rgba(91, 227, 54, 0.18) 0%, rgba(91, 227, 54, 0.04) 45%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Header da Tela Cheia */
+.fs-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 36px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 12, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.fs-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.fs-logo {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+}
+
+.fs-brand-title {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #ffffff;
+  display: block;
+}
+
+.fs-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-lime);
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+.fs-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-lime);
+  box-shadow: 0 0 10px var(--accent-lime);
+  animation: pulseDot 1.8s infinite;
+}
+
+.fs-project-badge {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px 18px;
+  border-radius: 24px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.fs-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fs-clock {
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.fs-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fs-action-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.fs-close-btn:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+/* Conteúdo da Tela Cheia */
+.fs-content {
+  position: relative;
+  z-index: 1;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 36px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  justify-content: center;
+}
+
+/* Card Hero Gigante */
+.fs-hero-card {
+  background: linear-gradient(180deg, #101726 0%, #0c121e 100%);
+  border: 1.5px solid rgba(91, 227, 54, 0.35);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(91, 227, 54, 0.12);
+  border-radius: 24px;
+  padding: 34px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.fs-hero-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fs-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.fs-tag-icon {
+  font-size: 16px;
+}
+
+.fs-pct-pill {
+  background: rgba(91, 227, 54, 0.16);
+  border: 1px solid rgba(91, 227, 54, 0.4);
+  color: var(--accent-lime);
+  font-size: 14px;
+  font-weight: 800;
+  padding: 6px 16px;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 16px rgba(91, 227, 54, 0.2);
+}
+
+.fs-big-value {
+  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif);
+  font-size: clamp(48px, 6.2vw, 84px);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--accent-lime);
+  text-shadow: 0 4px 30px rgba(91, 227, 54, 0.35);
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  margin: 4px 0;
+}
+
+/* Barra de Progresso com Marcadores */
+.fs-progress-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.fs-progress-bar-bg {
+  width: 100%;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+}
+
+.fs-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #34d399 0%, #5be336 60%, #a3e635 100%);
+  border-radius: 10px;
+  box-shadow: 0 0 16px rgba(91, 227, 54, 0.6);
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fs-progress-markers {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.02em;
+}
+
+/* Rodapé do Hero com Metas */
+.fs-hero-footer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.fs-footer-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fs-stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #8da2bd;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fs-stat-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Grid Inferior com 4 Pilares Comerciais */
+.fs-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 960px) {
+  .fs-pillars-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .fs-header {
+    padding: 16px 20px;
+  }
+  .fs-content {
+    padding: 20px;
+  }
+}
+
+.fs-pillar-card {
+  background: #0f1523;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+
+.fs-pillar-card:hover {
+  background: #141c2e;
+  border-color: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
+}
+
+.fs-pillar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fs-pillar-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.fs-pillar-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.fs-pillar-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #8da2bd;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.fs-pillar-value {
+  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif);
+  font-size: 26px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.fs-pillar-value.highlight-lime {
+  color: var(--accent-lime);
+}
+
+.fs-pillar-sub {
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: auto;
+}
+
