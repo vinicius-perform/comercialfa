@@ -383,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
       teamReports.forEach(t => {
-        const tName = t.closer || t.name || t.member;
+        const tName = t ? (t.closer || t.name || t.member) : '';
         if (t && String(tName).trim().toLowerCase() === String(name).trim().toLowerCase() && t.date === date) {
           matchIds.add(t.id);
         }

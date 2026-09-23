@@ -352,21 +352,22 @@ document.addEventListener('DOMContentLoaded', () => {
       // 2. Adiciona registros de teamReports que não constavam para garantir que nada seja perdido
       if (Array.isArray(teamReports)) {
         teamReports.forEach(t => {
-          if (t && t.id && !reportMap.has(t.id) && t.name !== 'Muller') {
+          const tName = t ? (t.closer || t.name || t.member) : '';
+          if (t && t.id && !reportMap.has(t.id) && tName !== 'Muller') {
             reportMap.set(t.id, {
               id: t.id,
-              closer: t.name,
+              closer: tName,
               clientId: t.clientId || null,
               clientLabel: t.clientLabel || null,
               date: t.date,
               leads: t.leads || 0,
               followups: t.followups || 0,
               prospeccoes: t.prospeccoes || 0,
-              meetingsScheduled: t.scheduled || 0,
-              meetingsHeld: t.held || 0,
+              meetingsScheduled: t.meetingsScheduled || t.scheduled || 0,
+              meetingsHeld: t.meetingsHeld || t.held || 0,
               sales: t.sales || 0,
-              contractVal: t.contracts || 'R$ 0,00',
-              cashCollected: t.cash || 'R$ 0,00',
+              contractVal: t.contractVal || t.contracts || 'R$ 0,00',
+              cashCollected: t.cashCollected || t.cash || 'R$ 0,00',
               convRate: t.convRate,
               totalEffort: t.totalEffort,
               updatedAt: t.timestamp || t.updatedAt
@@ -2163,11 +2164,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   async function loadDataFromSupabase() {
     try {
-      if (typeof dbFetchSettings === 'function') await dbFetchSettings();
-      if (typeof dbFetchClients === 'function') await dbFetchClients();
-      if (typeof dbFetchPlannings === 'function') await dbFetchPlannings();
-      if (typeof dbFetchCloserReports === 'function') await dbFetchCloserReports();
-      if (typeof dbGetPrimaryProjectId === 'function') await dbGetPrimaryProjectId();
+      await Promise.allSettled([
+        typeof dbFetchSettings === 'function' ? dbFetchSettings() : Promise.resolve(),
+        typeof dbFetchClients === 'function' ? dbFetchClients() : Promise.resolve(),
+        typeof dbFetchPlannings === 'function' ? dbFetchPlannings() : Promise.resolve(),
+        typeof dbFetchCloserReports === 'function' ? dbFetchCloserReports() : Promise.resolve(),
+        typeof dbGetPrimaryProjectId === 'function' ? dbGetPrimaryProjectId() : Promise.resolve()
+      ]);
     } catch (e) {
       console.warn('[Supabase Sync] Falha ao sincronizar com o banco:', e);
     }
