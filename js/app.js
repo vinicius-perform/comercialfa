@@ -221,34 +221,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- ELEMENTOS DO MODO TELA CHEIA (WAR ROOM / APRESENTAÇÃO) ---
   const fullscreenOverlay = document.getElementById('fullscreen-overlay');
   const btnOpenFullscreen = document.getElementById('btn-open-fullscreen');
+  const btnOpenFullscreenContratos = document.getElementById('btn-open-fullscreen-contratos');
   const btnTopbarFullscreen = document.getElementById('btn-topbar-fullscreen');
   const cardHeroFaturamento = document.getElementById('card-hero-faturamento');
+  const cardHeroContratos = document.getElementById('card-hero-contratos');
   const btnCloseFullscreen = document.getElementById('btn-close-fullscreen');
   const btnFsToggleNative = document.getElementById('btn-fs-toggle-native');
   const fsLiveClock = document.getElementById('fs-live-clock');
   const fsProjectName = document.getElementById('fs-project-name');
-
   const fsRevenueTotal = document.getElementById('fs-revenue-total');
-  const fsRevenuePct = document.getElementById('fs-revenue-pct');
-  const fsProgressFill = document.getElementById('fs-progress-fill');
-  const fsGoalTotal = document.getElementById('fs-goal-total');
-  const fsGapTotal = document.getElementById('fs-gap-total');
-  const fsSalesCount = document.getElementById('fs-sales-count');
-
-  const fsContractsTotal = document.getElementById('fs-contracts-total');
-  const fsContractsCount = document.getElementById('fs-contracts-count');
-  const fsContractsAvg = document.getElementById('fs-contracts-avg');
-
-  const fsProjectionTotal = document.getElementById('fs-projection-total');
-  const fsProjectionMetaPct = document.getElementById('fs-projection-meta-pct');
-
-  const fsPacingStatus = document.getElementById('fs-pacing-status');
-  const fsPacingDays = document.getElementById('fs-pacing-days');
-  const fsPacingSub = document.getElementById('fs-pacing-sub');
-
-  const fsMeetingsTotal = document.getElementById('fs-meetings-total');
-  const fsMeetingsSub = document.getElementById('fs-meetings-sub');
-  const fsConvRate = document.getElementById('fs-conv-rate');
+  const fsSalesSub = document.getElementById('fs-sales-sub');
 
   let latestDashboardData = null;
   let fsClockInterval = null;
@@ -1390,41 +1372,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!latestDashboardData) return;
     const d = latestDashboardData;
 
-    if (fsProjectName) fsProjectName.textContent = d.clientLabel || '⭐ Projeto Principal';
-    if (fsRevenueTotal) fsRevenueTotal.textContent = formatNumberToMoney(d.revenue || 0);
-    if (fsRevenuePct) fsRevenuePct.textContent = `${d.goalPct || 0}% DA META`;
-    if (fsProgressFill) fsProgressFill.style.width = `${Math.min(100, Math.max(0, d.goalPct || 0))}%`;
-    if (fsGoalTotal) fsGoalTotal.textContent = formatNumberToMoney(d.goal || 0);
-
-    if (fsGapTotal) {
-      if ((d.gap || 0) <= 0 && (d.revenue || 0) > 0) {
-        fsGapTotal.textContent = '🎉 META BATIDA!';
-        fsGapTotal.style.color = '#5be336';
-      } else {
-        fsGapTotal.textContent = formatNumberToMoney(d.gap || 0);
-        fsGapTotal.style.color = '#fcd34d';
-      }
+    if (fsProjectName) {
+      fsProjectName.textContent = d.clientLabel || '⭐ Projeto Principal';
     }
 
-    if (fsSalesCount) {
-      fsSalesCount.textContent = `${d.sales || 0} ${d.sales === 1 ? 'venda' : 'vendas'}`;
+    // Exibe o valor de contratos bem cheio em verde, simulando como valor de vendas do mês
+    const contractVal = d.contracts || 0;
+    if (fsRevenueTotal) {
+      fsRevenueTotal.textContent = formatNumberToMoney(contractVal);
     }
 
-    if (fsContractsTotal) fsContractsTotal.textContent = formatNumberToMoney(d.contracts || 0);
-    if (fsContractsCount) fsContractsCount.textContent = `${d.contractCount || 0} emitido(s)`;
-    if (fsContractsAvg) fsContractsAvg.textContent = `Ticket médio: ${formatNumberToMoney(d.contractAvg || 0)}`;
-
-    if (fsProjectionTotal) fsProjectionTotal.textContent = formatNumberToMoney(d.projected || 0);
-    if (fsProjectionMetaPct) fsProjectionMetaPct.textContent = `${d.projectedPct || 0}% da meta`;
-
-    if (fsPacingStatus) fsPacingStatus.textContent = d.pacingText || 'Ritmo Comercial';
-    if (fsPacingDays) fsPacingDays.textContent = `Dia ${d.passedDays || 1} de ${d.totalDays || 30}`;
-    const pctDays = d.totalDays > 0 ? Math.round(((d.passedDays || 1) / d.totalDays) * 100) : 0;
-    if (fsPacingSub) fsPacingSub.textContent = `${pctDays}% do mês transcorrido`;
-
-    if (fsMeetingsTotal) fsMeetingsTotal.textContent = `${d.meetingsHeld || 0} realizadas`;
-    if (fsMeetingsSub) fsMeetingsSub.textContent = `${d.meetingsScheduled || 0} agendadas • ${d.meetingsHeld || 0} realizadas`;
-    if (fsConvRate) fsConvRate.textContent = `${d.convRate || 0}% conversão`;
+    const fsSalesSub = document.getElementById('fs-sales-sub');
+    if (fsSalesSub) {
+      const clientName = d.clientLabel && !d.clientLabel.includes('Visão Consolidada') ? d.clientLabel : 'Operação Comercial';
+      fsSalesSub.textContent = `Total consolidado de vendas • ${clientName}`;
+    }
   }
 
   function openFullscreenMode() {
@@ -1468,12 +1430,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (btnOpenFullscreenContratos) {
+    btnOpenFullscreenContratos.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openFullscreenMode();
+    });
+  }
+
   if (btnTopbarFullscreen) {
     btnTopbarFullscreen.addEventListener('click', openFullscreenMode);
   }
 
   if (cardHeroFaturamento) {
     cardHeroFaturamento.addEventListener('click', () => {
+      openFullscreenMode();
+    });
+  }
+
+  if (cardHeroContratos) {
+    cardHeroContratos.addEventListener('click', () => {
       openFullscreenMode();
     });
   }

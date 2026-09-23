@@ -3559,12 +3559,12 @@ html.auth-locked .auth-overlay {
 /* Efeito de iluminação de fundo / ambient glow */
 .fs-backdrop-glow {
   position: fixed;
-  top: -15%;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  width: 900px;
-  height: 500px;
-  background: radial-gradient(ellipse at center, rgba(91, 227, 54, 0.18) 0%, rgba(91, 227, 54, 0.04) 45%, transparent 70%);
+  transform: translate(-50%, -50%);
+  width: min(1200px, 90vw);
+  height: min(700px, 70vh);
+  background: radial-gradient(ellipse at center, rgba(91, 227, 54, 0.24) 0%, rgba(91, 227, 54, 0.08) 45%, transparent 75%);
   pointer-events: none;
   z-index: 0;
 }
@@ -3679,230 +3679,102 @@ html.auth-locked .auth-overlay {
   color: #ef4444;
 }
 
-/* Conteúdo da Tela Cheia */
-.fs-content {
+/* Conteúdo de Foco Único em Vendas (Sem Cards ao redor) */
+.fs-content.fs-single-mode {
   position: relative;
   z-index: 1;
-  max-width: 1240px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 32px 36px 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 26px;
-  justify-content: center;
-}
-
-/* Card Hero Gigante */
-.fs-hero-card {
-  background: linear-gradient(180deg, #101726 0%, #0c121e 100%);
-  border: 1.5px solid rgba(91, 227, 54, 0.35);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(91, 227, 54, 0.12);
-  border-radius: 24px;
-  padding: 34px 44px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  position: relative;
-  overflow: hidden;
-}
-
-.fs-hero-header {
+  flex: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+  width: 100%;
 }
 
-.fs-hero-tag {
+.fs-single-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.fs-single-tag {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #94a3b8;
-  text-transform: uppercase;
-}
-
-.fs-tag-icon {
-  font-size: 16px;
-}
-
-.fs-pct-pill {
-  background: rgba(91, 227, 54, 0.16);
-  border: 1px solid rgba(91, 227, 54, 0.4);
+  gap: 10px;
+  padding: 10px 24px;
+  border-radius: 40px;
+  background: rgba(91, 227, 54, 0.12);
+  border: 1px solid rgba(91, 227, 54, 0.35);
   color: var(--accent-lime);
   font-size: 14px;
   font-weight: 800;
-  padding: 6px 16px;
-  border-radius: 20px;
-  letter-spacing: 0.02em;
-  box-shadow: 0 0 16px rgba(91, 227, 54, 0.2);
-}
-
-.fs-big-value {
-  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif);
-  font-size: clamp(48px, 6.2vw, 84px);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  color: var(--accent-lime);
-  text-shadow: 0 4px 30px rgba(91, 227, 54, 0.35);
-  line-height: 1.05;
-  font-variant-numeric: tabular-nums;
-  margin: 4px 0;
-}
-
-/* Barra de Progresso com Marcadores */
-.fs-progress-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 4px 0;
-}
-
-.fs-progress-bar-bg {
-  width: 100%;
-  height: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  position: relative;
-}
-
-.fs-progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #34d399 0%, #5be336 60%, #a3e635 100%);
-  border-radius: 10px;
-  box-shadow: 0 0 16px rgba(91, 227, 54, 0.6);
-  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.fs-progress-markers {
-  display: flex;
-  justify-content: space-between;
-  font-size: 10.5px;
-  font-weight: 600;
-  color: #64748b;
-  letter-spacing: 0.02em;
-}
-
-/* Rodapé do Hero com Metas */
-.fs-hero-footer {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.fs-footer-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.fs-stat-label {
-  font-size: 10px;
-  font-weight: 700;
-  color: #8da2bd;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  box-shadow: 0 0 28px rgba(91, 227, 54, 0.18);
+  user-select: none;
 }
 
-.fs-stat-val {
-  font-size: 20px;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.02em;
+.fs-tag-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent-lime);
+  box-shadow: 0 0 12px var(--accent-lime);
+  animation: pulseDot 1.8s infinite;
+}
+
+.fs-giant-number {
+  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif);
+  font-size: clamp(68px, 12.5vw, 160px);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: var(--accent-lime);
+  text-shadow: 0 0 50px rgba(91, 227, 54, 0.5), 0 0 110px rgba(91, 227, 54, 0.22);
   font-variant-numeric: tabular-nums;
+  margin: 8px 0;
+  user-select: none;
+  animation: fsPulseGlow 3s ease-in-out infinite alternate;
 }
 
-/* Grid Inferior com 4 Pilares Comerciais */
-.fs-pillars-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-}
-
-@media (max-width: 960px) {
-  .fs-pillars-grid {
-    grid-template-columns: repeat(2, 1fr);
+@keyframes fsPulseGlow {
+  0% {
+    text-shadow: 0 0 40px rgba(91, 227, 54, 0.4), 0 0 90px rgba(91, 227, 54, 0.18);
+    transform: scale(1);
   }
+  100% {
+    text-shadow: 0 0 60px rgba(91, 227, 54, 0.65), 0 0 130px rgba(91, 227, 54, 0.3);
+    transform: scale(1.012);
+  }
+}
+
+.fs-single-sub {
+  font-size: 16px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
   .fs-header {
     padding: 16px 20px;
+    flex-wrap: wrap;
+    gap: 12px;
   }
-  .fs-content {
-    padding: 20px;
+  .fs-project-badge {
+    order: 3;
+    width: 100%;
+    text-align: center;
   }
-}
-
-.fs-pillar-card {
-  background: #0f1523;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 16px;
-  padding: 20px 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transition: all 0.25s ease;
-}
-
-.fs-pillar-card:hover {
-  background: #141c2e;
-  border-color: rgba(255, 255, 255, 0.16);
-  transform: translateY(-2px);
-}
-
-.fs-pillar-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.fs-pillar-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-}
-
-.fs-pillar-pill {
-  font-size: 11px;
-  font-weight: 700;
-  color: #cbd5e1;
-  background: rgba(255, 255, 255, 0.06);
-  padding: 3px 10px;
-  border-radius: 12px;
-}
-
-.fs-pillar-title {
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #8da2bd;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.fs-pillar-value {
-  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif);
-  font-size: 26px;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-}
-
-.fs-pillar-value.highlight-lime {
-  color: var(--accent-lime);
-}
-
-.fs-pillar-sub {
-  font-size: 11.5px;
-  color: #64748b;
-  margin-top: auto;
+  .fs-giant-number {
+    font-size: clamp(48px, 13vw, 84px);
+  }
 }
 
