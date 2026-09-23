@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   const closersList = ['Tales', 'José', 'Elinaldo'];
   
-  let currentCloser = 'Tales';
   let currentView = 'view-dashboard';
 
   // Chaves do LocalStorage de Produção
@@ -55,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const views = {
     'view-dashboard': document.getElementById('view-dashboard'),
     'view-projects': document.getElementById('view-projects'),
-    'view-closers': document.getElementById('view-closers'),
     'view-history': document.getElementById('view-history')
   };
 
@@ -63,17 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const navLinks = {
     'view-dashboard': document.getElementById('nav-dashboard'),
     'view-projects': document.getElementById('nav-projects'),
-    'view-closers': document.getElementById('nav-closers'),
     'view-history': document.getElementById('nav-history')
   };
 
-  const closerChips = document.querySelectorAll('.closer-chip');
-
-  // Botões de navegação rápida
-  const btnQuickGotoCloser = document.getElementById('btn-quick-goto-closer');
+  // Botão de navegação rápida
   const btnCopyTeamLink = document.getElementById('btn-copy-team-link');
-  const bannerGoCloser = document.getElementById('banner-go-closer');
-  const btnCloserToDashboard = document.getElementById('btn-closer-to-dashboard');
 
   // Toast Container
   const toastContainer = document.getElementById('toast-container');
@@ -172,41 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCancelPlanning = document.getElementById('btn-cancel-planning');
   const btnSavePlanning = document.getElementById('btn-save-planning');
 
-
-  // --- ELEMENTOS DO HUB DE CLOSERS ---
-  const dateInput = document.getElementById('report-date');
-  if (dateInput) dateInput.value = formattedToday;
-
-  const headerCloserName = document.getElementById('header-closer-name');
-  const printCloserName = document.getElementById('print-closer-name');
-  const printReportDate = document.getElementById('print-report-date');
-  const btnPdfLabel = document.getElementById('btn-pdf-label');
-
-  const kpiSalesNum = document.getElementById('kpi-sales-num');
-  const kpiSalesSub = document.getElementById('kpi-sales-sub');
-  const kpiContractNum = document.getElementById('kpi-contract-num');
-  const kpiCashNum = document.getElementById('kpi-cash-num');
-
-  const inputLeads = document.getElementById('input-leads');
-  const inputFollowups = document.getElementById('input-followups');
-  const inputProspeccoes = document.getElementById('input-prospeccoes');
-  const inputMeetingsScheduled = document.getElementById('input-meetings-scheduled');
-  const inputMeetingsHeld = document.getElementById('input-meetings-held');
-  const inputSales = document.getElementById('input-sales');
-  const inputContractVal = document.getElementById('input-contract-val');
-  const inputCashCollected = document.getElementById('input-cash-collected');
-
-  const closerSegmentedBtns = document.querySelectorAll('.closer-selector-segmented .segmented-btn');
-
-  const bubbleConversionRate = document.getElementById('bubble-conversion-rate');
-  const bubbleAttendanceRate = document.getElementById('bubble-attendance-rate');
-  const bubbleEffortTotal = document.getElementById('bubble-effort-total');
-  const compBarSales = document.getElementById('comp-bar-sales');
-  const compBarMeetings = document.getElementById('comp-bar-meetings');
-
-  const btnGeneratePdf = document.getElementById('btn-generate-pdf');
-  const btnSaveLog = document.getElementById('btn-save-log');
-  const btnResetForm = document.getElementById('btn-reset-form');
 
   // --- ELEMENTOS DO HISTÓRICO CONSOLIDADO ---
   const historyTotalCount = document.getElementById('history-total-count');
@@ -327,8 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  setupCurrencyInput(inputContractVal);
-  setupCurrencyInput(inputCashCollected);
   setupCurrencyInput(settingMonthlyGoal);
   setupCurrencyInput(planRevenueGoal);
 
@@ -434,8 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (viewId === 'view-projects') {
       renderProjectsView();
 
-    } else if (viewId === 'view-closers') {
-      loadDayData();
+
     } else if (viewId === 'view-history') {
       renderConsolidatedHistory();
     }
@@ -452,9 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Atalhos de navegação no Dashboard
-  if (btnQuickGotoCloser) {
-    btnQuickGotoCloser.addEventListener('click', () => showView('view-closers'));
-  }
+
   if (btnCopyTeamLink) {
     btnCopyTeamLink.addEventListener('click', () => {
       const currentUrl = window.location.href;
@@ -479,13 +431,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (bannerGoCloser) {
-    bannerGoCloser.addEventListener('click', () => showView('view-closers'));
-  }
 
-  if (btnCloserToDashboard) {
-    btnCloserToDashboard.addEventListener('click', () => showView('view-dashboard'));
-  }
+
+
 
   // Sincronização automática quando relatórios forem enviados pela equipe no portal relatorio.html
   window.addEventListener('storage', (e) => {
@@ -844,195 +792,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
-  // HUB DOS CLOSERS • LÓGICA & EMISSÃO DE PDF A4
-  // ============================================================
-  function selectCloser(closerName) {
-    currentCloser = closerName;
-
-    closerChips.forEach(chip => {
-      if (chip.dataset.closer === closerName) {
-        chip.classList.add('active');
-      } else {
-        chip.classList.remove('active');
-      }
-    });
-
-    closerSegmentedBtns.forEach(btn => {
-      if (btn.dataset.closer === closerName) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-
-    if (headerCloserName) headerCloserName.textContent = closerName;
-    if (btnPdfLabel) btnPdfLabel.textContent = `GERAR RELATÓRIO DE ${closerName.toUpperCase()} (PDF)`;
-    if (printCloserName) printCloserName.innerHTML = `Nome: <strong>${closerName.toUpperCase()}</strong>`;
-
-    loadDayData();
-  }
-
-  closerChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      showView('view-closers');
-      selectCloser(chip.dataset.closer);
-    });
-  });
-
-  closerSegmentedBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      selectCloser(btn.dataset.closer);
-    });
-  });
-
-  function updateCloserDashboard() {
-    const leads = Math.max(0, parseInt(inputLeads.value, 10) || 0);
-    const followups = Math.max(0, parseInt(inputFollowups.value, 10) || 0);
-    const prospeccoes = Math.max(0, parseInt(inputProspeccoes.value, 10) || 0);
-    const scheduled = Math.max(0, parseInt(inputMeetingsScheduled.value, 10) || 0);
-    const held = Math.max(0, parseInt(inputMeetingsHeld.value, 10) || 0);
-    const sales = Math.max(0, parseInt(inputSales.value, 10) || 0);
-
-    const formattedContract = formatMoneyString(inputContractVal.value);
-    const formattedCash = formatMoneyString(inputCashCollected.value);
-    const totalEffort = followups + prospeccoes;
-
-    if (kpiSalesNum) kpiSalesNum.textContent = `${sales} un`;
-    if (kpiSalesSub) kpiSalesSub.textContent = `${sales} nova(s)`;
-    if (kpiContractNum) kpiContractNum.textContent = formattedContract;
-    if (kpiCashNum) kpiCashNum.textContent = formattedCash;
-
-    const attendanceRate = scheduled > 0 ? Math.min(100, Math.round((held / scheduled) * 100)) : (held > 0 ? 100 : 0);
-    const conversionRate = held > 0 ? Math.min(100, Math.round((sales / held) * 100)) : (sales > 0 ? 100 : 0);
-
-    if (bubbleConversionRate) bubbleConversionRate.textContent = `${conversionRate}%`;
-    if (bubbleAttendanceRate) bubbleAttendanceRate.textContent = `${attendanceRate}%`;
-    if (bubbleEffortTotal) bubbleEffortTotal.textContent = totalEffort;
-
-    if (compBarSales) {
-      const salesPct = Math.min(100, sales > 0 ? Math.max(25, sales * 33) : 10);
-      compBarSales.style.width = `${salesPct}%`;
-    }
-    if (compBarMeetings) {
-      const meetPct = scheduled > 0 ? Math.min(100, Math.max(20, (held / scheduled) * 100)) : 15;
-      compBarMeetings.style.width = `${meetPct}%`;
-    }
-
-    const selectedDate = dateInput ? dateInput.value : formattedToday;
-    if (printReportDate) printReportDate.innerHTML = `Data: <strong>${formatDateBR(selectedDate)}</strong>`;
-
-    [inputLeads, inputFollowups, inputProspeccoes, inputMeetingsScheduled, inputMeetingsHeld, inputSales, inputContractVal, inputCashCollected].forEach(input => {
-      if (input) input.setAttribute('value', input.value);
-    });
-  }
-
-  [inputLeads, inputFollowups, inputProspeccoes, inputMeetingsScheduled, inputMeetingsHeld, inputSales, inputContractVal, inputCashCollected].forEach(input => {
-    if (input) {
-      input.addEventListener('input', updateCloserDashboard);
-    }
-  });
-
-  if (dateInput) {
-    dateInput.addEventListener('change', () => {
-      loadDayData();
-    });
-  }
-
-  function loadDayData() {
-    const selectedDate = dateInput ? dateInput.value : formattedToday;
-    const reports = getStoredCloserReports();
-    const entry = reports.find(r => r.closer === currentCloser && r.date === selectedDate);
-
-    if (entry) {
-      inputLeads.value = entry.leads ?? 0;
-      inputFollowups.value = entry.followups ?? 0;
-      inputProspeccoes.value = entry.prospeccoes ?? 0;
-      inputMeetingsScheduled.value = entry.meetingsScheduled ?? 0;
-      inputMeetingsHeld.value = entry.meetingsHeld ?? 0;
-      inputSales.value = entry.sales ?? 0;
-      inputContractVal.value = formatMoneyString(entry.contractVal);
-      inputCashCollected.value = formatMoneyString(entry.cashCollected);
-      if (closerClientSelect) closerClientSelect.value = entry.clientId || '';
-    } else {
-      inputLeads.value = 0;
-      inputFollowups.value = 0;
-      inputProspeccoes.value = 0;
-      inputMeetingsScheduled.value = 0;
-      inputMeetingsHeld.value = 0;
-      inputSales.value = 0;
-      inputContractVal.value = 'R$ 0,00';
-      inputCashCollected.value = 'R$ 0,00';
-      if (closerClientSelect) closerClientSelect.value = '';
-    }
-
-    updateCloserDashboard();
-  }
-
-  function saveCurrentReport(showFeedback = true) {
-    const selectedDate = dateInput ? dateInput.value : formattedToday;
-
-    const newRecord = {
-      id: `${currentCloser}_${selectedDate}`,
-      closer: currentCloser,
-      clientId: closerClientSelect ? closerClientSelect.value || null : null,
-      date: selectedDate,
-      leads: parseInt(inputLeads.value, 10) || 0,
-      followups: parseInt(inputFollowups.value, 10) || 0,
-      prospeccoes: parseInt(inputProspeccoes.value, 10) || 0,
-      meetingsScheduled: parseInt(inputMeetingsScheduled.value, 10) || 0,
-      meetingsHeld: parseInt(inputMeetingsHeld.value, 10) || 0,
-      sales: parseInt(inputSales.value, 10) || 0,
-      contractVal: formatMoneyString(inputContractVal.value),
-      cashCollected: formatMoneyString(inputCashCollected.value),
-      updatedAt: new Date().toISOString()
-    };
-
-    let reports = getStoredCloserReports();
-    const existingIndex = reports.findIndex(r => r.id === newRecord.id);
-
-    if (existingIndex >= 0) {
-      reports[existingIndex] = newRecord;
-    } else {
-      reports.unshift(newRecord);
-    }
-
-    saveStoredCloserReports(reports);
-    updateExecDashboard();
-
-    if (showFeedback) {
-      showToast(`Métricas de ${currentCloser} salvas no histórico!`);
-    }
-  }
-
-  if (btnSaveLog) {
-    btnSaveLog.addEventListener('click', () => saveCurrentReport(true));
-  }
-
-  if (btnResetForm) {
-    btnResetForm.addEventListener('click', () => {
-      inputLeads.value = 0;
-      inputFollowups.value = 0;
-      inputProspeccoes.value = 0;
-      inputMeetingsScheduled.value = 0;
-      inputMeetingsHeld.value = 0;
-      inputSales.value = 0;
-      inputContractVal.value = 'R$ 0,00';
-      inputCashCollected.value = 'R$ 0,00';
-      updateCloserDashboard();
-      showToast('Campos do Closer resetados para zero.');
-    });
-  }
-
-  // Botão Gerar Relatório do Closer em PDF
-  if (btnGeneratePdf) {
-    btnGeneratePdf.addEventListener('click', () => {
-      saveCurrentReport(false);
-      updateCloserDashboard();
-      window.print();
-    });
-  }
-
-  // ============================================================
   // HISTÓRICO COMERCIAL CONSOLIDADO
   // ============================================================
   function renderConsolidatedHistory() {
@@ -1098,25 +857,11 @@ document.addEventListener('DOMContentLoaded', () => {
         <td style="text-align: center;"><strong style="color:${entry.sales > 0 ? '#10b981' : 'inherit'};">${entry.sales}</strong></td>
         <td style="text-align: right;">${entry.contracts}</td>
         <td style="text-align: right;"><strong style="color:#10b981;">${entry.cash}</strong></td>
-        <td>
-          <button type="button" class="btn-uifry-sec btn-quick-load-history" data-name="${entry.name}" data-date="${entry.date}" style="padding: 4px 8px; font-size: 11px;">
-            Carregar
-          </button>
-        </td>
       `;
       historyTableBody.appendChild(tr);
     });
 
-    document.querySelectorAll('.btn-quick-load-history').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const name = btn.dataset.name;
-        const d = btn.dataset.date;
-        showView('view-closers');
-        if (dateInput) dateInput.value = d;
-        selectCloser(name);
-        showToast(`Registro de ${name} (${formatDateBR(d)}) carregado!`);
-      });
-    });
+
   }
 
   if (historyFilterMember) {
@@ -1905,15 +1650,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Roteamento inicial por Hash
   const initialHash = window.location.hash.replace('#', '');
-  if (initialHash === 'sdrs' || initialHash === 'closers') {
-    showView('view-closers');
-  } else if (initialHash === 'projects') {
+  if (initialHash === 'projects') {
     showView('view-projects');
   } else if (initialHash === 'history') {
     showView('view-history');
   } else {
     showView('view-dashboard');
   }
-
-  selectCloser('Tales');
 });
