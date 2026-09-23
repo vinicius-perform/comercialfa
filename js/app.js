@@ -371,6 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => toast.remove(), 300);
     }, 3500);
   }
+  window.showToast = showToast;
 
   function formatDateBR(dateStr) {
     if (!dateStr) return '';
