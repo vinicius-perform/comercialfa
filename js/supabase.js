@@ -248,8 +248,27 @@ async function dbFetchCloserReports() {
           cashCollected: r.cash_collected || 'R$ 0,00',
           updatedAt: r.updated_at
         }));
-        localStorage.setItem(STORAGE_CLOSER_REPORTS, JSON.stringify(mapped));
-        return mapped;
+
+        // Merge com registros locais para garantir que nenhum relatório seja perdido
+        let localReports = [];
+        try {
+          const raw = localStorage.getItem(STORAGE_CLOSER_REPORTS);
+          localReports = raw ? JSON.parse(raw) : [];
+        } catch (e) {}
+
+        const mergedMap = new Map();
+        mapped.forEach(r => { if (r && r.id) mergedMap.set(r.id, r); });
+        
+        localReports.forEach(lr => {
+          if (lr && lr.id && !mergedMap.has(lr.id)) {
+            mergedMap.set(lr.id, lr);
+            dbSyncCloserReport(lr);
+          }
+        });
+
+        const mergedList = Array.from(mergedMap.values());
+        localStorage.setItem(STORAGE_CLOSER_REPORTS, JSON.stringify(mergedList));
+        return mergedList;
       }
     } catch (e) {
       console.warn('[Supabase] Erro ao buscar closer_reports:', e);

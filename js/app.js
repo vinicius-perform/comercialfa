@@ -265,11 +265,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function parseMoneyToNumber(raw) {
-    if (raw === undefined || raw === null) return 0;
-    if (typeof raw === 'number') return raw;
-    const digits = String(raw).replace(/\D/g, '');
-    if (!digits) return 0;
-    return parseInt(digits, 10) / 100;
+    if (raw === undefined || raw === null || raw === '') return 0;
+    if (typeof raw === 'number') return isNaN(raw) ? 0 : raw;
+    const str = String(raw).trim();
+    if (str.includes(',')) {
+      const digits = str.replace(/\D/g, '');
+      if (!digits) return 0;
+      return parseInt(digits, 10) / 100;
+    }
+    const cleaned = str.replace(/[R$\s]/g, '');
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : num;
   }
 
   function formatNumberToMoney(num) {
@@ -326,10 +332,50 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   function getStoredCloserReports() {
     try {
-      const data = localStorage.getItem(STORAGE_CLOSER_REPORTS);
-      if (!data) return [];
-      const parsed = JSON.parse(data);
-      return Array.isArray(parsed) ? parsed.filter(r => r.closer !== 'Muller') : [];
+      const rawC = localStorage.getItem(STORAGE_CLOSER_REPORTS);
+      const closerReports = rawC ? JSON.parse(rawC) : [];
+
+      const rawT = localStorage.getItem('fa_prod_team_reports_v1');
+      const teamReports = rawT ? JSON.parse(rawT) : [];
+
+      const reportMap = new Map();
+
+      // 1. Carrega relatórios de closers
+      if (Array.isArray(closerReports)) {
+        closerReports.forEach(r => {
+          if (r && r.id && r.closer !== 'Muller') {
+            reportMap.set(r.id, r);
+          }
+        });
+      }
+
+      // 2. Adiciona registros de teamReports que não constavam para garantir que nada seja perdido
+      if (Array.isArray(teamReports)) {
+        teamReports.forEach(t => {
+          if (t && t.id && !reportMap.has(t.id) && t.name !== 'Muller') {
+            reportMap.set(t.id, {
+              id: t.id,
+              closer: t.name,
+              clientId: t.clientId || null,
+              clientLabel: t.clientLabel || null,
+              date: t.date,
+              leads: t.leads || 0,
+              followups: t.followups || 0,
+              prospeccoes: t.prospeccoes || 0,
+              meetingsScheduled: t.scheduled || 0,
+              meetingsHeld: t.held || 0,
+              sales: t.sales || 0,
+              contractVal: t.contracts || 'R$ 0,00',
+              cashCollected: t.cash || 'R$ 0,00',
+              convRate: t.convRate,
+              totalEffort: t.totalEffort,
+              updatedAt: t.timestamp || t.updatedAt
+            });
+          }
+        });
+      }
+
+      return Array.from(reportMap.values());
     } catch (e) {
       console.error('Erro ao ler relatórios dos closers', e);
       return [];
@@ -525,10 +571,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const closerReports = getStoredCloserReports();
     let monthCloserReports = closerReports.filter(r => (r.date || '').startsWith(selectedMonth));
 
-    // Se filtrou por um cliente específico
-    if (selectedClientId !== 'all') {
-      monthCloserReports = monthCloserReports.filter(r => r.clientId === selectedClientId);
-    }
+      // Se filtrou por um cliente específico
+      if (selectedClientId !== 'all') {
+        const primaryProjectId = localStorage.getItem('fa_primary_project_id_v1');
+        const isPrimary = Boolean(primaryProjectId && String(selectedClientId) === String(primaryProjectId));
+        monthCloserReports = monthCloserReports.filter(r => {
+          const matchesId = r.clientId && String(r.clientId).trim() === String(selectedClientId).trim();
+          const unassignedAndPrimary = (!r.clientId || r.clientId === 'all' || r.clientId === 'null') && isPrimary;
+          return matchesId || unassignedAndPrimary;
+        });
+      }
 
     // Busca metas de planejamento para o mês e cliente selecionados
     let goal = 0;
@@ -855,21 +907,49 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!historyTableBody) return;
     const closerReports = getStoredCloserReports();
     const selectedMember = historyFilterMember ? historyFilterMember.value : 'all';
+    const clients = JSON.parse(localStorage.getItem(STORAGE_CLIENTS_KEY) || '[]');
+    const primaryProjectId = localStorage.getItem('fa_primary_project_id_v1');
 
     let allEntries = [];
 
     closerReports.forEach(r => {
+      // Determina o nome do projeto/cliente do relatório
+      let clientName = '🌐 Geral';
+      let isPrimary = false;
+
+      if (r.clientId) {
+        const found = clients.find(c => String(c.id).trim() === String(r.clientId).trim());
+        if (found) {
+          isPrimary = Boolean(primaryProjectId && String(found.id) === String(primaryProjectId));
+          clientName = isPrimary ? `⭐ ${found.name}` : found.name;
+        } else if (r.clientLabel) {
+          clientName = r.clientLabel;
+        }
+      } else if (r.clientLabel && !r.clientLabel.includes('Geral')) {
+        clientName = r.clientLabel;
+      } else if (primaryProjectId) {
+        const pObj = clients.find(c => String(c.id) === String(primaryProjectId));
+        if (pObj) {
+          clientName = `⭐ ${pObj.name}`;
+          isPrimary = true;
+        }
+      }
+
       allEntries.push({
+        id: r.id,
         date: r.date,
         name: r.closer,
         role: 'Comercial',
+        clientName: clientName,
+        isPrimary: isPrimary,
+        clientId: r.clientId,
         leads: r.leads || 0,
         followups: (parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0),
         scheduled: r.meetingsScheduled || 0,
         held: r.meetingsHeld || 0,
         sales: r.sales || 0,
-        contracts: r.contractVal || 'R$ 0,00',
-        cash: r.cashCollected || 'R$ 0,00'
+        contracts: formatMoneyString(r.contractVal),
+        cash: formatMoneyString(r.cashCollected)
       });
     });
 
@@ -899,12 +979,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     allEntries.forEach(entry => {
       const tr = document.createElement('tr');
+      tr.className = 'history-row-clickable';
+      tr.title = 'Clique para expandir e ver o relatório oficial em imagem';
       tr.innerHTML = `
         <td><strong>${formatDateBR(entry.date)}</strong></td>
         <td><strong style="color:var(--text-dark);">${entry.name}</strong></td>
         <td>
-          <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; background:#f4f5f6; color:var(--text-dark);">
-            ${entry.role}
+          <span class="project-table-badge ${entry.isPrimary ? 'is-primary' : ''}" title="${entry.clientName}">
+            ${entry.clientName}
           </span>
         </td>
         <td style="text-align: center;">${entry.leads}</td>
@@ -914,11 +996,220 @@ document.addEventListener('DOMContentLoaded', () => {
         <td style="text-align: center;"><strong style="color:${entry.sales > 0 ? '#10b981' : 'inherit'};">${entry.sales}</strong></td>
         <td style="text-align: right;">${entry.contracts}</td>
         <td style="text-align: right;"><strong style="color:#10b981;">${entry.cash}</strong></td>
+        <td style="text-align: center;">
+          <button type="button" class="btn-history-view-image" data-id="${entry.id}">
+            <span>🖼️ Ver Imagem</span>
+          </button>
+        </td>
       `;
+
+      tr.addEventListener('click', () => {
+        openReportImageModal(entry.id);
+      });
+
       historyTableBody.appendChild(tr);
     });
+  }
 
+  // ============================================================
+  // MODAL: VISUALIZAR & EXPANDIR RELATÓRIO COMO IMAGEM OFICIAL
+  // ============================================================
+  function openReportImageModal(reportId) {
+    const reports = getStoredCloserReports();
+    const report = reports.find(r => String(r.id) === String(reportId));
+    if (!report) {
+      showToast('Relatório não encontrado.', true);
+      return;
+    }
 
+    const clients = JSON.parse(localStorage.getItem(STORAGE_CLIENTS_KEY) || '[]');
+    const primaryId = localStorage.getItem('fa_primary_project_id_v1');
+    const clientObj = clients.find(c => String(c.id).trim() === String(report.clientId || '').trim());
+    const isPrimary = Boolean(clientObj && primaryId && String(clientObj.id) === String(primaryId));
+    const clientName = clientObj 
+      ? (isPrimary ? `⭐ ${clientObj.name} (Projeto Principal)` : clientObj.name) 
+      : (report.clientLabel || 'Geral / Fazendo Acontecer™');
+
+    const container = document.getElementById('history-exportable-card');
+    if (!container) return;
+
+    const leads = report.leads || 0;
+    const followups = parseInt(report.followups, 10) || 0;
+    const prospeccoes = parseInt(report.prospeccoes, 10) || 0;
+    const totalEffort = followups + prospeccoes;
+    const scheduled = report.meetingsScheduled || 0;
+    const held = report.meetingsHeld || 0;
+    const sales = report.sales || 0;
+    const contracts = formatMoneyString(report.contractVal);
+    const cash = formatMoneyString(report.cashCollected);
+    const convRate = held > 0 ? Math.round((sales / held) * 100) : (sales > 0 ? 100 : 0);
+    const dateFormatted = formatDateBR(report.date);
+
+    container.innerHTML = `
+      <!-- Cabeçalho do Card -->
+      <div class="card-report-header">
+        <div class="report-card-brand">
+          <img src="assets/logo-sidebar.png" alt="FAZENDO ACONTECER™" class="report-logo">
+          <span class="report-brand-sub">PERFORMANCE COMERCIAL OFICIAL</span>
+        </div>
+        <div class="report-card-meta">
+          <div class="meta-tag-pill">RELATÓRIO COMERCIAL</div>
+          <div class="meta-date">${dateFormatted}</div>
+        </div>
+      </div>
+
+      <!-- Nome do Membro & Projeto -->
+      <div class="card-member-row">
+        <div class="member-info-block">
+          <span class="member-label">RESPONSÁVEL:</span>
+          <h3 class="member-name">${(report.closer || '').toUpperCase()}</h3>
+        </div>
+        <div style="text-align: right;">
+          <span class="member-label">PROJETO OU CLIENTE:</span>
+          <div style="font-size: 13.5px; font-weight: 700; color: #a3e635; margin-top: 2px;">${clientName}</div>
+        </div>
+      </div>
+
+      <!-- Grade de Métricas -->
+      <div class="card-metrics-grid">
+        <div class="card-metric-box">
+          <span class="metric-box-label">LEAD RECEBIDOS</span>
+          <span class="metric-box-val">${leads}</span>
+        </div>
+        <div class="card-metric-box">
+          <span class="metric-box-label">FOLLOW-UP FEITOS</span>
+          <span class="metric-box-val">${followups}</span>
+        </div>
+        <div class="card-metric-box">
+          <span class="metric-box-label">PROSPECÇÃO NO DIA</span>
+          <span class="metric-box-val">${prospeccoes}</span>
+        </div>
+        <div class="card-metric-box">
+          <span class="metric-box-label">REUNIÃO AGENDADA</span>
+          <span class="metric-box-val">${scheduled}</span>
+        </div>
+        <div class="card-metric-box">
+          <span class="metric-box-label">REUNIÃO REALIZADA</span>
+          <span class="metric-box-val">${held}</span>
+        </div>
+        <div class="card-metric-box">
+          <span class="metric-box-label">CONVERSÃO (V/R)</span>
+          <span class="metric-box-val lime-val">${convRate}%</span>
+        </div>
+
+        <!-- Resumo Final -->
+        <div style="grid-column: 1 / -1; margin-top: 6px; padding-top: 10px; border-top: 1px solid #1e283d;">
+          <span style="font-size: 9px; font-weight: 700; color: #8da2bd; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 8px;">
+            RESULTADO FINAL / RESUMO
+          </span>
+          <div class="card-summary-grid">
+            <div class="card-metric-box">
+              <span class="metric-box-label">TOTAL VENDAS</span>
+              <span class="metric-box-val">${sales}</span>
+              <span style="font-size: 8.5px; color: #8da2bd; margin-top: 2px;">${sales} nova(s)</span>
+            </div>
+            <div class="card-metric-box">
+              <span class="metric-box-label">VALOR CONTRATO</span>
+              <span class="metric-box-val">${contracts}</span>
+              <span style="font-size: 8.5px; color: #8da2bd; margin-top: 2px;">Contratos enviados</span>
+            </div>
+            <div class="card-metric-box" style="background: rgba(30, 41, 25, 0.6); border: 1px solid rgba(163, 230, 53, 0.35);">
+              <span class="metric-box-label" style="color: #a3e635; font-weight: 800;">CASH COLETADO</span>
+              <span class="metric-box-val lime-val">${cash}</span>
+              <span style="font-size: 8.5px; color: #a3e635; opacity: 0.85; margin-top: 2px;">Receita recebida</span>
+            </div>
+            <div class="card-metric-box">
+              <span class="metric-box-label">ESFORÇO ATIVO</span>
+              <span class="metric-box-val">${totalEffort}</span>
+              <span style="font-size: 8.5px; color: #8da2bd; margin-top: 2px;">Follow-ups + Prospecções</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rodapé do Card -->
+      <div class="card-report-footer">
+        <span>Fazendo Acontecer™ • Painel Comercial Executivo</span>
+        <span>${report.updatedAt ? new Date(report.updatedAt).toLocaleString('pt-BR') : 'Oficial'}</span>
+      </div>
+    `;
+
+    const modal = document.getElementById('modal-report-image');
+    if (modal) modal.classList.add('open');
+
+    // Botão Baixar Imagem (PNG)
+    const btnDownload = document.getElementById('btn-download-report-image');
+    if (btnDownload) {
+      btnDownload.onclick = () => {
+        if (typeof html2canvas === 'undefined') {
+          showToast('Biblioteca html2canvas indisponível.');
+          return;
+        }
+        showToast('Gerando imagem em alta resolução...');
+        html2canvas(container, {
+          scale: 2.5,
+          useCORS: true,
+          backgroundColor: '#0f1422',
+          logging: false
+        }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = `Relatorio_${report.closer}_${report.date}.png`;
+          link.href = canvas.toDataURL('image/png');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          showToast('Imagem PNG baixada com sucesso!');
+        }).catch(err => {
+          console.error('Erro ao gerar imagem:', err);
+          showToast('Erro ao exportar imagem.');
+        });
+      };
+    }
+
+    // Botão Copiar p/ WhatsApp
+    const btnWhatsapp = document.getElementById('btn-copy-report-whatsapp');
+    if (btnWhatsapp) {
+      btnWhatsapp.onclick = () => {
+        let text = `📊 *RELATÓRIO COMERCIAL - FAZENDO ACONTECER™*\n`;
+        text += `📅 *Data:* ${dateFormatted}\n`;
+        text += `👤 *Responsável:* ${report.closer}\n`;
+        text += `🏢 *Projeto:* ${clientName.replace(/^⭐\s*/, '')}\n\n`;
+        text += `*MÉTRICAS OPERACIONAIS*\n`;
+        text += `📥 Leads Recebidos: ${leads}\n`;
+        text += `🔄 Follow-ups: ${followups}\n`;
+        text += `🎯 Prospecções: ${prospeccoes}\n`;
+        text += `📅 Reuniões Agendadas: ${scheduled}\n`;
+        text += `🤝 Reuniões Realizadas: ${held}\n`;
+        text += `📈 Taxa de Conversão: ${convRate}%\n\n`;
+        text += `*RESULTADO FINAL*\n`;
+        text += `🛒 Vendas: ${sales}\n`;
+        text += `📄 Valor Contrato: ${contracts}\n`;
+        text += `💰 Cash Coletado: ${cash}\n`;
+        text += `⚡ Esforço Ativo: ${totalEffort}\n\n`;
+        text += `_Gerado via Painel Comercial Fazendo Acontecer™_`;
+
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('Resumo copiado para a área de transferência!');
+        }).catch(() => {
+          showToast('Erro ao copiar texto.');
+        });
+      };
+    }
+  }
+
+  function closeReportImageModal() {
+    const modal = document.getElementById('modal-report-image');
+    if (modal) modal.classList.remove('open');
+  }
+
+  const btnCloseReportImage = document.getElementById('btn-close-report-image');
+  if (btnCloseReportImage) btnCloseReportImage.addEventListener('click', closeReportImageModal);
+
+  const modalReportImage = document.getElementById('modal-report-image');
+  if (modalReportImage) {
+    modalReportImage.addEventListener('click', (e) => {
+      if (e.target === modalReportImage) closeReportImageModal();
+    });
   }
 
   if (historyFilterMember) {
@@ -953,6 +1244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('closerReports_v2');
         localStorage.removeItem('sdrReports_v2');
         localStorage.removeItem('fa_team_reports_unified_v1');
+        localStorage.removeItem('fa_prod_team_reports_v1');
 
         if (typeof dbClearAllReports === 'function') {
           await dbClearAllReports();
@@ -1138,6 +1430,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // Determina o mês de referência para o resumo dos projetos
     const refMonth = dashFilterMonth ? dashFilterMonth.value : currentMonthKey;
 
+    // Identifica e valida o Projeto Principal antes de calcular métricas
+    let primaryProjectId = localStorage.getItem('fa_primary_project_id_v1');
+    if (typeof dbGetPrimaryProjectId === 'function') {
+      const remotePrimary = await dbGetPrimaryProjectId();
+      if (remotePrimary) primaryProjectId = remotePrimary;
+    }
+
+    if (!primaryProjectId && clients.length > 0) {
+      const defaultPrimary = clients.find(c => c.status === 'active') || clients[0];
+      if (defaultPrimary) {
+        primaryProjectId = defaultPrimary.id;
+        if (typeof dbSetPrimaryProjectId === 'function') {
+          dbSetPrimaryProjectId(primaryProjectId);
+        } else {
+          localStorage.setItem('fa_primary_project_id_v1', primaryProjectId);
+        }
+      }
+    }
+
+    if (primaryProjectId && !clients.some(c => String(c.id) === String(primaryProjectId))) {
+      primaryProjectId = clients.length > 0 ? clients[0].id : null;
+      if (primaryProjectId) {
+        if (typeof dbSetPrimaryProjectId === 'function') dbSetPrimaryProjectId(primaryProjectId);
+      } else {
+        localStorage.removeItem('fa_primary_project_id_v1');
+      }
+    }
+
     // Métricas Globais da Barra de Projetos
     const activeClientsCount = clients.filter(c => c.status === 'active').length;
     let totalPlannedRev = 0;
@@ -1153,10 +1473,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const plannedMeetings = plan ? Number(plan.meetings_goal) || 0 : 0;
       const notes = plan ? (plan.notes || '') : '';
 
-      // Relatórios associados ao cliente
+      // Identifica se este cliente é o projeto principal
+      const isPrimary = Boolean(primaryProjectId && String(c.id) === String(primaryProjectId));
+
+      // Relatórios associados ao cliente (e atribuição ao projeto principal se for geral/sem clientId)
       const reports = closerReports.filter(r => {
         if (!r.date || !r.date.startsWith(refMonth)) return false;
-        return r.clientId === c.id;
+        const matchesId = r.clientId && String(r.clientId).trim() === String(c.id).trim();
+        const unassignedAndPrimary = (!r.clientId || r.clientId === 'all' || r.clientId === 'null') && (isPrimary || clients.length === 1);
+        return matchesId || unassignedAndPrimary;
       });
 
       const actualRev = reports.reduce((sum, r) => sum + parseMoneyToNumber(r.cashCollected), 0);
@@ -1207,36 +1532,6 @@ document.addEventListener('DOMContentLoaded', () => {
         projectsActiveCount.textContent = `${filteredClients.length} de ${clients.length} cliente(s)`;
       } else {
         projectsActiveCount.textContent = `${clients.length} cliente(s) cadastrado(s)`;
-      }
-    }
-
-    // Identifica e valida o Projeto Principal
-    let primaryProjectId = localStorage.getItem('fa_primary_project_id_v1');
-    if (typeof dbGetPrimaryProjectId === 'function') {
-      const remotePrimary = await dbGetPrimaryProjectId();
-      if (remotePrimary) primaryProjectId = remotePrimary;
-    }
-
-    // Se existem clientes mas nenhum foi marcado como principal, define o primeiro ativo
-    if (!primaryProjectId && clients.length > 0) {
-      const defaultPrimary = clients.find(c => c.status === 'active') || clients[0];
-      if (defaultPrimary) {
-        primaryProjectId = defaultPrimary.id;
-        if (typeof dbSetPrimaryProjectId === 'function') {
-          dbSetPrimaryProjectId(primaryProjectId);
-        } else {
-          localStorage.setItem('fa_primary_project_id_v1', primaryProjectId);
-        }
-      }
-    }
-
-    // Se o ID salvo não existe mais na lista de clientes, limpa ou redefine
-    if (primaryProjectId && !clients.some(c => String(c.id) === String(primaryProjectId))) {
-      primaryProjectId = clients.length > 0 ? clients[0].id : null;
-      if (primaryProjectId) {
-        if (typeof dbSetPrimaryProjectId === 'function') dbSetPrimaryProjectId(primaryProjectId);
-      } else {
-        localStorage.removeItem('fa_primary_project_id_v1');
       }
     }
 

@@ -297,7 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function gatherCurrentReportData() {
     const selectedDate = inputReportDate ? (inputReportDate.value || getTodayIso()) : getTodayIso();
     const effectiveName = currentName || 'Tales';
-    const selectedClientId = selectClientId ? selectClientId.value : null;
+    let selectedClientId = selectClientId ? selectClientId.value : null;
+    const primaryId = localStorage.getItem('fa_primary_project_id_v1');
+    if (!selectedClientId && primaryId) {
+      selectedClientId = primaryId;
+    }
 
     // Seção 1: Esforço & Volume de Leads
     const leads = Math.max(0, parseInt(inputRepLeads ? inputRepLeads.value : 0, 10) || 0);
@@ -321,6 +325,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const opt = selectClientId.options[selectClientId.selectedIndex];
       if (opt && opt.value) {
         clientLabel = opt.getAttribute('data-clean-name') || opt.textContent.replace(/^⭐\s*/, '').replace(/\s*\(Projeto Principal\)$/, '');
+      } else if (primaryId) {
+        const cachedClients = JSON.parse(localStorage.getItem(STORAGE_CLIENTS_KEY || 'fa_prod_clients_v1') || '[]');
+        const pObj = cachedClients.find(c => String(c.id) === String(primaryId));
+        if (pObj) clientLabel = pObj.name;
       }
     }
 
