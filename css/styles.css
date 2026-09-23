@@ -887,6 +887,7 @@ body {
   align-items: center;
   pointer-events: none;
   z-index: 5;
+  transition: left 0.4s ease;
 }
 
 .pacing-pin-time::after {

@@ -307,7 +307,7 @@
             <div class="pacing-labels-row">
               <div class="pacing-legend-item">
                 <span class="legend-color-dot dot-gray"></span>
-                <span>Tempo Decorrido: <strong id="exec-time-elapsed-label">0% (Dia 0 de 30)</strong></span>
+                <span>Tempo Decorrido: <strong id="exec-time-elapsed-label">Calculando...</strong></span>
               </div>
               <div class="pacing-legend-item">
                 <span class="legend-color-dot dot-lime"></span>
@@ -319,15 +319,15 @@
             <div class="pacing-dual-track">
               <!-- Trilha de Tempo Decorrido (Fundo) -->
               <div class="pacing-track-time">
-                <div class="pacing-fill-time" id="pacing-bar-time" style="width: 50%;"></div>
-                <div class="pacing-pin-time" id="pacing-pin-time" style="left: 50%;">
-                  <span class="pin-bubble">Hoje (Dia <span id="pin-day-num">15</span>)</span>
+                <div class="pacing-fill-time" id="pacing-bar-time" style="width: 0%;"></div>
+                <div class="pacing-pin-time" id="pacing-pin-time" style="left: 0%;">
+                  <span class="pin-bubble" id="pacing-pin-bubble">Hoje (Dia <span id="pin-day-num">-</span>)</span>
                 </div>
               </div>
 
               <!-- Trilha de Meta Faturada (Frente) -->
               <div class="pacing-track-money">
-                <div class="pacing-fill-money" id="pacing-bar-money" style="width: 40%;"></div>
+                <div class="pacing-fill-money" id="pacing-bar-money" style="width: 0%;"></div>
               </div>
             </div>
           </div>

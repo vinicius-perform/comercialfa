@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pacingPinTime = document.getElementById('pacing-pin-time');
   const pacingBarMoney = document.getElementById('pacing-bar-money');
   const pinDayNum = document.getElementById('pin-day-num');
+  const pacingPinBubble = document.getElementById('pacing-pin-bubble');
 
   const statDaysPassed = document.getElementById('stat-days-passed');
   const statDaysRemaining = document.getElementById('stat-days-remaining');
@@ -134,6 +135,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let projectsSearchQuery = '';
   let projectsStatusFilter = 'all';
+
+  // Sincronização Imediata e Síncrona do Pacing no Primeiro Render
+  function initImmediatePacing() {
+    try {
+      const now = new Date();
+      const curY = now.getFullYear();
+      const curM = now.getMonth() + 1;
+      const curDay = now.getDate();
+      const totalDays = new Date(curY, curM, 0).getDate();
+      const passed = Math.min(totalDays, Math.max(1, curDay));
+      const remaining = Math.max(0, totalDays - passed);
+      const pct = Math.round((passed / totalDays) * 100);
+
+      if (execTimeElapsedLabel) {
+        execTimeElapsedLabel.textContent = `${pct}% (Dia ${passed} de ${totalDays})`;
+      }
+      if (pacingBarTime) pacingBarTime.style.width = `${pct}%`;
+      if (pacingPinTime) pacingPinTime.style.left = `${pct}%`;
+
+      const bubble = pacingPinBubble || document.querySelector('.pin-bubble');
+      if (bubble) {
+        bubble.innerHTML = `Hoje (Dia <span id="pin-day-num">${passed}</span>)`;
+      } else if (pinDayNum) {
+        pinDayNum.textContent = passed;
+      }
+
+      if (statDaysPassed) statDaysPassed.textContent = `${passed} dia${passed !== 1 ? 's' : ''}`;
+      if (statDaysRemaining) statDaysRemaining.textContent = `${remaining} dia${remaining !== 1 ? 's' : ''} restantes`;
+    } catch (e) {
+      console.warn('[Pacing Immediate Init]', e);
+    }
+  }
+  initImmediatePacing();
 
   // Modal de Cliente
   const modalClient = document.getElementById('modal-client');
@@ -454,35 +488,41 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   function updateExecDashboard() {
     try {
+      const now = new Date();
+      const actualYear = now.getFullYear();
+      const actualMonth = now.getMonth() + 1;
+      const actualDay = now.getDate();
+      const actualMonthKey = `${actualYear}-${String(actualMonth).padStart(2, '0')}`;
+
       const selectedClientId = dashFilterClient ? dashFilterClient.value : 'all';
-      const selectedMonth = dashFilterMonth ? dashFilterMonth.value : currentMonthKey;
+      const selectedMonth = dashFilterMonth ? dashFilterMonth.value : actualMonthKey;
 
       // Extrai ano e mês selecionados
-      const [selY, selM] = (selectedMonth || currentMonthKey).split('-').map(Number);
+      const [selY, selM] = (selectedMonth || actualMonthKey).split('-').map(Number);
       const totalDaysInMonth = new Date(selY, selM, 0).getDate();
-      const isCurrentMonth = (selectedMonth === currentMonthKey);
-      const isPastMonth = (selectedMonth < currentMonthKey);
+      const isCurrentMonth = (selectedMonth === actualMonthKey);
+      const isPastMonth = (selectedMonth < actualMonthKey);
 
-    let passedDays = 0;
-    let remainingDays = 0;
-    let timeElapsedPct = 0;
+      let passedDays = 0;
+      let remainingDays = 0;
+      let timeElapsedPct = 0;
 
-    if (isPastMonth) {
-      passedDays = totalDaysInMonth;
-      remainingDays = 0;
-      timeElapsedPct = 100;
-    } else if (isCurrentMonth) {
-      passedDays = Math.max(1, today.getDate());
-      remainingDays = Math.max(0, totalDaysInMonth - passedDays);
-      timeElapsedPct = Math.round((passedDays / totalDaysInMonth) * 100);
-    } else {
-      passedDays = 0;
-      remainingDays = totalDaysInMonth;
-      timeElapsedPct = 0;
-    }
+      if (isPastMonth) {
+        passedDays = totalDaysInMonth;
+        remainingDays = 0;
+        timeElapsedPct = 100;
+      } else if (isCurrentMonth) {
+        passedDays = Math.min(totalDaysInMonth, Math.max(1, actualDay));
+        remainingDays = Math.max(0, totalDaysInMonth - passedDays);
+        timeElapsedPct = Math.round((passedDays / totalDaysInMonth) * 100);
+      } else {
+        passedDays = 0;
+        remainingDays = totalDaysInMonth;
+        timeElapsedPct = 0;
+      }
 
-    // Carrega registros
-    const closerReports = getStoredCloserReports();
+      // Carrega registros
+      const closerReports = getStoredCloserReports();
     let monthCloserReports = closerReports.filter(r => (r.date || '').startsWith(selectedMonth));
 
     // Se filtrou por um cliente específico
@@ -597,16 +637,30 @@ document.addEventListener('DOMContentLoaded', () => {
     if (execTimeElapsedLabel) {
       if (isPastMonth) {
         execTimeElapsedLabel.textContent = `100% (Mês Encerrado • ${totalDaysInMonth} dias)`;
-      } else {
+      } else if (isCurrentMonth) {
         execTimeElapsedLabel.textContent = `${timeElapsedPct}% (Dia ${passedDays} de ${totalDaysInMonth})`;
+      } else {
+        execTimeElapsedLabel.textContent = `0% (Aguardando Início • ${totalDaysInMonth} dias)`;
       }
     }
     if (execMetaElapsedLabel) execMetaElapsedLabel.textContent = `${goalPct}% (${formatNumberToMoney(totalRevenue)})`;
 
-    if (pacingBarTime) pacingBarTime.style.width = `${Math.min(100, timeElapsedPct)}%`;
-    if (pacingPinTime) pacingPinTime.style.left = `${Math.min(100, timeElapsedPct)}%`;
-    if (pacingBarMoney) pacingBarMoney.style.width = `${Math.min(100, goalPct)}%`;
-    if (pinDayNum) pinDayNum.textContent = isPastMonth ? totalDaysInMonth : passedDays;
+    if (pacingBarTime) pacingBarTime.style.width = `${Math.min(100, Math.max(0, timeElapsedPct))}%`;
+    if (pacingPinTime) pacingPinTime.style.left = `${Math.min(100, Math.max(0, timeElapsedPct))}%`;
+    if (pacingBarMoney) pacingBarMoney.style.width = `${Math.min(100, Math.max(0, goalPct))}%`;
+
+    const bubble = pacingPinBubble || document.querySelector('.pin-bubble');
+    if (bubble) {
+      if (isPastMonth) {
+        bubble.innerHTML = `Fim do Mês (Dia <span id="pin-day-num">${totalDaysInMonth}</span>)`;
+      } else if (isCurrentMonth) {
+        bubble.innerHTML = `Hoje (Dia <span id="pin-day-num">${passedDays}</span>)`;
+      } else {
+        bubble.innerHTML = `Início (Dia <span id="pin-day-num">1</span>)`;
+      }
+    } else if (pinDayNum) {
+      pinDayNum.textContent = isPastMonth ? totalDaysInMonth : (isCurrentMonth ? passedDays : 1);
+    }
 
     // Status do Ritmo (Pacing)
     if (execPacingPill && execPacingStatusText) {
@@ -633,8 +687,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    if (statDaysPassed) statDaysPassed.textContent = `${passedDays} dias`;
-    if (statDaysRemaining) statDaysRemaining.textContent = isPastMonth ? '0 dias (encerrado)' : `${remainingDays} dias restantes`;
+    if (statDaysPassed) statDaysPassed.textContent = `${passedDays} dia${passedDays !== 1 ? 's' : ''}`;
+    if (statDaysRemaining) statDaysRemaining.textContent = isPastMonth ? '0 dias (encerrado)' : `${remainingDays} dia${remainingDays !== 1 ? 's' : ''} restantes`;
     if (statCurrentDailyPace) statCurrentDailyPace.textContent = `${formatNumberToMoney(dailyPace)} / dia`;
     if (statRequiredDailyPace) statRequiredDailyPace.textContent = isPastMonth ? '—' : `${formatNumberToMoney(requiredDailyPace)} / dia`;
 
@@ -1756,6 +1810,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   populateTopBarFilters();
   populateMonthFilter();
+  updateExecDashboard();
+  renderConsolidatedHistory();
+  renderProjectsView();
   initSupabaseHealth();
   loadDataFromSupabase();
 
