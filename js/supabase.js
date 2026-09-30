@@ -584,6 +584,113 @@ async function dbVerifyCredentials(login, password) {
 }
 
 // ============================================================
+// 7. MEMBROS DA EQUIPE / SDRS (CRUD & ATIVAÇÃO/DESATIVAÇÃO)
+// ============================================================
+const STORAGE_MEMBERS_KEY = 'fa_prod_team_members_v1';
+
+const DEFAULT_TEAM_MEMBERS = [
+  { id: 'mbr_tales', name: 'Tales', role: 'SDR / Comercial', status: 'active', email: '', phone: '', created_at: new Date().toISOString() },
+  { id: 'mbr_jose', name: 'José', role: 'SDR / Comercial', status: 'active', email: '', phone: '', created_at: new Date().toISOString() },
+  { id: 'mbr_elinaldo', name: 'Elinaldo', role: 'SDR / Comercial', status: 'active', email: '', phone: '', created_at: new Date().toISOString() }
+];
+
+async function dbFetchTeamMembers() {
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient
+        .from('team_members')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (!error && Array.isArray(data) && data.length > 0) {
+        localStorage.setItem(STORAGE_MEMBERS_KEY, JSON.stringify(data));
+        return data;
+      }
+    } catch (e) {
+      console.warn('[Supabase] Erro ao buscar team_members:', e);
+    }
+  }
+
+  // Fallback LocalStorage
+  try {
+    const raw = localStorage.getItem(STORAGE_MEMBERS_KEY);
+    if (raw !== null) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (err) {}
+
+  // Se não houver nada, inicializa padrão
+  localStorage.setItem(STORAGE_MEMBERS_KEY, JSON.stringify(DEFAULT_TEAM_MEMBERS));
+  return DEFAULT_TEAM_MEMBERS;
+}
+
+async function dbSaveTeamMember(member) {
+  let members = [];
+  try {
+    const raw = localStorage.getItem(STORAGE_MEMBERS_KEY);
+    members = raw ? JSON.parse(raw) : DEFAULT_TEAM_MEMBERS;
+  } catch (e) {
+    members = DEFAULT_TEAM_MEMBERS;
+  }
+
+  const memberId = member.id || `mbr_${Date.now()}`;
+  const record = {
+    ...member,
+    id: memberId,
+    status: member.status || 'active',
+    updated_at: new Date().toISOString()
+  };
+
+  const idx = members.findIndex(m => m.id === memberId || m.name.toLowerCase() === member.name.toLowerCase());
+  if (idx >= 0) {
+    members[idx] = { ...members[idx], ...record };
+  } else {
+    members.push({ ...record, created_at: new Date().toISOString() });
+  }
+
+  localStorage.setItem(STORAGE_MEMBERS_KEY, JSON.stringify(members));
+
+  if (supabaseClient) {
+    try {
+      const cloudRecord = {
+        id: memberId,
+        name: record.name,
+        role: record.role || 'SDR / Pré-Vendas',
+        status: record.status || 'active',
+        email: record.email || null,
+        phone: record.phone || null,
+        updated_at: new Date().toISOString()
+      };
+      await supabaseClient.from('team_members').upsert([cloudRecord]);
+    } catch (e) {
+      console.warn('[Supabase] Erro ao sincronizar team_member:', e);
+    }
+  }
+
+  return record;
+}
+
+async function dbDeleteTeamMember(id) {
+  let members = [];
+  try {
+    const raw = localStorage.getItem(STORAGE_MEMBERS_KEY);
+    members = raw ? JSON.parse(raw) : [];
+  } catch (e) {}
+
+  members = members.filter(m => m.id !== id);
+  localStorage.setItem(STORAGE_MEMBERS_KEY, JSON.stringify(members));
+
+  if (supabaseClient) {
+    try {
+      await supabaseClient.from('team_members').delete().eq('id', id);
+    } catch (e) {
+      console.warn('[Supabase] Erro ao excluir team_member:', e);
+    }
+  }
+}
+
+// ============================================================
 // EXPORTAÇÕES GLOBAIS
 // ============================================================
 window.dbFetchClients = dbFetchClients;
@@ -601,6 +708,11 @@ window.dbFetchSdrReports = dbFetchSdrReports;
 window.dbSyncSdrReport = dbSyncSdrReport;
 window.dbDeleteSdrReport = dbDeleteSdrReport;
 
+window.dbFetchTeamMembers = dbFetchTeamMembers;
+window.dbSaveTeamMember = dbSaveTeamMember;
+window.dbDeleteTeamMember = dbDeleteTeamMember;
+window.STORAGE_MEMBERS_KEY = STORAGE_MEMBERS_KEY;
+
 window.dbClearAllReports = dbClearAllReports;
 window.dbFetchSettings = dbFetchSettings;
 window.dbSaveSetting = dbSaveSetting;
@@ -610,3 +722,4 @@ window.dbVerifyCredentials = dbVerifyCredentials;
 
 window.checkSupabaseHealth = checkSupabaseHealth;
 window.supabaseClient = supabaseClient;
+

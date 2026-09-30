@@ -82,6 +82,18 @@
             </span>
             <span class="nav-label">Projetos & Clientes</span>
           </a>
+
+          <a href="#sdr-performance" class="nav-link" data-view="view-sdr-performance" id="nav-sdr-performance">
+            <span class="nav-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <line x1="20" y1="8" x2="20" y2="14"></line>
+                <line x1="23" y1="11" x2="17" y2="11"></line>
+              </svg>
+            </span>
+            <span class="nav-label">Performance por SDR</span>
+          </a>
         </nav>
       </div>
 
@@ -108,6 +120,22 @@
             </span>
             <span class="nav-label">Link da Equipe (Form)</span>
             <span class="nav-badge-pill" style="margin-left:auto; background:rgba(91,227,54,0.15); color:var(--accent-lime);">Link</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- SEÇÃO 3: CONFIGURAÇÕES & SISTEMA -->
+      <div class="sidebar-group">
+        <span class="sidebar-group-title">SISTEMA</span>
+        <nav class="sidebar-nav">
+          <a href="#settings" class="nav-link" data-view="view-settings" id="nav-settings">
+            <span class="nav-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </span>
+            <span class="nav-label">Configurações</span>
           </a>
         </nav>
       </div>
@@ -149,8 +177,8 @@
                   <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                 </svg>
                 <select id="dash-filter-client" class="topbar-filter-select">
-                  <option value="primary">⭐ Projeto Principal</option>
-                  <option value="all">🌐 Visão Consolidada (Todos os Clientes)</option>
+                  <option value="primary">Projeto Principal</option>
+                  <option value="all">Visão Consolidada (Todos os Clientes)</option>
                 </select>
               </div>
 
@@ -265,8 +293,10 @@
                 <span class="pulse-dot"></span>
                 <span id="exec-pacing-status-text">Calculando ritmo...</span>
               </span>
-              <button type="button" class="btn-uifry-sec" id="btn-open-goal-modal" style="padding: 6px 12px; font-size: 11.5px;">
-                Meta: <strong id="exec-goal-label">R$ 100.000,00</strong> ✎
+              <button type="button" class="btn-uifry-sec" id="btn-open-goal-modal" style="padding: 6px 12px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 6px;">
+                <span>Meta:</span>
+                <strong id="exec-goal-label">R$ 100.000,00</strong>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
               </button>
             </div>
           </div>
@@ -514,6 +544,386 @@
       </section>
 
       <!-- ==========================================================
+           VIEW: PERFORMANCE POR SDR (Time de Pré-Vendas & Prospecção)
+           ========================================================== -->
+      <section id="view-sdr-performance" class="app-view">
+        <!-- Top Bar Executiva de SDR -->
+        <header class="top-bar">
+          <div class="top-bar-left">
+            <h1 class="page-title">Performance por SDR</h1>
+            <span class="closer-active-pill" id="sdr-active-pill">
+              <span class="pulse-dot"></span>
+              <span id="sdr-active-count">Time de Pré-Vendas</span>
+            </span>
+
+            <div class="topbar-filters-wrapper">
+              <!-- Seletor de Mês -->
+              <div class="topbar-filter-chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <input type="month" id="sdr-filter-month" class="topbar-filter-input" style="background:transparent; border:none; color:inherit; font-size:12px; font-weight:600; cursor:pointer;">
+              </div>
+
+              <!-- Seletor de SDR Individual / Equipe -->
+              <div class="topbar-filter-chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <select id="sdr-filter-member" class="topbar-filter-select">
+                  <option value="all">Todos os SDRs (Visão Geral)</option>
+                  <option value="Tales">Tales</option>
+                  <option value="José">José</option>
+                  <option value="Elinaldo">Elinaldo</option>
+                </select>
+              </div>
+
+              <!-- Seletor de Cliente / Projeto -->
+              <div class="topbar-filter-chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <select id="sdr-filter-client" class="topbar-filter-select">
+                  <option value="all">Todos os Projetos</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="top-bar-right">
+            <button type="button" class="btn-uifry-sec" id="btn-export-sdr-csv" style="padding: 7px 14px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Exportar CSV (SDR)</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- ============================================================
+             SEÇÃO: DESTAQUES DO TIME (SPOTLIGHT CARDS)
+             ============================================================ -->
+        <section class="sdr-spotlight-section">
+          <div class="sdr-spotlight-grid">
+            <!-- Destaque 1: Líder Geral / Top SDR -->
+            <div class="sdr-spotlight-card spotlight-gold">
+              <div class="spotlight-card-header">
+                <div class="spotlight-badge-icon badge-gold">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                    <path d="M4 22h16"></path>
+                    <path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path>
+                    <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"></path>
+                  </svg>
+                </div>
+                <span class="spotlight-tag tag-gold">Top Performer Geral</span>
+              </div>
+              <div class="spotlight-body">
+                <span class="spotlight-label">LÍDER DO RANKING</span>
+                <h3 class="spotlight-name" id="sdr-spotlight-top-name">—</h3>
+                <div class="spotlight-metrics-row">
+                  <span class="spotlight-big-val highlight-gold" id="sdr-spotlight-top-metric">0 agendamentos</span>
+                  <span class="spotlight-sub" id="sdr-spotlight-top-sub">Maior volume e assertividade</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Destaque 2: Campeão de Esforço -->
+            <div class="sdr-spotlight-card spotlight-lime">
+              <div class="spotlight-card-header">
+                <div class="spotlight-badge-icon badge-lime">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                </div>
+                <span class="spotlight-tag tag-lime">Motor de Prospecção</span>
+              </div>
+              <div class="spotlight-body">
+                <span class="spotlight-label">CAMPEÃO DE ESFORÇO</span>
+                <h3 class="spotlight-name" id="sdr-spotlight-effort-name">—</h3>
+                <div class="spotlight-metrics-row">
+                  <span class="spotlight-big-val highlight-lime" id="sdr-spotlight-effort-metric">0 ações</span>
+                  <span class="spotlight-sub" id="sdr-spotlight-effort-sub">Follow-ups e prospecções</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Destaque 3: Maior Taxa de Comparecimento / Show-up -->
+            <div class="sdr-spotlight-card spotlight-cyan">
+              <div class="spotlight-card-header">
+                <div class="spotlight-badge-icon badge-cyan">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <span class="spotlight-tag tag-cyan">Maior Qualificação</span>
+              </div>
+              <div class="spotlight-body">
+                <span class="spotlight-label">MAIOR SHOW-UP RATE</span>
+                <h3 class="spotlight-name" id="sdr-spotlight-showup-name">—</h3>
+                <div class="spotlight-metrics-row">
+                  <span class="spotlight-big-val highlight-cyan" id="sdr-spotlight-showup-metric">0% comparecimento</span>
+                  <span class="spotlight-sub" id="sdr-spotlight-showup-sub">Reuniões realizadas vs agendadas</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Destaque 4: Maior Faturamento Originado -->
+            <div class="sdr-spotlight-card spotlight-emerald">
+              <div class="spotlight-card-header">
+                <div class="spotlight-badge-icon badge-emerald">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                </div>
+                <span class="spotlight-tag tag-emerald">Geração de Receita</span>
+              </div>
+              <div class="spotlight-body">
+                <span class="spotlight-label">MAIOR CASH ORIGINADO</span>
+                <h3 class="spotlight-name" id="sdr-spotlight-cash-name">—</h3>
+                <div class="spotlight-metrics-row">
+                  <span class="spotlight-big-val highlight-emerald" id="sdr-spotlight-cash-metric">R$ 0,00</span>
+                  <span class="spotlight-sub" id="sdr-spotlight-cash-sub">Impacto real em vendas</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             4 CARDS EXECUTIVOS MACRO DE SDR
+             ============================================================ -->
+        <section class="kpi-four-grid" style="margin-top: 20px;">
+          <!-- Card 1: Esforço Operacional Total -->
+          <div class="kpi-card card-dark-hero">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-lime">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 14 14"></polyline>
+                </svg>
+              </div>
+              <span class="kpi-tag-status lime-tag" id="sdr-kpi-effort-pace">0 ações / dia</span>
+            </div>
+            <span class="kpi-card-subtitle">ESFORÇO ATIVO CONSOLIDADO</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value highlight-lime" id="sdr-kpi-total-effort">0</span>
+            </div>
+            <div class="kpi-card-footer-info">
+              <span>Follow-ups + Prospecções</span>
+              <strong id="sdr-kpi-effort-breakdown">0 follow-ups • 0 prospecções</strong>
+            </div>
+          </div>
+
+          <!-- Card 2: Reuniões Agendadas -->
+          <div class="kpi-card card-white">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-gray">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
+              <span class="kpi-tag-status gray-tag" id="sdr-kpi-scheduled-count">0 passadas</span>
+            </div>
+            <span class="kpi-card-subtitle">REUNIÕES AGENDADAS</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value dark-text" id="sdr-kpi-total-scheduled">0</span>
+            </div>
+            <div class="kpi-card-footer-info">
+              <span>Passadas para Closers</span>
+              <span id="sdr-kpi-scheduled-avg">Média: 0 / dia útil</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Taxa de Agendamento Média -->
+          <div class="kpi-card card-dark-secondary">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-lime-outline">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+              </div>
+              <span class="kpi-tag-status lime-outline-tag" id="sdr-kpi-schedule-benchmark">Eficiência</span>
+            </div>
+            <span class="kpi-card-subtitle">TAXA DE AGENDAMENTO</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value highlight-lime" id="sdr-kpi-schedule-rate">0%</span>
+            </div>
+            <div class="kpi-card-footer-info">
+              <span>Agendadas / Esforço</span>
+              <span id="sdr-kpi-schedule-sub">Conversão da prospecção</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Taxa de Comparecimento (Show-up) -->
+          <div class="kpi-card card-white">
+            <div class="kpi-card-top">
+              <div class="kpi-badge-icon badge-cyan">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <span class="kpi-tag-status gray-tag" id="sdr-kpi-showup-tag">Show-up Rate</span>
+            </div>
+            <span class="kpi-card-subtitle">TAXA DE COMPARECIMENTO</span>
+            <div class="kpi-card-value-row">
+              <span class="kpi-card-big-value dark-text" id="sdr-kpi-showup-rate">0%</span>
+            </div>
+            <div class="kpi-card-footer-info">
+              <span>Reuniões Realizadas</span>
+              <span id="sdr-kpi-showup-detail">0 de 0 compareceram</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             FUNIL DE PROSPECÇÃO & CONVERSÃO DO SDR
+             ============================================================ -->
+        <section class="white-box-card" style="margin-top: 22px;">
+          <div class="box-card-header">
+            <div class="header-left-title">
+              <h2 class="box-card-title">Funil de Prospecção & Conversão (SDR ➔ Closer)</h2>
+              <p class="box-card-desc">Jornada de qualificação: do volume de leads e esforço até a presença em reunião e fechamento</p>
+            </div>
+            <span class="kpi-mini-pill" id="sdr-funnel-period-pill">Mês Selecionado</span>
+          </div>
+
+          <div class="commercial-funnel-pipeline">
+            <!-- Etapa 1: Leads Recebidos -->
+            <div class="funnel-step">
+              <span class="funnel-step-order">01. ENTRADA</span>
+              <span class="funnel-step-name">Leads Recebidos</span>
+              <span class="funnel-step-val" id="sdr-funnel-leads-val">0</span>
+              <span class="funnel-step-sub">Volume de base</span>
+            </div>
+
+            <div class="funnel-connector">
+              <span class="funnel-conv-tag" id="sdr-funnel-conv-effort">0%</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <!-- Etapa 2: Esforço Ativo -->
+            <div class="funnel-step">
+              <span class="funnel-step-order">02. PROSPECÇÃO</span>
+              <span class="funnel-step-name">Esforço Operacional</span>
+              <span class="funnel-step-val" id="sdr-funnel-effort-val">0</span>
+              <span class="funnel-step-sub">Follow-ups + Prosp.</span>
+            </div>
+
+            <div class="funnel-connector">
+              <span class="funnel-conv-tag" id="sdr-funnel-conv-schedule">0%</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <!-- Etapa 3: Reuniões Agendadas -->
+            <div class="funnel-step">
+              <span class="funnel-step-order">03. AGENDAMENTO</span>
+              <span class="funnel-step-name">Reuniões Agendadas</span>
+              <span class="funnel-step-val" id="sdr-funnel-scheduled-val">0</span>
+              <span class="funnel-step-sub">Passadas aos Closers</span>
+            </div>
+
+            <div class="funnel-connector">
+              <span class="funnel-conv-tag" id="sdr-funnel-conv-held">0%</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <!-- Etapa 4: Reuniões Realizadas (Show-up) -->
+            <div class="funnel-step">
+              <span class="funnel-step-order">04. COMPARECIMENTO</span>
+              <span class="funnel-step-name">Reuniões Realizadas</span>
+              <span class="funnel-step-val" id="sdr-funnel-held-val">0</span>
+              <span class="funnel-step-sub" id="sdr-funnel-noshow-sub">No-show: 0</span>
+            </div>
+
+            <div class="funnel-connector">
+              <span class="funnel-conv-tag" id="sdr-funnel-conv-sales">0%</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <!-- Etapa 5: Vendas Geradas -->
+            <div class="funnel-step step-winner">
+              <span class="funnel-step-order">05. RESULTADO</span>
+              <span class="funnel-step-name">Vendas Originadas</span>
+              <span class="funnel-step-val highlight-lime" id="sdr-funnel-sales-val">0</span>
+              <span class="funnel-step-sub" id="sdr-funnel-cash-val">R$ 0,00</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             RANKING & LEADERBOARD DETALHADO POR SDR
+             ============================================================ -->
+        <section class="white-box-card" style="margin-top: 22px;">
+          <div class="box-card-header">
+            <div class="header-left-title">
+              <h2 class="box-card-title">Ranking & Performance Individual por SDR</h2>
+              <p class="box-card-desc">Classificação detalhada por agendamentos, taxa de comparecimento (show-up), esforço e score de produtividade</p>
+            </div>
+            <div class="ranking-header-badges">
+              <span class="legend-badge"><span class="badge-dot-gold"></span> Top 1</span>
+              <span class="legend-badge"><span class="badge-dot-lime"></span> Alta Conversão</span>
+            </div>
+          </div>
+
+          <div class="table-responsive-box">
+            <table class="uifry-table sdr-leaderboard-table">
+              <thead>
+                <tr>
+                  <th style="width: 70px; text-align: center;">Posição</th>
+                  <th>SDR / Pré-Vendedor</th>
+                  <th style="text-align: center;">Leads</th>
+                  <th style="text-align: center;">Follow-ups</th>
+                  <th style="text-align: center;">Prospecções</th>
+                  <th style="text-align: center;">Esforço Total</th>
+                  <th style="text-align: center;">Agendadas</th>
+                  <th style="text-align: center;">Realizadas</th>
+                  <th style="text-align: center;">Tx. Agendamento</th>
+                  <th style="text-align: center;">Comparecimento (Show-up)</th>
+                  <th style="text-align: center;">Vendas</th>
+                  <th style="text-align: right;">Cash Originado</th>
+                  <th style="text-align: center;">Score</th>
+                </tr>
+              </thead>
+              <tbody id="sdr-ranking-table-body">
+                <!-- Injetado dinamicamente via app.js -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             CARDS INDIVIDUAIS DE ANÁLISE DETALHADA POR SDR
+             ============================================================ -->
+        <section class="sdr-individual-section" style="margin-top: 22px; margin-bottom: 30px;">
+          <div class="sdr-section-title-row">
+            <h2 class="box-card-title">Diagnóstico Individual por SDR</h2>
+            <p class="box-card-desc">Visão aprofundada das métricas, consistência diária e taxas de conversão de cada membro</p>
+          </div>
+
+          <div class="sdr-individual-grid" id="sdr-individual-cards-container">
+            <!-- Cards injetados via app.js -->
+          </div>
+        </section>
+      </section>
+
+      <!-- ==========================================================
            VIEW 3: HISTÓRICO & DADOS CONSOLIDADOS
            ========================================================== -->
       <section id="view-history" class="app-view">
@@ -585,8 +995,175 @@
         </div>
       </section>
 
+      <!-- ==========================================================
+           VIEW 4: CONFIGURAÇÕES & GESTÃO DE SDRS / EQUIPE
+           ========================================================== -->
+      <section id="view-settings" class="app-view">
+        <header class="top-bar">
+          <div class="top-bar-left">
+            <h1 class="page-title">Configurações & Gestão de SDRs</h1>
+            <span class="closer-active-pill" id="settings-team-pill">
+              <span class="pulse-dot"></span>
+              <span id="settings-active-count">Carregando membros...</span>
+            </span>
+          </div>
+
+          <div class="top-bar-right">
+            <button type="button" class="btn-top-cta btn-cta-sdr" id="btn-open-create-member">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>+ Novo SDR / Membro</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Summary Strip de Gestão -->
+        <div class="projects-summary-strip" style="margin-bottom: 20px;">
+          <div class="p-strip-item">
+            <span class="p-strip-label">TOTAL DE MEMBROS</span>
+            <span class="p-strip-val" id="settings-stat-total-members">0</span>
+          </div>
+          <div class="p-strip-item">
+            <span class="p-strip-label">SDRS ATIVOS (NO FORMULÁRIO)</span>
+            <span class="p-strip-val highlight-lime" id="settings-stat-active-members">0</span>
+          </div>
+          <div class="p-strip-item">
+            <span class="p-strip-label">SDRS DESATIVADOS</span>
+            <span class="p-strip-val" id="settings-stat-inactive-members">0</span>
+          </div>
+          <div class="p-strip-item">
+            <span class="p-strip-label">RELATÓRIOS VINCULADOS</span>
+            <span class="p-strip-val" id="settings-stat-total-reports">0</span>
+          </div>
+        </div>
+
+        <!-- Tabela de Membros & SDRs -->
+        <div class="white-box-card">
+          <div class="box-card-header">
+            <div class="header-left-title">
+              <h2 class="box-card-title">Membros do Time Comercial & SDRs</h2>
+              <p class="box-card-desc">Ative ou desative SDRs. Apenas membros marcados como <strong>Ativo</strong> aparecem no portal de relatórios diários da equipe (<code>relatorio.html</code>).</p>
+            </div>
+          </div>
+
+          <div class="table-responsive-box">
+            <table class="uifry-table settings-members-table">
+              <thead>
+                <tr>
+                  <th>Membro / SDR</th>
+                  <th>Cargo / Função</th>
+                  <th style="text-align: center;">Status (Formulário)</th>
+                  <th style="text-align: center;">Lançamentos no Mês</th>
+                  <th style="text-align: center;">Data de Cadastro</th>
+                  <th style="text-align: right;">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="settings-members-table-body">
+                <!-- Preenchido via app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Ajustes Gerais do Sistema -->
+        <div class="white-box-card" style="margin-top: 20px; margin-bottom: 30px;">
+          <div class="box-card-header">
+            <div class="header-left-title">
+              <h2 class="box-card-title">Parâmetros Gerais do Painel</h2>
+              <p class="box-card-desc">Configurações globais de metas, projetos padrão e acesso ao portal</p>
+            </div>
+          </div>
+
+          <div class="settings-general-grid">
+            <!-- Item 1: Meta Financeira Mensal -->
+            <div class="settings-general-item">
+              <div class="settings-item-info">
+                <span class="settings-item-title">Meta Global de Faturamento</span>
+                <span class="settings-item-desc">Meta mensal usada como referência para Pacing e Projeção no Dashboard Executivo.</span>
+              </div>
+              <div class="settings-item-action">
+                <strong id="settings-global-goal-val" style="font-size: 15px; color: var(--text-dark); margin-right: 10px;">R$ 100.000,00</strong>
+                <button type="button" class="btn-uifry-sec" id="btn-settings-edit-goal" style="padding: 6px 12px; font-size: 12px;">Editar Meta</button>
+              </div>
+            </div>
+
+            <!-- Item 2: Link do Formulário da Equipe -->
+            <div class="settings-general-item">
+              <div class="settings-item-info">
+                <span class="settings-item-title">Link do Portal da Equipe (relatorio.html)</span>
+                <span class="settings-item-desc">Envie este link para os SDRs lançarem suas métricas diárias sem necessidade de login.</span>
+              </div>
+              <div class="settings-item-action">
+                <button type="button" class="btn-apple-action" id="btn-settings-copy-link" style="padding: 6px 12px; font-size: 12px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  <span>Copiar Link</span>
+                </button>
+                <a href="relatorio.html" target="_blank" class="btn-uifry-lime" style="padding: 6px 12px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                  <span>Abrir Portal</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
     </main>
+  </div>
+
+  <!-- ============================================================
+       MODAL: CADASTRO / EDIÇÃO DE SDR / MEMBRO DA EQUIPE
+       ============================================================ -->
+  <div class="modal-backdrop" id="modal-member">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-member-title">Novo Membro Comercial</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-member">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="member-form-id" value="">
+        <div class="modal-field">
+          <label for="member-name" class="field-label">NOME DO SDR / MEMBRO *</label>
+          <div class="uifry-input-box">
+            <input type="text" id="member-name" class="uifry-input font-bold" placeholder="Ex: Mariana Silva" required>
+          </div>
+          <span class="modal-hint">Este é o nome que aparecerá no formulário de relatórios quando o status estiver Ativo.</span>
+        </div>
+
+        <div class="modal-field" style="margin-top: 14px;">
+          <label for="member-role" class="field-label">CARGO / FUNÇÃO</label>
+          <div class="uifry-input-box">
+            <input type="text" id="member-role" class="uifry-input" placeholder="Ex: SDR / Pré-Vendas, Closer, BDR Outbound" value="SDR / Pré-Vendas">
+          </div>
+        </div>
+
+        <div class="modal-field" style="margin-top: 14px;">
+          <label for="member-status" class="field-label">STATUS DO MEMBRO</label>
+          <div class="uifry-input-box">
+            <select id="member-status" class="uifry-input" style="background: transparent; border: none; cursor: pointer;">
+              <option value="active">Ativo (Aparece no formulário de relatórios)</option>
+              <option value="inactive">Inativo (Oculto do formulário)</option>
+            </select>
+          </div>
+          <span class="modal-hint">Ao desativar, o membro deixa de aparecer para preenchimento de relatório, preservando o histórico existente.</span>
+        </div>
+
+        <div class="modal-field" style="margin-top: 14px;">
+          <label for="member-email" class="field-label">E-MAIL (OPCIONAL)</label>
+          <div class="uifry-input-box">
+            <input type="email" id="member-email" class="uifry-input" placeholder="sdr@fazendoacontecer.com">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-uifry-sec" id="btn-cancel-member">Cancelar</button>
+        <button type="button" class="btn-uifry-lime" id="btn-save-member">Salvar Membro</button>
+      </div>
+    </div>
   </div>
 
   <!-- ============================================================
@@ -648,9 +1225,9 @@
           <label for="client-status" class="field-label">STATUS DO PROJETO</label>
           <div class="uifry-input-box">
             <select id="client-status" class="uifry-input" style="background: transparent; border: none; cursor: pointer;">
-              <option value="active">🟢 Ativo (Em Operação)</option>
-              <option value="onboarding">🟡 Em Onboarding</option>
-              <option value="paused">⚪ Pausado / Em Espera</option>
+              <option value="active">Ativo (Em Operação)</option>
+              <option value="onboarding">Em Onboarding</option>
+              <option value="paused">Pausado / Em Espera</option>
             </select>
           </div>
         </div>
@@ -658,7 +1235,7 @@
         <div class="modal-field" style="margin-top: 14px; padding: 10px 12px; background: #f8fafc; border: 1px solid var(--border-card); border-radius: var(--radius-sm);">
           <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-dark); cursor: pointer; user-select: none;">
             <input type="checkbox" id="client-is-primary" style="width: 16px; height: 16px; accent-color: #10b981; cursor: pointer;">
-            <span>⭐ Definir como Projeto Principal para os relatórios</span>
+            <span>Definir como Projeto Principal para os relatórios</span>
           </label>
           <span style="display: block; font-size: 11px; color: var(--text-secondary); margin-top: 4px; margin-left: 24px;">
             Este projeto será selecionado automaticamente quando o formulário de relatórios for aberto.
@@ -891,8 +1468,8 @@
     <div class="modal-card modal-card-large" style="max-width: 660px; max-height: 92vh; display: flex; flex-direction: column;">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(91, 227, 54, 0.12); display: flex; align-items: center; justify-content: center; font-size: 18px;">
-            🖼️
+          <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(91, 227, 54, 0.12); display: flex; align-items: center; justify-content: center; color: var(--accent-lime);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
           </div>
           <div>
             <h3 class="modal-title" id="report-modal-title">Relatório Comercial Oficial</h3>

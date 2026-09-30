@@ -157,29 +157,56 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
+  padding: 9px 12px;
   border-radius: var(--radius-md);
   color: var(--text-muted);
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   cursor: pointer;
-  transition: var(--transition);
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, background, color;
 }
 
 .nav-link:hover {
   color: var(--text-white);
-  background: var(--bg-sidebar-hover);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(2px);
+}
+
+.nav-link:active {
+  transform: scale(0.98);
 }
 
 .nav-link.active {
-  color: var(--text-white);
-  background: transparent;
-  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  bottom: 7px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent-lime);
+  box-shadow: 0 0 10px var(--accent-lime-glow);
+  animation: applePillEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes applePillEnter {
+  0% { transform: scaleY(0.4); opacity: 0; }
+  100% { transform: scaleY(1); opacity: 1; }
 }
 
 .nav-link.active .nav-icon-box {
   color: var(--accent-lime);
+  transform: scale(1.04);
 }
 
 .nav-icon-box {
@@ -189,12 +216,13 @@ body {
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
-  transition: var(--transition);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .nav-icon-box svg {
   width: 18px;
   height: 18px;
+  stroke: currentColor;
 }
 
 /* Subseção de Closers na Sidebar */
@@ -316,21 +344,67 @@ body {
   padding: 28px 36px;
   background: var(--bg-canvas);
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  scroll-behavior: smooth;
 }
 
-/* Multi-View SPA System */
+/* Multi-View SPA System: Fluid Apple Motion */
+@keyframes appleViewFadeSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.996);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .app-view {
   display: none;
   flex-direction: column;
   gap: 20px;
   width: 100%;
+  opacity: 0;
+  transform: translateY(8px);
+  will-change: opacity, transform;
 }
 
 .app-view.active {
   display: flex;
+  opacity: 1;
+  transform: translateY(0);
+  animation: appleViewFadeSlide 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Entrada com micro-escalonamento sutil para sensação orgânica */
+.app-view.active > header.top-bar {
+  animation: appleViewFadeSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.app-view.active > section,
+.app-view.active > div.white-box-card,
+.app-view.active > div.projects-summary-strip {
+  animation: appleViewFadeSlide 0.28s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.app-view.active > *:nth-child(2) {
+  animation-delay: 0.02s;
+}
+
+.app-view.active > *:nth-child(3) {
+  animation-delay: 0.05s;
+}
+
+.app-view.active > *:nth-child(4) {
+  animation-delay: 0.08s;
+}
+
+.app-view.active > *:nth-child(5) {
+  animation-delay: 0.11s;
 }
 
 .print-header {
@@ -3777,4 +3851,723 @@ html.auth-locked .auth-overlay {
     font-size: clamp(48px, 13vw, 84px);
   }
 }
+
+/* ==========================================================================
+   MÓDULO: PERFORMANCE POR SDR (Apple & uifry Luxury Dark Design)
+   ========================================================================== */
+
+/* Seção de Destaques (Spotlight Grid) */
+.sdr-spotlight-section {
+  margin-bottom: 8px;
+}
+
+.sdr-spotlight-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1200px) {
+  .sdr-spotlight-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .sdr-spotlight-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sdr-spotlight-card {
+  background: #14171a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.sdr-spotlight-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+/* Spotlight Card Header */
+.spotlight-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.spotlight-badge-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spotlight-badge-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.badge-gold {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-cyan {
+  background: rgba(6, 182, 212, 0.14);
+  color: #06b6d4;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.badge-emerald {
+  background: rgba(16, 185, 129, 0.14);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* Spotlight Tags */
+.spotlight-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.tag-gold {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.tag-lime {
+  background: rgba(91, 227, 54, 0.15);
+  color: var(--accent-lime);
+  border: 1px solid rgba(91, 227, 54, 0.3);
+}
+
+.tag-cyan {
+  background: rgba(6, 182, 212, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.tag-emerald {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* Spotlight Body */
+.spotlight-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.spotlight-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.spotlight-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spotlight-metrics-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spotlight-big-val {
+  font-size: 14.5px;
+  font-weight: 800;
+}
+
+.highlight-gold {
+  color: #fbbf24;
+}
+
+.highlight-cyan {
+  color: #38bdf8;
+}
+
+.highlight-emerald {
+  color: #34d399;
+}
+
+.spotlight-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+/* Efeitos Específicos dos Cards */
+.spotlight-gold {
+  background: linear-gradient(145deg, #18191c 0%, #1c1811 100%);
+  border-color: rgba(245, 158, 11, 0.22);
+}
+
+.spotlight-lime {
+  background: linear-gradient(145deg, #18191c 0%, #111c12 100%);
+  border-color: rgba(91, 227, 54, 0.22);
+}
+
+.spotlight-cyan {
+  background: linear-gradient(145deg, #18191c 0%, #111a1f 100%);
+  border-color: rgba(6, 182, 212, 0.22);
+}
+
+.spotlight-emerald {
+  background: linear-gradient(145deg, #18191c 0%, #0f1c16 100%);
+  border-color: rgba(16, 185, 129, 0.22);
+}
+
+/* ==========================================================================
+   TABELA DE RANKING & LEADERBOARD POR SDR
+   ========================================================================== */
+.sdr-leaderboard-table th {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.sdr-leaderboard-table td {
+  padding: 13px 12px;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+/* Badges Metálicos de Posição (1º, 2º, 3º, ...) */
+.rank-badge-metal {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.rank-gold {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  color: #1c1917;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.rank-silver {
+  background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+  color: #0f172a;
+  box-shadow: 0 2px 6px rgba(148, 163, 184, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.rank-bronze {
+  background: linear-gradient(135deg, #fed7aa 0%, #c2410c 100%);
+  color: #431407;
+  box-shadow: 0 2px 6px rgba(194, 65, 12, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.rank-default {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-secondary);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Célula de Membro Apple (Sem avatares com letras) */
+.apple-member-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.apple-member-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-dark);
+  letter-spacing: -0.01em;
+}
+
+.apple-member-sub {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.apple-role-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* Pílulas de Eficiência e Métricas */
+.sdr-metric-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sdr-metric-pill.pill-high {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.sdr-metric-pill.pill-med {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+}
+
+.sdr-metric-pill.pill-low {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+/* Score de Produtividade */
+.sdr-score-badge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 9px;
+  border-radius: 10px;
+  background: #14171a;
+  color: var(--accent-lime);
+  border: 1px solid rgba(91, 227, 54, 0.25);
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Badges da Legenda no Header */
+.ranking-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.legend-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.badge-dot-gold {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+.badge-dot-lime {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-lime);
+}
+
+/* ==========================================================================
+   CARDS INDIVIDUAIS DE ANÁLISE POR SDR
+   ========================================================================== */
+.sdr-section-title-row {
+  margin-bottom: 14px;
+}
+
+.sdr-individual-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .sdr-individual-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .sdr-individual-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sdr-ind-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sdr-ind-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.sdr-ind-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.sdr-ind-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sdr-ind-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.01em;
+}
+
+.sdr-ind-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-dark);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.sdr-ind-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.sdr-ind-stat-item {
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: var(--radius-sm);
+  padding: 10px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.sdr-ind-stat-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 2px;
+}
+
+.sdr-ind-stat-val {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+/* Barra de Comparecimento Individual */
+.sdr-ind-progress-box {
+  margin-top: auto;
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sdr-ind-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.sdr-ind-progress-label strong {
+  color: var(--text-dark);
+}
+
+.sdr-ind-progress-track {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.sdr-ind-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, var(--accent-lime));
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   MÓDULO: CONFIGURAÇÕES & GESTÃO DE SDRS (APPLE PRO DESIGN)
+   ========================================================================== */
+
+/* Toggle Switch Apple iOS Style */
+.apple-status-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.apple-toggle-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.apple-toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-track {
+  width: 38px;
+  height: 22px;
+  background-color: rgba(120, 120, 128, 0.2);
+  border-radius: 22px;
+  position: relative;
+  transition: background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.toggle-thumb {
+  width: 18px;
+  height: 18px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.apple-toggle-switch input:checked + .toggle-track {
+  background-color: #34c759;
+  border-color: #30b753;
+}
+
+.apple-toggle-switch input:checked + .toggle-track .toggle-thumb {
+  transform: translateX(16px);
+}
+
+.apple-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: var(--transition);
+}
+
+.apple-status-pill.is-active {
+  background: rgba(52, 199, 89, 0.12);
+  color: #248a3d;
+  border: 1px solid rgba(52, 199, 89, 0.25);
+}
+
+.apple-status-pill.is-inactive {
+  background: rgba(142, 142, 147, 0.12);
+  color: #8e8e93;
+  border: 1px solid rgba(142, 142, 147, 0.25);
+}
+
+/* Tabela de Membros */
+.settings-members-table th {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.settings-members-table td {
+  padding: 13px 12px;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+/* Botões de Ação Apple Pro */
+.apple-action-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-apple-action {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  font-family: inherit;
+}
+
+.btn-apple-action svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+}
+
+.btn-apple-action:hover {
+  background: #f5f5f7;
+  border-color: rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+}
+
+.btn-apple-action:active {
+  transform: scale(0.97);
+}
+
+.btn-apple-action.btn-apple-danger {
+  color: #e11d48;
+  border-color: rgba(225, 29, 72, 0.2);
+  background: rgba(225, 29, 72, 0.04);
+}
+
+.btn-apple-action.btn-apple-danger:hover {
+  background: rgba(225, 29, 72, 0.1);
+  border-color: rgba(225, 29, 72, 0.35);
+}
+
+.btn-apple-view-report {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: inherit;
+}
+
+.btn-apple-view-report:hover {
+  background: #1d1d1f;
+  color: #ffffff;
+  border-color: #1d1d1f;
+  transform: translateY(-1px);
+}
+
+.btn-apple-view-report:active {
+  transform: scale(0.97);
+}
+
+/* Lista de Configurações Gerais */
+.settings-general-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-general-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  background: #f8fafc;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.settings-general-item:hover {
+  background: #f1f5f9;
+}
+
+.settings-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 650px;
+}
+
+.settings-item-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.settings-item-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.settings-item-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
 

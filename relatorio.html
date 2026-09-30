@@ -74,7 +74,8 @@
             <!-- Seleção Unificada de Membro da Equipe -->
             <div class="name-chips-container" id="team-names-box">
               <label class="input-sublabel">Selecione o seu nome na equipe comercial:</label>
-              <div class="chips-grid">
+              <div class="chips-grid" id="team-chips-grid">
+                <!-- Injetado dinamicamente via relatorio.js com base nos membros ativos -->
                 <button type="button" class="name-chip active" data-name="Tales">
                   <span>Tales</span>
                 </button>
@@ -96,12 +97,12 @@
             </div>
             <div class="apple-input-box" style="margin-top: 8px;">
               <select id="report-client-id" class="apple-input" style="cursor: pointer;">
-                <option value="">🌐 Projeto Geral / Fazendo Acontecer™</option>
+                <option value="">Projeto Geral / Fazendo Acontecer™</option>
               </select>
             </div>
             <div id="primary-badge-notice" class="primary-badge-notice" style="display: none;">
-              <span class="p-notice-icon">⭐</span>
-              <span>Projeto Principal puxado automaticamente: <strong id="primary-badge-name"></strong></span>
+              <span class="p-notice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
+              <span>Projeto Principal: <strong id="primary-badge-name"></strong></span>
             </div>
             <span class="field-hint">Selecione para qual projeto ou cliente você operou hoje (opcional).</span>
           </div>

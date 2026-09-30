@@ -30,10 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!primaryBadgeNotice) return;
     if (isPrimary) {
       primaryBadgeNotice.className = 'primary-badge-notice is-primary';
-      primaryBadgeNotice.innerHTML = `<span class="p-notice-icon">⭐</span><span>Projeto Principal puxado automaticamente: <strong>${name}</strong></span>`;
+      primaryBadgeNotice.innerHTML = `<span class="p-notice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span><span>Projeto Principal: <strong>${name}</strong></span>`;
     } else {
       primaryBadgeNotice.className = 'primary-badge-notice is-custom';
-      primaryBadgeNotice.innerHTML = `<span class="p-notice-icon">🏢</span><span>Projeto Selecionado: <strong>${name}</strong></span>`;
+      primaryBadgeNotice.innerHTML = `<span class="p-notice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><rect x="2" y="2" width="20" height="20" rx="4"></rect></svg></span><span>Projeto Selecionado: <strong>${name}</strong></span>`;
     }
     primaryBadgeNotice.style.display = 'flex';
   }
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!selectClientId) return;
 
     function renderClientOptions(clients, primaryId) {
-      selectClientId.innerHTML = '<option value="">🌐 Projeto Geral / Fazendo Acontecer™</option>';
+      selectClientId.innerHTML = '<option value="">Projeto Geral / Fazendo Acontecer™</option>';
 
       if (!Array.isArray(clients) || clients.length === 0) {
         hidePrimaryNotice();
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const opt = document.createElement('option');
         opt.value = c.id;
         opt.setAttribute('data-clean-name', c.name);
-        opt.textContent = isPrimary ? `⭐ ${c.name} (Projeto Principal)` : `${c.name} (${c.segment || 'Geral'})`;
+        opt.textContent = isPrimary ? `${c.name} (Projeto Principal)` : `${c.name} (${c.segment || 'Geral'})`;
         selectClientId.appendChild(opt);
       });
 
@@ -284,18 +284,91 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
-  // SELEÇÃO UNIFICADA DE MEMBRO DA EQUIPE
+  // SELEÇÃO DINÂMICA DE MEMBRO DA EQUIPE (APENAS ATIVOS)
   // ============================================================
-  if (teamNamesBox) {
-    const chips = teamNamesBox.querySelectorAll('.name-chip');
-    chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        chips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        currentName = chip.dataset.name || 'Tales';
+  const STORAGE_MEMBERS_KEY = 'fa_prod_team_members_v1';
+  const teamChipsGrid = document.getElementById('team-chips-grid') || (teamNamesBox ? teamNamesBox.querySelector('.chips-grid') : null);
+
+  function renderDynamicTeamChips(members) {
+    if (!teamChipsGrid) return;
+    
+    if (!Array.isArray(members) || members.length === 0) {
+      members = [
+        { name: 'Tales', status: 'active' },
+        { name: 'José', status: 'active' },
+        { name: 'Elinaldo', status: 'active' }
+      ];
+    }
+
+    // Filtra estritamente apenas membros com status ativo
+    const activeMembers = members.filter(m => m.status !== 'inactive');
+
+    if (activeMembers.length === 0) {
+      teamChipsGrid.innerHTML = '<span style="font-size:12.5px; color:#f87171; padding:8px 0; display:block;">⚠️ Nenhum membro comercial ativo no momento. Ative um membro nas Configurações do painel.</span>';
+      return;
+    }
+
+    // Se o currentName atual não estiver entre os ativos, redefine para o primeiro ativo
+    const isCurrentActive = activeMembers.some(m => m.name.toLowerCase() === (currentName || '').toLowerCase());
+    if (!isCurrentActive && activeMembers.length > 0) {
+      currentName = activeMembers[0].name;
+    }
+
+    teamChipsGrid.innerHTML = '';
+    activeMembers.forEach(m => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      const isActive = (m.name.toLowerCase() === (currentName || '').toLowerCase());
+      btn.className = `name-chip ${isActive ? 'active' : ''}`;
+      btn.setAttribute('data-name', m.name);
+      btn.innerHTML = `<span>${m.name}</span>`;
+
+      btn.addEventListener('click', () => {
+        teamChipsGrid.querySelectorAll('.name-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        currentName = m.name;
       });
+
+      teamChipsGrid.appendChild(btn);
     });
   }
+
+  async function loadTeamMembers() {
+    // 1. Carregamento imediato do cache local
+    try {
+      const raw = localStorage.getItem(STORAGE_MEMBERS_KEY);
+      if (raw) {
+        const cached = JSON.parse(raw);
+        if (Array.isArray(cached) && cached.length > 0) {
+          renderDynamicTeamChips(cached);
+        }
+      }
+    } catch (e) {}
+
+    // 2. Sincroniza em segundo plano com Supabase
+    try {
+      if (typeof dbFetchTeamMembers === 'function') {
+        const remoteMembers = await dbFetchTeamMembers();
+        if (Array.isArray(remoteMembers) && remoteMembers.length > 0) {
+          renderDynamicTeamChips(remoteMembers);
+        }
+      }
+    } catch (err) {
+      console.warn('[Portal Relatório] Erro ao buscar membros do Supabase:', err);
+    }
+  }
+
+  loadTeamMembers();
+
+  // Ouve mudanças de ativação/desativação vindas do painel em tempo real
+  window.addEventListener('storage', (e) => {
+    if (e.key === STORAGE_MEMBERS_KEY) {
+      try {
+        const updated = JSON.parse(e.newValue || '[]');
+        renderDynamicTeamChips(updated);
+      } catch (err) {}
+    }
+  });
 
   // ============================================================
   // COLETA DE DADOS DO FORMULÁRIO GERAL (8 CAMPOS)

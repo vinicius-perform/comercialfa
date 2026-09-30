@@ -54,14 +54,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const views = {
     'view-dashboard': document.getElementById('view-dashboard'),
     'view-projects': document.getElementById('view-projects'),
-    'view-history': document.getElementById('view-history')
+    'view-sdr-performance': document.getElementById('view-sdr-performance'),
+    'view-history': document.getElementById('view-history'),
+    'view-settings': document.getElementById('view-settings')
   };
 
   // Links da Sidebar
   const navLinks = {
     'view-dashboard': document.getElementById('nav-dashboard'),
     'view-projects': document.getElementById('nav-projects'),
-    'view-history': document.getElementById('nav-history')
+    'view-sdr-performance': document.getElementById('nav-sdr-performance'),
+    'view-history': document.getElementById('nav-history'),
+    'view-settings': document.getElementById('nav-settings')
   };
 
   // Botão de navegação rápida
@@ -486,10 +490,12 @@ document.addEventListener('DOMContentLoaded', () => {
       updateExecDashboard();
     } else if (viewId === 'view-projects') {
       renderProjectsView();
-
-
+    } else if (viewId === 'view-sdr-performance') {
+      renderSdrPerformanceView();
     } else if (viewId === 'view-history') {
       renderConsolidatedHistory();
+    } else if (viewId === 'view-settings') {
+      renderSettingsView();
     }
   }
 
@@ -537,6 +543,9 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('storage', (e) => {
     if (e.key === STORAGE_CLOSER_REPORTS || e.key === STORAGE_SDR_REPORTS) {
       updateExecDashboard();
+      if (typeof renderSdrPerformanceView === 'function') {
+        renderSdrPerformanceView();
+      }
       if (typeof renderConsolidatedHistory === 'function') {
         renderConsolidatedHistory();
       }
@@ -957,6 +966,497 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
+  // PERFORMANCE POR SDR • CÁLCULOS, DESTAQUES, FUNIL E RANKING
+  // ============================================================
+  const sdrFilterMonth = document.getElementById('sdr-filter-month');
+  const sdrFilterMember = document.getElementById('sdr-filter-member');
+  const sdrFilterClient = document.getElementById('sdr-filter-client');
+  const sdrActiveCount = document.getElementById('sdr-active-count');
+  const btnExportSdrCsv = document.getElementById('btn-export-sdr-csv');
+
+  // Spotlight Elements
+  const sdrSpotlightTopName = document.getElementById('sdr-spotlight-top-name');
+  const sdrSpotlightTopMetric = document.getElementById('sdr-spotlight-top-metric');
+  const sdrSpotlightTopSub = document.getElementById('sdr-spotlight-top-sub');
+  const sdrSpotlightEffortName = document.getElementById('sdr-spotlight-effort-name');
+  const sdrSpotlightEffortMetric = document.getElementById('sdr-spotlight-effort-metric');
+  const sdrSpotlightEffortSub = document.getElementById('sdr-spotlight-effort-sub');
+  const sdrSpotlightShowupName = document.getElementById('sdr-spotlight-showup-name');
+  const sdrSpotlightShowupMetric = document.getElementById('sdr-spotlight-showup-metric');
+  const sdrSpotlightShowupSub = document.getElementById('sdr-spotlight-showup-sub');
+  const sdrSpotlightCashName = document.getElementById('sdr-spotlight-cash-name');
+  const sdrSpotlightCashMetric = document.getElementById('sdr-spotlight-cash-metric');
+  const sdrSpotlightCashSub = document.getElementById('sdr-spotlight-cash-sub');
+
+  // Macro KPIs
+  const sdrKpiTotalEffort = document.getElementById('sdr-kpi-total-effort');
+  const sdrKpiEffortPace = document.getElementById('sdr-kpi-effort-pace');
+  const sdrKpiEffortBreakdown = document.getElementById('sdr-kpi-effort-breakdown');
+  const sdrKpiTotalScheduled = document.getElementById('sdr-kpi-total-scheduled');
+  const sdrKpiScheduledCount = document.getElementById('sdr-kpi-scheduled-count');
+  const sdrKpiScheduledAvg = document.getElementById('sdr-kpi-scheduled-avg');
+  const sdrKpiScheduleRate = document.getElementById('sdr-kpi-schedule-rate');
+  const sdrKpiScheduleSub = document.getElementById('sdr-kpi-schedule-sub');
+  const sdrKpiShowupRate = document.getElementById('sdr-kpi-showup-rate');
+  const sdrKpiShowupDetail = document.getElementById('sdr-kpi-showup-detail');
+
+  // Funnel
+  const sdrFunnelLeadsVal = document.getElementById('sdr-funnel-leads-val');
+  const sdrFunnelEffortVal = document.getElementById('sdr-funnel-effort-val');
+  const sdrFunnelScheduledVal = document.getElementById('sdr-funnel-scheduled-val');
+  const sdrFunnelHeldVal = document.getElementById('sdr-funnel-held-val');
+  const sdrFunnelSalesVal = document.getElementById('sdr-funnel-sales-val');
+  const sdrFunnelCashVal = document.getElementById('sdr-funnel-cash-val');
+  const sdrFunnelNoshowSub = document.getElementById('sdr-funnel-noshow-sub');
+  const sdrFunnelConvEffort = document.getElementById('sdr-funnel-conv-effort');
+  const sdrFunnelConvSchedule = document.getElementById('sdr-funnel-conv-schedule');
+  const sdrFunnelConvHeld = document.getElementById('sdr-funnel-conv-held');
+  const sdrFunnelConvSales = document.getElementById('sdr-funnel-conv-sales');
+  const sdrFunnelPeriodPill = document.getElementById('sdr-funnel-period-pill');
+
+  // Leaderboard & Cards
+  const sdrRankingTableBody = document.getElementById('sdr-ranking-table-body');
+  const sdrIndividualCardsContainer = document.getElementById('sdr-individual-cards-container');
+
+  function initSdrFilters() {
+    if (sdrFilterMonth && !sdrFilterMonth.value) {
+      sdrFilterMonth.value = currentMonthKey;
+    }
+  }
+  initSdrFilters();
+
+  function renderSdrPerformanceView() {
+    try {
+      const now = new Date();
+      const actualYear = now.getFullYear();
+      const actualMonth = now.getMonth() + 1;
+      const actualDay = now.getDate();
+      const actualMonthKey = `${actualYear}-${String(actualMonth).padStart(2, '0')}`;
+
+      const selectedMonth = sdrFilterMonth ? (sdrFilterMonth.value || actualMonthKey) : actualMonthKey;
+      const selectedMember = sdrFilterMember ? sdrFilterMember.value : 'all';
+      const selectedClientId = sdrFilterClient ? sdrFilterClient.value : 'all';
+
+      const [selY, selM] = selectedMonth.split('-').map(Number);
+      const totalDaysInMonth = new Date(selY, selM, 0).getDate();
+      const isCurrentMonth = (selectedMonth === actualMonthKey);
+      const isPastMonth = (selectedMonth < actualMonthKey);
+      const passedDays = isPastMonth ? totalDaysInMonth : (isCurrentMonth ? Math.min(totalDaysInMonth, Math.max(1, actualDay)) : 1);
+
+      // Carrega relatórios comerciais
+      const allReports = getStoredCloserReports();
+      let monthReports = allReports.filter(r => (r.date || '').startsWith(selectedMonth));
+
+      // Filtro por Cliente
+      if (selectedClientId !== 'all') {
+        const primaryProjectId = localStorage.getItem('fa_primary_project_id_v1');
+        const isPrimary = Boolean(primaryProjectId && String(selectedClientId) === String(primaryProjectId));
+        monthReports = monthReports.filter(r => {
+          const matchesId = r.clientId && String(r.clientId).trim() === String(selectedClientId).trim();
+          const unassignedAndPrimary = (!r.clientId || r.clientId === 'all' || r.clientId === 'null') && isPrimary;
+          return matchesId || unassignedAndPrimary;
+        });
+      }
+
+      // Constrói lista de membros SDR (Tales, José, Elinaldo + adicionais dos relatórios)
+      const sdrMap = {};
+      closersList.forEach(name => {
+        sdrMap[name] = {
+          name,
+          leads: 0,
+          followups: 0,
+          prospeccoes: 0,
+          effort: 0,
+          scheduled: 0,
+          held: 0,
+          noshow: 0,
+          sales: 0,
+          contracts: 0,
+          cash: 0,
+          reportCount: 0,
+          scheduleRate: 0,
+          showupRate: 0,
+          salesRate: 0,
+          score: 0
+        };
+      });
+
+      monthReports.forEach(r => {
+        const name = r.closer || r.sdr || r.member || r.name;
+        if (!name || name === 'Muller') return;
+
+        if (!sdrMap[name]) {
+          sdrMap[name] = {
+            name,
+            leads: 0,
+            followups: 0,
+            prospeccoes: 0,
+            effort: 0,
+            scheduled: 0,
+            held: 0,
+            noshow: 0,
+            sales: 0,
+            contracts: 0,
+            cash: 0,
+            reportCount: 0,
+            scheduleRate: 0,
+            showupRate: 0,
+            salesRate: 0,
+            score: 0
+          };
+        }
+
+        const l = parseInt(r.leads, 10) || 0;
+        const fu = parseInt(r.followups, 10) || 0;
+        const pr = parseInt(r.prospeccoes, 10) || 0;
+        const sch = parseInt(r.meetingsScheduled || r.scheduled, 10) || 0;
+        const hld = parseInt(r.meetingsHeld || r.held, 10) || 0;
+        const sls = parseInt(r.sales, 10) || 0;
+        const cnt = parseMoneyToNumber(r.contractVal || r.contracts);
+        const csh = parseMoneyToNumber(r.cashCollected || r.cash);
+
+        sdrMap[name].leads += l;
+        sdrMap[name].followups += fu;
+        sdrMap[name].prospeccoes += pr;
+        sdrMap[name].effort += (fu + pr);
+        sdrMap[name].scheduled += sch;
+        sdrMap[name].held += hld;
+        sdrMap[name].sales += sls;
+        sdrMap[name].contracts += cnt;
+        sdrMap[name].cash += csh;
+        sdrMap[name].reportCount += 1;
+      });
+
+      // Calcula taxas e score de cada SDR
+      let allSdrs = Object.values(sdrMap);
+      allSdrs.forEach(s => {
+        s.noshow = Math.max(0, s.scheduled - s.held);
+        s.scheduleRate = s.effort > 0 ? Math.round((s.scheduled / s.effort) * 100) : (s.scheduled > 0 ? 100 : 0);
+        s.showupRate = s.scheduled > 0 ? Math.min(100, Math.round((s.held / s.scheduled) * 100)) : (s.held > 0 ? 100 : 0);
+        s.salesRate = s.held > 0 ? Math.round((s.sales / s.held) * 100) : 0;
+        // Score ponderado de eficiência de pré-vendas
+        s.score = Math.round((s.scheduled * 6) + (s.held * 10) + (s.sales * 18) + (s.effort * 0.15));
+      });
+
+      // Se filtrou por um SDR específico
+      let displaySdrs = allSdrs;
+      if (selectedMember !== 'all') {
+        displaySdrs = allSdrs.filter(s => s.name === selectedMember);
+      }
+
+      // Totais Macro do Time (ou do SDR filtrado)
+      let totalLeads = 0;
+      let totalFollowups = 0;
+      let totalProspeccoes = 0;
+      let totalEffort = 0;
+      let totalScheduled = 0;
+      let totalHeld = 0;
+      let totalSales = 0;
+      let totalContracts = 0;
+      let totalCash = 0;
+
+      displaySdrs.forEach(s => {
+        totalLeads += s.leads;
+        totalFollowups += s.followups;
+        totalProspeccoes += s.prospeccoes;
+        totalEffort += s.effort;
+        totalScheduled += s.scheduled;
+        totalHeld += s.held;
+        totalSales += s.sales;
+        totalContracts += s.contracts;
+        totalCash += s.cash;
+      });
+
+      const totalNoShow = Math.max(0, totalScheduled - totalHeld);
+      const macroScheduleRate = totalEffort > 0 ? Math.round((totalScheduled / totalEffort) * 100) : (totalScheduled > 0 ? 100 : 0);
+      const macroShowupRate = totalScheduled > 0 ? Math.min(100, Math.round((totalHeld / totalScheduled) * 100)) : (totalHeld > 0 ? 100 : 0);
+      const dailyEffortPace = passedDays > 0 ? Math.round(totalEffort / passedDays) : 0;
+      const dailyScheduledPace = passedDays > 0 ? (totalScheduled / passedDays).toFixed(1) : '0.0';
+
+      if (sdrActiveCount) {
+        sdrActiveCount.textContent = `${displaySdrs.length} SDR(s) • ${monthReports.length} relatórios`;
+      }
+
+      // ==========================================================
+      // ATUALIZAÇÃO DOS 4 CARDS MACRO DE SDR
+      // ==========================================================
+      if (sdrKpiTotalEffort) sdrKpiTotalEffort.textContent = totalEffort;
+      if (sdrKpiEffortPace) sdrKpiEffortPace.textContent = `${dailyEffortPace} ações / dia`;
+      if (sdrKpiEffortBreakdown) sdrKpiEffortBreakdown.textContent = `${totalFollowups} follow-ups • ${totalProspeccoes} prospecções`;
+
+      if (sdrKpiTotalScheduled) sdrKpiTotalScheduled.textContent = totalScheduled;
+      if (sdrKpiScheduledCount) sdrKpiScheduledCount.textContent = `${totalScheduled} agendamento(s)`;
+      if (sdrKpiScheduledAvg) sdrKpiScheduledAvg.textContent = `Média: ${dailyScheduledPace} / dia decorrido`;
+
+      if (sdrKpiScheduleRate) sdrKpiScheduleRate.textContent = `${macroScheduleRate}%`;
+      if (sdrKpiScheduleSub) sdrKpiScheduleSub.textContent = `Conversão sobre ${totalEffort} contatos`;
+
+      if (sdrKpiShowupRate) sdrKpiShowupRate.textContent = `${macroShowupRate}%`;
+      if (sdrKpiShowupDetail) sdrKpiShowupDetail.textContent = `${totalHeld} de ${totalScheduled} compareceram (${totalNoShow} no-show)`;
+
+      // ==========================================================
+      // ATUALIZAÇÃO DO FUNIL DE PROSPECÇÃO & CONVERSÃO
+      // ==========================================================
+      if (sdrFunnelLeadsVal) sdrFunnelLeadsVal.textContent = totalLeads;
+      if (sdrFunnelEffortVal) sdrFunnelEffortVal.textContent = totalEffort;
+      if (sdrFunnelScheduledVal) sdrFunnelScheduledVal.textContent = totalScheduled;
+      if (sdrFunnelHeldVal) sdrFunnelHeldVal.textContent = totalHeld;
+      if (sdrFunnelSalesVal) sdrFunnelSalesVal.textContent = totalSales;
+      if (sdrFunnelCashVal) sdrFunnelCashVal.textContent = formatNumberToMoney(totalCash);
+      if (sdrFunnelNoshowSub) sdrFunnelNoshowSub.textContent = `No-show: ${totalNoShow} perdas`;
+
+      if (sdrFunnelConvEffort) {
+        const rate = totalLeads > 0 ? Math.round((totalEffort / totalLeads) * 100) : 0;
+        sdrFunnelConvEffort.textContent = `${rate}%`;
+      }
+      if (sdrFunnelConvSchedule) {
+        sdrFunnelConvSchedule.textContent = `${macroScheduleRate}%`;
+      }
+      if (sdrFunnelConvHeld) {
+        sdrFunnelConvHeld.textContent = `${macroShowupRate}%`;
+      }
+      if (sdrFunnelConvSales) {
+        const rate = totalHeld > 0 ? Math.round((totalSales / totalHeld) * 100) : 0;
+        sdrFunnelConvSales.textContent = `${rate}%`;
+      }
+      if (sdrFunnelPeriodPill) {
+        const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        sdrFunnelPeriodPill.textContent = `${monthNames[selM - 1] || 'Mês'} ${selY}`;
+      }
+
+      // ==========================================================
+      // DESTAQUES DO TIME (SPOTLIGHT CARDS)
+      // ==========================================================
+      const sortedByScore = allSdrs.slice().sort((a, b) => b.score - a.score || b.scheduled - a.scheduled || b.held - a.held);
+      const sortedByEffort = allSdrs.slice().sort((a, b) => b.effort - a.effort || b.followups - a.followups);
+      const sortedByShowup = allSdrs.slice().filter(s => s.scheduled > 0 || s.held > 0).sort((a, b) => b.showupRate - a.showupRate || b.held - a.held);
+      const sortedByCash = allSdrs.slice().sort((a, b) => b.cash - a.cash || b.sales - a.sales);
+
+      const topPerformer = sortedByScore[0] || { name: '—', scheduled: 0, score: 0 };
+      const topEffort = sortedByEffort[0] || { name: '—', effort: 0, followups: 0, prospeccoes: 0 };
+      const topShowup = (sortedByShowup.length > 0 ? sortedByShowup[0] : allSdrs[0]) || { name: '—', showupRate: 0, scheduled: 0, held: 0 };
+      const topCash = sortedByCash[0] || { name: '—', cash: 0, sales: 0 };
+
+      if (sdrSpotlightTopName) sdrSpotlightTopName.textContent = topPerformer.name;
+      if (sdrSpotlightTopMetric) sdrSpotlightTopMetric.textContent = `${topPerformer.scheduled} agendamento(s)`;
+      if (sdrSpotlightTopSub) sdrSpotlightTopSub.textContent = `Score de Produtividade: ${topPerformer.score} pts`;
+
+      if (sdrSpotlightEffortName) sdrSpotlightEffortName.textContent = topEffort.name;
+      if (sdrSpotlightEffortMetric) sdrSpotlightEffortMetric.textContent = `${topEffort.effort} ações ativas`;
+      if (sdrSpotlightEffortSub) sdrSpotlightEffortSub.textContent = `${topEffort.followups} follow-ups • ${topEffort.prospeccoes} prospecções`;
+
+      if (sdrSpotlightShowupName) sdrSpotlightShowupName.textContent = topShowup.name;
+      if (sdrSpotlightShowupMetric) sdrSpotlightShowupMetric.textContent = `${topShowup.showupRate}% comparecimento`;
+      if (sdrSpotlightShowupSub) sdrSpotlightShowupSub.textContent = `${topShowup.held} de ${topShowup.scheduled} reuniões realizadas`;
+
+      if (sdrSpotlightCashName) sdrSpotlightCashName.textContent = topCash.name;
+      if (sdrSpotlightCashMetric) sdrSpotlightCashMetric.textContent = formatNumberToMoney(topCash.cash);
+      if (sdrSpotlightCashSub) sdrSpotlightCashSub.textContent = `${topCash.sales} venda(s) originada(s)`;
+
+      // ==========================================================
+      // TABELA DE RANKING & LEADERBOARD
+      // ==========================================================
+      if (sdrRankingTableBody) {
+        sdrRankingTableBody.innerHTML = '';
+        const rankList = displaySdrs.slice().sort((a, b) => b.score - a.score || b.scheduled - a.scheduled || b.held - a.held || b.effort - a.effort);
+
+        if (rankList.length === 0) {
+          sdrRankingTableBody.innerHTML = `
+            <tr>
+              <td colspan="13" style="text-align: center; color: var(--text-secondary); padding: 24px;">
+                Nenhum relatório de SDR encontrado no período selecionado.
+              </td>
+            </tr>
+          `;
+        } else {
+          rankList.forEach((s, idx) => {
+            const tr = document.createElement('tr');
+            const rankPos = idx + 1;
+            let rankClass = 'rank-default';
+            if (rankPos === 1) { rankClass = 'rank-gold'; }
+            else if (rankPos === 2) { rankClass = 'rank-silver'; }
+            else if (rankPos === 3) { rankClass = 'rank-bronze'; }
+
+            // Pílulas de Taxas
+            const schClass = s.scheduleRate >= 15 ? 'pill-high' : (s.scheduleRate >= 8 ? 'pill-med' : 'pill-low');
+            const showClass = s.showupRate >= 70 ? 'pill-high' : (s.showupRate >= 50 ? 'pill-med' : 'pill-low');
+
+            tr.innerHTML = `
+              <td style="text-align: center;">
+                <span class="rank-badge-metal ${rankClass}" title="Posição #${rankPos}">
+                  ${rankPos}º
+                </span>
+              </td>
+              <td>
+                <div class="apple-member-cell">
+                  <span class="apple-member-name">${s.name}</span>
+                  <span class="apple-member-sub">${s.reportCount} relatório(s) no mês</span>
+                </div>
+              </td>
+              <td style="text-align: center; color: var(--text-secondary);">${s.leads}</td>
+              <td style="text-align: center;">${s.followups}</td>
+              <td style="text-align: center;">${s.prospeccoes}</td>
+              <td style="text-align: center;"><strong style="color: var(--text-dark);">${s.effort}</strong></td>
+              <td style="text-align: center;"><strong style="color: var(--text-dark); font-size: 14px;">${s.scheduled}</strong></td>
+              <td style="text-align: center;"><strong style="color: #10b981; font-size: 14px;">${s.held}</strong></td>
+              <td style="text-align: center;">
+                <span class="sdr-metric-pill ${schClass}">${s.scheduleRate}%</span>
+              </td>
+              <td style="text-align: center;">
+                <span class="sdr-metric-pill ${showClass}">${s.showupRate}%</span>
+              </td>
+              <td style="text-align: center;">
+                <strong style="color: ${s.sales > 0 ? '#10b981' : 'var(--text-secondary)'};">${s.sales}</strong>
+              </td>
+              <td style="text-align: right;">
+                <strong style="color: #10b981;">${formatNumberToMoney(s.cash)}</strong>
+              </td>
+              <td style="text-align: center;">
+                <span class="sdr-score-badge">${s.score} pts</span>
+              </td>
+            `;
+            sdrRankingTableBody.appendChild(tr);
+          });
+        }
+      }
+
+      // ==========================================================
+      // CARDS INDIVIDUAIS DE ANÁLISE POR SDR
+      // ==========================================================
+      if (sdrIndividualCardsContainer) {
+        sdrIndividualCardsContainer.innerHTML = '';
+
+        displaySdrs.forEach(s => {
+          const card = document.createElement('div');
+          card.className = 'sdr-ind-card';
+          const avgDaily = passedDays > 0 ? (s.effort / passedDays).toFixed(1) : 0;
+
+          card.innerHTML = `
+            <div class="sdr-ind-header">
+              <div class="sdr-ind-profile">
+                <h4 class="sdr-ind-name">${s.name}</h4>
+                <span class="sdr-role-text">Membro Comercial • ${s.reportCount} envios</span>
+              </div>
+              <span class="sdr-ind-badge">${s.score} pts</span>
+            </div>
+
+            <div class="sdr-ind-stats-row">
+              <div class="sdr-ind-stat-item">
+                <span class="sdr-ind-stat-label">LEADS</span>
+                <span class="sdr-ind-stat-val">${s.leads}</span>
+              </div>
+              <div class="sdr-ind-stat-item">
+                <span class="sdr-ind-stat-label">FOLLOW-UPS</span>
+                <span class="sdr-ind-stat-val">${s.followups}</span>
+              </div>
+              <div class="sdr-ind-stat-item">
+                <span class="sdr-ind-stat-label">PROSPECÇÕES</span>
+                <span class="sdr-ind-stat-val">${s.prospeccoes}</span>
+              </div>
+            </div>
+
+            <div class="sdr-ind-stats-row">
+              <div class="sdr-ind-stat-item" style="background: rgba(91, 227, 54, 0.05); border-color: rgba(91, 227, 54, 0.2);">
+                <span class="sdr-ind-stat-label" style="color: #059669;">AGENDADAS</span>
+                <span class="sdr-ind-stat-val" style="color: #059669;">${s.scheduled}</span>
+              </div>
+              <div class="sdr-ind-stat-item" style="background: rgba(6, 182, 212, 0.05); border-color: rgba(6, 182, 212, 0.2);">
+                <span class="sdr-ind-stat-label" style="color: #0891b2;">REALIZADAS</span>
+                <span class="sdr-ind-stat-val" style="color: #0891b2;">${s.held}</span>
+              </div>
+              <div class="sdr-ind-stat-item" style="background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2);">
+                <span class="sdr-ind-stat-label" style="color: #059669;">VENDAS</span>
+                <span class="sdr-ind-stat-val" style="color: #059669;">${s.sales}</span>
+              </div>
+            </div>
+
+            <div style="font-size: 11.5px; color: var(--text-secondary); margin: 6px 0 10px 0; display: flex; justify-content: space-between; align-items: center;">
+              <span>Média diária: <strong>${avgDaily} ações/dia</strong></span>
+              <span>Cash: <strong style="color: #10b981;">${formatNumberToMoney(s.cash)}</strong></span>
+            </div>
+
+            <div class="sdr-ind-progress-box">
+              <div class="sdr-ind-progress-label">
+                <span>Taxa de Comparecimento (Show-up):</span>
+                <strong>${s.showupRate}% (${s.held}/${s.scheduled})</strong>
+              </div>
+              <div class="sdr-ind-progress-track">
+                <div class="sdr-ind-progress-fill" style="width: ${Math.min(100, Math.max(0, s.showupRate))}%;"></div>
+              </div>
+            </div>
+          `;
+          sdrIndividualCardsContainer.appendChild(card);
+        });
+      }
+
+    } catch (err) {
+      console.error('[SDR Performance] Erro ao renderizar view:', err);
+    }
+  }
+
+  // Exportação CSV de SDR
+  if (btnExportSdrCsv) {
+    btnExportSdrCsv.addEventListener('click', () => {
+      const selectedMonth = sdrFilterMonth ? (sdrFilterMonth.value || currentMonthKey) : currentMonthKey;
+      const allReports = getStoredCloserReports();
+      const monthReports = allReports.filter(r => (r.date || '').startsWith(selectedMonth));
+
+      const sdrMap = {};
+      closersList.forEach(name => {
+        sdrMap[name] = { name, leads: 0, followups: 0, prospeccoes: 0, effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0, score: 0 };
+      });
+
+      monthReports.forEach(r => {
+        const name = r.closer || r.sdr || r.member || r.name;
+        if (!name || name === 'Muller') return;
+        if (!sdrMap[name]) {
+          sdrMap[name] = { name, leads: 0, followups: 0, prospeccoes: 0, effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0, score: 0 };
+        }
+        sdrMap[name].leads += (parseInt(r.leads, 10) || 0);
+        sdrMap[name].followups += (parseInt(r.followups, 10) || 0);
+        sdrMap[name].prospeccoes += (parseInt(r.prospeccoes, 10) || 0);
+        sdrMap[name].effort += ((parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0));
+        sdrMap[name].scheduled += (parseInt(r.meetingsScheduled || r.scheduled, 10) || 0);
+        sdrMap[name].held += (parseInt(r.meetingsHeld || r.held, 10) || 0);
+        sdrMap[name].sales += (parseInt(r.sales, 10) || 0);
+        sdrMap[name].contracts += parseMoneyToNumber(r.contractVal || r.contracts);
+        sdrMap[name].cash += parseMoneyToNumber(r.cashCollected || r.cash);
+      });
+
+      const members = Object.values(sdrMap);
+      members.forEach(s => {
+        s.score = Math.round((s.scheduled * 6) + (s.held * 10) + (s.sales * 18) + (s.effort * 0.15));
+      });
+      members.sort((a, b) => b.score - a.score || b.scheduled - a.scheduled);
+
+      let csv = 'Posicao,SDR,Leads,Followups,Prospeccoes,Esforco_Total,Reunioes_Agendadas,Reunioes_Realizadas,Tx_Agendamento,Tx_Comparecimento_ShowUp,Vendas,Cash_Originado,Score_Produtividade\n';
+      members.forEach((m, idx) => {
+        const schRate = m.effort > 0 ? Math.round((m.scheduled / m.effort) * 100) : 0;
+        const showRate = m.scheduled > 0 ? Math.min(100, Math.round((m.held / m.scheduled) * 100)) : 0;
+        csv += `${idx + 1},"${m.name}",${m.leads},${m.followups},${m.prospeccoes},${m.effort},${m.scheduled},${m.held},"${schRate}%","${showRate}%",${m.sales},"${formatNumberToMoney(m.cash)}",${m.score}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `sdr_performance_${selectedMonth}.csv`;
+      link.click();
+      showToast('Relatório de SDR exportado com sucesso!');
+    });
+  }
+
+  // Listeners dos Filtros da Aba de SDR
+  if (sdrFilterMonth) {
+    sdrFilterMonth.addEventListener('change', renderSdrPerformanceView);
+  }
+  if (sdrFilterMember) {
+    sdrFilterMember.addEventListener('change', renderSdrPerformanceView);
+  }
+  if (sdrFilterClient) {
+    sdrFilterClient.addEventListener('change', renderSdrPerformanceView);
+  }
+
+  // ============================================================
   // HISTÓRICO COMERCIAL CONSOLIDADO
   // ============================================================
   function renderConsolidatedHistory() {
@@ -1053,8 +1553,9 @@ document.addEventListener('DOMContentLoaded', () => {
         <td style="text-align: right;">${entry.contracts}</td>
         <td style="text-align: right;"><strong style="color:#10b981;">${entry.cash}</strong></td>
         <td style="text-align: center;">
-          <button type="button" class="btn-history-view-image" data-id="${entry.id}">
-            <span>🖼️ Ver Imagem</span>
+          <button type="button" class="btn-apple-view-report btn-history-view-image" data-id="${entry.id}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            <span>Ver Relatório</span>
           </button>
         </td>
       `;
@@ -1350,7 +1851,351 @@ document.addEventListener('DOMContentLoaded', () => {
 
       closeSettingsModal();
       updateExecDashboard();
+      if (typeof renderSettingsView === 'function') {
+        renderSettingsView();
+      }
       showToast('Meta mensal atualizada com sucesso!');
+    });
+  }
+
+  // ============================================================
+  // GESTÃO DE CONFIGURAÇÕES & SDRS (TIME COMERCIAL)
+  // ============================================================
+  const STORAGE_MEMBERS_KEY = 'fa_prod_team_members_v1';
+
+  const settingsStatTotalMembers = document.getElementById('settings-stat-total-members');
+  const settingsStatActiveMembers = document.getElementById('settings-stat-active-members');
+  const settingsStatInactiveMembers = document.getElementById('settings-stat-inactive-members');
+  const settingsStatTotalReports = document.getElementById('settings-stat-total-reports');
+  const settingsMembersTableBody = document.getElementById('settings-members-table-body');
+  const settingsActiveCount = document.getElementById('settings-active-count');
+  const settingsGlobalGoalVal = document.getElementById('settings-global-goal-val');
+  const btnSettingsEditGoal = document.getElementById('btn-settings-edit-goal');
+  const btnSettingsCopyLink = document.getElementById('btn-settings-copy-link');
+
+  // Modal Member Elements
+  const modalMember = document.getElementById('modal-member');
+  const modalMemberTitle = document.getElementById('modal-member-title');
+  const memberFormId = document.getElementById('member-form-id');
+  const memberName = document.getElementById('member-name');
+  const memberRole = document.getElementById('member-role');
+  const memberStatus = document.getElementById('member-status');
+  const memberEmail = document.getElementById('member-email');
+  const btnOpenCreateMember = document.getElementById('btn-open-create-member');
+  const btnCloseMember = document.getElementById('btn-close-member');
+  const btnCancelMember = document.getElementById('btn-cancel-member');
+  const btnSaveMember = document.getElementById('btn-save-member');
+
+  function getTeamMembers() {
+    try {
+      const raw = localStorage.getItem(STORAGE_MEMBERS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+
+    const defaults = [
+      { id: 'mbr_tales', name: 'Tales', role: 'SDR / Comercial', status: 'active', email: '', created_at: '2026-01-01T00:00:00.000Z' },
+      { id: 'mbr_jose', name: 'José', role: 'SDR / Comercial', status: 'active', email: '', created_at: '2026-01-01T00:00:00.000Z' },
+      { id: 'mbr_elinaldo', name: 'Elinaldo', role: 'SDR / Comercial', status: 'active', email: '', created_at: '2026-01-01T00:00:00.000Z' }
+    ];
+    localStorage.setItem(STORAGE_MEMBERS_KEY, JSON.stringify(defaults));
+    return defaults;
+  }
+
+  function getActiveTeamMemberNames() {
+    const members = getTeamMembers();
+    return members.filter(m => m.status !== 'inactive').map(m => m.name);
+  }
+
+  function updateAllMemberDropdowns() {
+    const members = getTeamMembers();
+
+    // 1. Dropdown na aba SDR Performance
+    if (sdrFilterMember) {
+      const currentVal = sdrFilterMember.value;
+      sdrFilterMember.innerHTML = '<option value="all">Todos os SDRs (Visão Geral)</option>';
+      members.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.name;
+        opt.textContent = m.status === 'inactive' ? `${m.name} (Inativo)` : m.name;
+        sdrFilterMember.appendChild(opt);
+      });
+      if (Array.from(sdrFilterMember.options).some(o => o.value === currentVal)) {
+        sdrFilterMember.value = currentVal;
+      } else {
+        sdrFilterMember.value = 'all';
+      }
+    }
+
+    // 2. Dropdown na aba Histórico
+    if (historyFilterMember) {
+      const currentVal = historyFilterMember.value;
+      historyFilterMember.innerHTML = '<option value="all">Toda a Equipe</option>';
+      members.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.name;
+        opt.textContent = m.status === 'inactive' ? `${m.name} (Inativo)` : m.name;
+        historyFilterMember.appendChild(opt);
+      });
+      if (Array.from(historyFilterMember.options).some(o => o.value === currentVal)) {
+        historyFilterMember.value = currentVal;
+      } else {
+        historyFilterMember.value = 'all';
+      }
+    }
+  }
+
+  function renderSettingsView() {
+    try {
+      const members = getTeamMembers();
+      const allReports = getStoredCloserReports();
+      const currentMonthReports = allReports.filter(r => (r.date || '').startsWith(currentMonthKey));
+
+      const totalMembers = members.length;
+      const activeMembers = members.filter(m => m.status !== 'inactive').length;
+      const inactiveMembers = totalMembers - activeMembers;
+
+      if (settingsStatTotalMembers) settingsStatTotalMembers.textContent = totalMembers;
+      if (settingsStatActiveMembers) settingsStatActiveMembers.textContent = activeMembers;
+      if (settingsStatInactiveMembers) settingsStatInactiveMembers.textContent = inactiveMembers;
+      if (settingsStatTotalReports) settingsStatTotalReports.textContent = allReports.length;
+
+      if (settingsActiveCount) {
+        settingsActiveCount.textContent = `${activeMembers} SDRs ativos • ${inactiveMembers} inativos`;
+      }
+
+      if (settingsGlobalGoalVal) {
+        settingsGlobalGoalVal.textContent = formatNumberToMoney(getMonthlyGoal());
+      }
+
+      if (!settingsMembersTableBody) return;
+      settingsMembersTableBody.innerHTML = '';
+
+      if (members.length === 0) {
+        settingsMembersTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding: 24px; color: var(--text-secondary);">
+              Nenhum membro cadastrado no momento. Clique em "+ Novo SDR / Membro" para cadastrar.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      members.forEach(m => {
+        const tr = document.createElement('tr');
+        const isActive = (m.status !== 'inactive');
+
+        // Contagem de relatórios deste membro no mês
+        const monthCount = currentMonthReports.filter(r => {
+          const rName = r.closer || r.sdr || r.member || r.name || '';
+          return String(rName).trim().toLowerCase() === String(m.name).trim().toLowerCase();
+        }).length;
+
+        const dateStr = m.created_at ? formatDateBR(m.created_at.split('T')[0]) : '—';
+
+        tr.innerHTML = `
+          <td>
+            <div class="apple-member-cell">
+              <span class="apple-member-name">${m.name}</span>
+              ${m.email ? `<span class="apple-member-sub">${m.email}</span>` : ''}
+            </div>
+          </td>
+          <td>
+            <span class="apple-role-tag">
+              ${m.role || 'SDR / Pré-Vendas'}
+            </span>
+          </td>
+          <td style="text-align: center;">
+            <div class="apple-status-cell">
+              <label class="apple-toggle-switch" title="Ativar ou desativar presença deste SDR no formulário de relatórios">
+                <input type="checkbox" class="sdr-toggle-active-checkbox" data-id="${m.id}" ${isActive ? 'checked' : ''}>
+                <span class="toggle-track">
+                  <span class="toggle-thumb"></span>
+                </span>
+              </label>
+              <span class="apple-status-pill ${isActive ? 'is-active' : 'is-inactive'}">
+                ${isActive ? 'Ativo' : 'Inativo'}
+              </span>
+            </div>
+          </td>
+          <td style="text-align: center;">
+            <strong style="color: ${monthCount > 0 ? 'var(--text-dark)' : 'var(--text-secondary)'}; font-variant-numeric: tabular-nums;">${monthCount}</strong>
+          </td>
+          <td style="text-align: center; color: var(--text-secondary); font-size: 12px;">
+            ${dateStr}
+          </td>
+          <td style="text-align: right;">
+            <div class="apple-action-group">
+              <button type="button" class="btn-apple-action btn-edit-member" data-id="${m.id}" title="Editar SDR">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <span>Editar</span>
+              </button>
+              <button type="button" class="btn-apple-action btn-apple-danger btn-delete-member" data-id="${m.id}" data-name="${m.name}" title="Excluir SDR">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>Excluir</span>
+              </button>
+            </div>
+          </td>
+        `;
+
+        // Event listener do Switch Ativo / Inativo
+        const checkbox = tr.querySelector('.sdr-toggle-active-checkbox');
+        const pillText = tr.querySelector('.apple-status-pill');
+        checkbox.addEventListener('change', async () => {
+          const newStatus = checkbox.checked ? 'active' : 'inactive';
+          pillText.textContent = checkbox.checked ? 'Ativo' : 'Inativo';
+          pillText.className = `apple-status-pill ${checkbox.checked ? 'is-active' : 'is-inactive'}`;
+
+          m.status = newStatus;
+          if (typeof dbSaveTeamMember === 'function') {
+            await dbSaveTeamMember(m);
+          } else {
+            const list = getTeamMembers();
+            const idx = list.findIndex(item => item.id === m.id);
+            if (idx >= 0) list[idx].status = newStatus;
+            localStorage.setItem(STORAGE_MEMBERS_KEY, JSON.stringify(list));
+          }
+
+          updateAllMemberDropdowns();
+          showToast(checkbox.checked ? `SDR ${m.name} ativado no formulário!` : `SDR ${m.name} desativado do formulário.`);
+        });
+
+        // Event listener de Editar
+        const btnEdit = tr.querySelector('.btn-edit-member');
+        btnEdit.addEventListener('click', () => {
+          openMemberModal(m);
+        });
+
+        // Event listener de Excluir
+        const btnDelete = tr.querySelector('.btn-delete-member');
+        btnDelete.addEventListener('click', async () => {
+          if (confirm(`Tem certeza de que deseja remover o SDR "${m.name}" da equipe? (O histórico de relatórios anteriores permanecerá preservado no banco).`)) {
+            if (typeof dbDeleteTeamMember === 'function') {
+              await dbDeleteTeamMember(m.id);
+            } else {
+              let list = getTeamMembers();
+              list = list.filter(item => item.id !== m.id);
+              localStorage.setItem(STORAGE_MEMBERS_KEY, JSON.stringify(list));
+            }
+
+            renderSettingsView();
+            updateAllMemberDropdowns();
+            showToast(`SDR ${m.name} removido com sucesso.`);
+          }
+        });
+
+        settingsMembersTableBody.appendChild(tr);
+      });
+
+    } catch (e) {
+      console.error('[Settings View] Erro ao renderizar:', e);
+    }
+  }
+
+  function openMemberModal(member = null) {
+    if (!modalMember) return;
+    if (member) {
+      if (modalMemberTitle) modalMemberTitle.textContent = 'Editar Membro Comercial';
+      if (memberFormId) memberFormId.value = member.id;
+      if (memberName) memberName.value = member.name || '';
+      if (memberRole) memberRole.value = member.role || 'SDR / Pré-Vendas';
+      if (memberStatus) memberStatus.value = member.status || 'active';
+      if (memberEmail) memberEmail.value = member.email || '';
+    } else {
+      if (modalMemberTitle) modalMemberTitle.textContent = 'Novo SDR / Membro Comercial';
+      if (memberFormId) memberFormId.value = '';
+      if (memberName) memberName.value = '';
+      if (memberRole) memberRole.value = 'SDR / Pré-Vendas';
+      if (memberStatus) memberStatus.value = 'active';
+      if (memberEmail) memberEmail.value = '';
+    }
+    modalMember.classList.add('open');
+    if (memberName) setTimeout(() => memberName.focus(), 50);
+  }
+
+  function closeMemberModal() {
+    if (modalMember) modalMember.classList.remove('open');
+  }
+
+  if (btnOpenCreateMember) {
+    btnOpenCreateMember.addEventListener('click', () => openMemberModal(null));
+  }
+  if (btnCloseMember) btnCloseMember.addEventListener('click', closeMemberModal);
+  if (btnCancelMember) btnCancelMember.addEventListener('click', closeMemberModal);
+
+  if (modalMember) {
+    modalMember.addEventListener('click', (e) => {
+      if (e.target === modalMember) closeMemberModal();
+    });
+  }
+
+  if (btnSaveMember) {
+    btnSaveMember.addEventListener('click', async () => {
+      const name = memberName ? memberName.value.trim() : '';
+      if (!name) {
+        showToast('Por favor, informe o nome do membro.', true);
+        if (memberName) memberName.focus();
+        return;
+      }
+
+      const id = memberFormId ? memberFormId.value : '';
+      const role = memberRole ? memberRole.value.trim() : 'SDR / Pré-Vendas';
+      const status = memberStatus ? memberStatus.value : 'active';
+      const email = memberEmail ? memberEmail.value.trim() : '';
+
+      const memberObj = {
+        id: id || `mbr_${Date.now()}`,
+        name: name,
+        role: role,
+        status: status,
+        email: email
+      };
+
+      if (typeof dbSaveTeamMember === 'function') {
+        await dbSaveTeamMember(memberObj);
+      } else {
+        const list = getTeamMembers();
+        const idx = list.findIndex(m => m.id === memberObj.id);
+        if (idx >= 0) list[idx] = { ...list[idx], ...memberObj };
+        else list.push({ ...memberObj, created_at: new Date().toISOString() });
+        localStorage.setItem(STORAGE_MEMBERS_KEY, JSON.stringify(list));
+      }
+
+      closeMemberModal();
+      renderSettingsView();
+      updateAllMemberDropdowns();
+      showToast(`Membro "${name}" salvo com sucesso!`);
+    });
+  }
+
+  if (btnSettingsEditGoal) {
+    btnSettingsEditGoal.addEventListener('click', openSettingsModal);
+  }
+
+  if (btnSettingsCopyLink) {
+    btnSettingsCopyLink.addEventListener('click', () => {
+      const currentUrl = window.location.href;
+      let baseUrl = currentUrl.split('#')[0];
+      if (baseUrl.endsWith('index.html')) {
+        baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('index.html'));
+      }
+      if (!baseUrl.endsWith('/')) {
+        baseUrl += '/';
+      }
+      const teamUrl = baseUrl + 'relatorio.html';
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(teamUrl).then(() => {
+          showToast('Link do formulário copiado!');
+        }).catch(() => {
+          window.open(teamUrl, '_blank');
+        });
+      } else {
+        window.open(teamUrl, '_blank');
+      }
     });
   }
 
@@ -1522,6 +2367,38 @@ document.addEventListener('DOMContentLoaded', () => {
     optAll.value = 'all';
     optAll.textContent = '🌐 Visão Consolidada (Todos os Clientes)';
     dashFilterClient.appendChild(optAll);
+
+    // Povoa também o filtro de clientes da aba SDR se existir
+    if (sdrFilterClient) {
+      const prevSdrVal = sdrFilterClient.value;
+      sdrFilterClient.innerHTML = '';
+      
+      const optSdrAll = document.createElement('option');
+      optSdrAll.value = 'all';
+      optSdrAll.textContent = '🌐 Todos os Projetos (Consolidado)';
+      sdrFilterClient.appendChild(optSdrAll);
+
+      if (primaryClient) {
+        const optSdrPrimary = document.createElement('option');
+        optSdrPrimary.value = primaryClient.id;
+        optSdrPrimary.textContent = `⭐ ${primaryClient.name} (Projeto Principal)`;
+        sdrFilterClient.appendChild(optSdrPrimary);
+      }
+
+      clients.forEach(c => {
+        if (primaryClient && String(c.id) === String(primaryClient.id)) return;
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.name} (${c.segment || 'Geral'})`;
+        sdrFilterClient.appendChild(opt);
+      });
+
+      if (prevSdrVal && Array.from(sdrFilterClient.options).some(o => o.value === prevSdrVal)) {
+        sdrFilterClient.value = prevSdrVal;
+      } else {
+        sdrFilterClient.value = 'all';
+      }
+    }
 
     // Seleção: Se o usuário NÃO trocou manualmente durante a sessão, PUXA SEMPRE O PRINCIPAL!
     if (!userManuallySelectedClient && primaryClient) {
@@ -2346,24 +3223,31 @@ document.addEventListener('DOMContentLoaded', () => {
         typeof dbFetchClients === 'function' ? dbFetchClients() : Promise.resolve(),
         typeof dbFetchPlannings === 'function' ? dbFetchPlannings() : Promise.resolve(),
         typeof dbFetchCloserReports === 'function' ? dbFetchCloserReports() : Promise.resolve(),
+        typeof dbFetchTeamMembers === 'function' ? dbFetchTeamMembers() : Promise.resolve(),
         typeof dbGetPrimaryProjectId === 'function' ? dbGetPrimaryProjectId() : Promise.resolve()
       ]);
     } catch (e) {
       console.warn('[Supabase Sync] Falha ao sincronizar com o banco:', e);
     }
 
+    updateAllMemberDropdowns();
     await populateTopBarFilters();
     updateExecDashboard();
+    renderSdrPerformanceView();
     renderConsolidatedHistory();
     renderProjectsView();
+    renderSettingsView();
   }
 
   // 1. Executa imediatamente e sincronamente usando os dados em cache do localStorage
+  updateAllMemberDropdowns();
   populateTopBarFiltersSync();
   populateMonthFilter();
   updateExecDashboard();
+  renderSdrPerformanceView();
   renderConsolidatedHistory();
   renderProjectsView();
+  renderSettingsView();
   initSupabaseHealth();
   loadDataFromSupabase();
 
@@ -2371,8 +3255,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const initialHash = window.location.hash.replace('#', '');
   if (initialHash === 'projects') {
     showView('view-projects');
+  } else if (initialHash === 'sdr-performance' || initialHash === 'sdr') {
+    showView('view-sdr-performance');
   } else if (initialHash === 'history') {
     showView('view-history');
+  } else if (initialHash === 'settings') {
+    showView('view-settings');
   } else {
     showView('view-dashboard');
   }

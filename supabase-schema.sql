@@ -88,7 +88,19 @@ CREATE TABLE IF NOT EXISTS public.team_reports (
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 6. TABELA DE CONFIGURAÇÕES GERAIS DO DASHBOARD
+-- 6. TABELA DE MEMBROS DA EQUIPE / SDRS
+CREATE TABLE IF NOT EXISTS public.team_members (
+  id TEXT PRIMARY KEY, -- formato: mbr_{uuid} ou mbr_{nome}
+  name TEXT NOT NULL,
+  role TEXT DEFAULT 'SDR / Pré-Vendas',
+  status TEXT DEFAULT 'active', -- 'active' ou 'inactive'
+  email TEXT,
+  phone TEXT,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 7. TABELA DE CONFIGURAÇÕES GERAIS DO DASHBOARD
 CREATE TABLE IF NOT EXISTS public.system_settings (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL,
@@ -105,7 +117,14 @@ ALTER TABLE public.client_planning ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.closer_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sdr_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.team_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.team_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.system_settings ENABLE ROW LEVEL SECURITY;
+
+-- Políticas para public.team_members
+CREATE POLICY "Permitir leitura pública team_members" ON public.team_members FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "Permitir inserção pública team_members" ON public.team_members FOR INSERT TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "Permitir atualização pública team_members" ON public.team_members FOR UPDATE TO anon, authenticated USING (true);
+CREATE POLICY "Permitir exclusão pública team_members" ON public.team_members FOR DELETE TO anon, authenticated USING (true);
 
 -- Políticas para public.team_reports
 CREATE POLICY "Permitir leitura pública team_reports" ON public.team_reports FOR SELECT TO anon, authenticated USING (true);
@@ -143,8 +162,15 @@ CREATE POLICY "Permitir inserção pública settings" ON public.system_settings 
 CREATE POLICY "Permitir atualização pública settings" ON public.system_settings FOR UPDATE TO anon, authenticated USING (true);
 
 -- ==============================================================================
--- CONFIGURAÇÕES PADRÃO DO SISTEMA
+-- CONFIGURAÇÕES E MEMBROS PADRÃO DO SISTEMA
 -- ==============================================================================
+
+INSERT INTO public.team_members (id, name, role, status)
+VALUES 
+  ('mbr_tales', 'Tales', 'SDR / Comercial', 'active'),
+  ('mbr_jose', 'José', 'SDR / Comercial', 'active'),
+  ('mbr_elinaldo', 'Elinaldo', 'SDR / Comercial', 'active')
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.system_settings (key, value)
 VALUES 
@@ -152,4 +178,5 @@ VALUES
   ('money_on_table', '45000'),
   ('win_rate', '40')
 ON CONFLICT (key) DO NOTHING;
+
 
