@@ -483,7 +483,9 @@
               <span id="projects-active-count">Carregando clientes...</span>
             </span>
             <span class="primary-project-header-pill" id="projects-primary-pill" style="display: none;">
-              <span class="p-star-icon">⭐</span>
+              <span class="p-star-icon">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              </span>
               <span>Principal: <strong id="projects-primary-name">-</strong></span>
             </span>
           </div>
@@ -531,9 +533,8 @@
 
           <div class="projects-status-tabs" id="projects-status-tabs">
             <button type="button" class="p-tab-btn active" data-status="all">Todos</button>
-            <button type="button" class="p-tab-btn" data-status="active">🟢 Ativos</button>
-            <button type="button" class="p-tab-btn" data-status="onboarding">🟡 Onboarding</button>
-            <button type="button" class="p-tab-btn" data-status="paused">⚪ Pausados</button>
+            <button type="button" class="p-tab-btn" data-status="active">Ativos</button>
+            <button type="button" class="p-tab-btn" data-status="finished">Finalizados / Pausados</button>
           </div>
         </div>
 
@@ -1226,7 +1227,7 @@
           <div class="uifry-input-box">
             <select id="client-status" class="uifry-input" style="background: transparent; border: none; cursor: pointer;">
               <option value="active">Ativo (Em Operação)</option>
-              <option value="onboarding">Em Onboarding</option>
+              <option value="finished">Finalizado / Desativado</option>
               <option value="paused">Pausado / Em Espera</option>
             </select>
           </div>

@@ -2640,7 +2640,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Filtra lista de clientes por busca e por status
     let filteredClients = [...clients];
     if (projectsStatusFilter && projectsStatusFilter !== 'all') {
-      filteredClients = filteredClients.filter(c => (c.status || 'active') === projectsStatusFilter);
+      if (projectsStatusFilter === 'active') {
+        filteredClients = filteredClients.filter(c => (c.status || 'active') === 'active');
+      } else if (projectsStatusFilter === 'finished') {
+        filteredClients = filteredClients.filter(c => c.status === 'finished' || c.status === 'paused');
+      } else {
+        filteredClients = filteredClients.filter(c => (c.status || 'active') === projectsStatusFilter);
+      }
     }
     if (projectsSearchQuery && projectsSearchQuery.trim()) {
       const q = projectsSearchQuery.trim().toLowerCase();
@@ -2723,8 +2729,13 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       const isPrimary = Boolean(primaryProjectId && String(c.id) === String(primaryProjectId));
+      const isClientActive = (c.status || 'active') === 'active';
+      const statusClass = isClientActive ? 'status-active' : (c.status === 'paused' ? 'status-paused' : 'status-finished');
+      const statusLabel = isClientActive ? 'Ativo' : (c.status === 'paused' ? 'Pausado' : 'Finalizado');
+      const cardStateClass = isClientActive ? '' : (c.status === 'paused' ? 'is-paused-card' : 'is-finished-card');
+
       const card = document.createElement('div');
-      card.className = `project-card ${isPrimary ? 'is-primary-card' : ''}`;
+      card.className = `project-card ${isPrimary ? 'is-primary-card' : ''} ${cardStateClass}`;
       card.dataset.clientId = c.id;
 
       card.innerHTML = `
@@ -2732,13 +2743,21 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="project-card-title-box">
             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
               <h3 class="project-card-name">${c.name}</h3>
-              ${isPrimary ? '<span class="badge-primary-project" title="Projeto Principal definido para novos relatórios">⭐ Principal</span>' : ''}
+              ${isPrimary ? '<span class="badge-primary-project" title="Projeto Principal definido para novos relatórios"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" stroke="none" style="vertical-align:-1px;margin-right:2px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>Principal</span>' : ''}
             </div>
             <span class="project-card-segment">${c.segment || 'Segmento B2B'}</span>
           </div>
-          <span class="project-status-pill status-${c.status || 'active'}">
-            ${c.status === 'active' ? '🟢 Ativo' : c.status === 'onboarding' ? '🟡 Onboarding' : '⚪ Pausado'}
-          </span>
+
+          <div class="project-card-status-control">
+            <label class="apple-toggle-switch" title="${isClientActive ? 'Clique para desativar/finalizar este projeto' : 'Clique para ativar este projeto'}">
+              <input type="checkbox" class="project-status-toggle" data-id="${c.id}" ${isClientActive ? 'checked' : ''}>
+              <span class="apple-toggle-slider"></span>
+            </label>
+            <span class="project-status-pill ${statusClass}">
+              <span class="status-dot"></span>
+              <span>${statusLabel}</span>
+            </span>
+          </div>
         </div>
 
         <div class="project-card-stats">
@@ -2820,6 +2839,49 @@ document.addEventListener('DOMContentLoaded', () => {
       projectsClientsContainer.appendChild(card);
     });
 
+    // Listener para o Apple Switch de Ativação / Desativação / Finalização
+    projectsClientsContainer.querySelectorAll('.project-status-toggle').forEach(toggle => {
+      toggle.addEventListener('change', async () => {
+        const cId = toggle.getAttribute('data-id');
+        const targetCli = clients.find(c => String(c.id) === String(cId));
+        if (!targetCli) return;
+
+        const willBeActive = toggle.checked;
+        targetCli.status = willBeActive ? 'active' : 'finished';
+
+        // Se o projeto foi desativado/finalizado e era o projeto principal, atualiza o principal
+        if (!willBeActive && primaryProjectId && String(targetCli.id) === String(primaryProjectId)) {
+          const nextActive = clients.find(other => String(other.id) !== String(targetCli.id) && (other.status === 'active' || !other.status));
+          if (nextActive) {
+            primaryProjectId = nextActive.id;
+            if (typeof dbSetPrimaryProjectId === 'function') {
+              await dbSetPrimaryProjectId(nextActive.id);
+            } else {
+              localStorage.setItem('fa_primary_project_id_v1', nextActive.id);
+            }
+          } else {
+            primaryProjectId = null;
+            if (typeof dbSetPrimaryProjectId === 'function') {
+              await dbSetPrimaryProjectId('');
+            } else {
+              localStorage.removeItem('fa_primary_project_id_v1');
+            }
+          }
+        }
+
+        await dbSaveClient(targetCli);
+        await populateTopBarFilters();
+        await renderProjectsView();
+        updateExecDashboard();
+
+        if (willBeActive) {
+          showToast(`Projeto "${targetCli.name}" ativado com sucesso!`);
+        } else {
+          showToast(`Projeto "${targetCli.name}" finalizado/desativado.`);
+        }
+      });
+    });
+
     // Eventos dos botões dos cards
     projectsClientsContainer.querySelectorAll('.btn-set-primary').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -2828,6 +2890,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!targetCli) return;
 
         btn.disabled = true;
+
+        // Ao definir como principal, garante que o projeto esteja ativo
+        if (targetCli.status !== 'active') {
+          targetCli.status = 'active';
+          await dbSaveClient(targetCli);
+        }
+
         if (typeof dbSetPrimaryProjectId === 'function') {
           await dbSetPrimaryProjectId(cId);
         } else {
@@ -2839,7 +2908,7 @@ document.addEventListener('DOMContentLoaded', () => {
           dashFilterClient.value = cId;
           updateExecDashboard();
         }
-        showToast(`⭐ Projeto "${targetCli.name}" definido como Principal para relatórios e dashboard!`);
+        showToast(`Projeto "${targetCli.name}" definido como Principal para relatórios e dashboard!`);
       });
     });
 

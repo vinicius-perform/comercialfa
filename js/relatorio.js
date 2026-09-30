@@ -53,9 +53,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // Apenas projetos com status ativo são elegíveis para novos lançamentos diários
+      const activeClients = clients.filter(c => (c.status || 'active') === 'active');
+
       let primaryClient = null;
 
-      clients.forEach(c => {
+      activeClients.forEach(c => {
         const isPrimary = Boolean(primaryId && String(c.id) === String(primaryId));
         if (isPrimary) primaryClient = c;
 
@@ -70,9 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (primaryClient) {
         selectClientId.value = primaryClient.id;
         showPrimaryNotice(primaryClient.name, true);
-      } else if (clients.length === 1) {
-        selectClientId.value = clients[0].id;
-        showPrimaryNotice(clients[0].name, false);
+      } else if (activeClients.length === 1) {
+        selectClientId.value = activeClients[0].id;
+        showPrimaryNotice(activeClients[0].name, false);
       } else {
         hidePrimaryNotice();
       }

@@ -2738,27 +2738,127 @@ input[type=number] {
   color: var(--text-secondary);
 }
 
+.project-card.is-finished-card {
+  opacity: 0.85;
+  border-style: dashed;
+}
+
+.project-card.is-finished-card:hover {
+  opacity: 1;
+}
+
+.project-card-status-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Apple iOS Toggle Switch para Status do Projeto */
+.apple-toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 22px;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.apple-toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.apple-toggle-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e2e8f0;
+  transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 22px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.apple-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #ffffff;
+  transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.apple-toggle-switch input:checked + .apple-toggle-slider {
+  background-color: #34c759;
+}
+
+.apple-toggle-switch input:checked + .apple-toggle-slider:before {
+  transform: translateX(16px);
+}
+
+/* Status Pill Padrão Apple */
 .project-status-pill {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
   white-space: nowrap;
+  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
+}
+
+.project-status-pill .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
 }
 
 .project-status-pill.status-active {
-  background: rgba(91, 227, 54, 0.15);
-  color: #2e7d32;
+  background: rgba(52, 199, 89, 0.12);
+  color: #1b8738;
+  border: 1px solid rgba(52, 199, 89, 0.25);
 }
 
-.project-status-pill.status-onboarding {
-  background: rgba(234, 179, 8, 0.15);
-  color: #b45309;
+.project-status-pill.status-active .status-dot {
+  box-shadow: 0 0 6px rgba(52, 199, 89, 0.6);
+  animation: pulseGreenDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseGreenDot {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.65; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.project-status-pill.status-finished {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
 }
 
 .project-status-pill.status-paused {
-  background: #f1f3f5;
-  color: #6c757d;
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.project-status-pill.status-onboarding {
+  background: rgba(59, 130, 246, 0.12);
+  color: #1d4ed8;
+  border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
 .project-card-stats {
