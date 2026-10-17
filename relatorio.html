@@ -64,28 +64,31 @@
 
         <form id="daily-report-form" autocomplete="off">
 
-          <!-- ETAPA 1: SELEÇÃO DE NOME -->
+          <!-- ETAPA 1: DIGITAÇÃO DO NOME -->
           <div class="form-section">
             <div class="section-title-row">
               <span class="section-number">1</span>
               <span class="section-title">QUEM É VOCÊ?</span>
             </div>
 
-            <!-- Seleção Unificada de Membro da Equipe -->
-            <div class="name-chips-container" id="team-names-box">
-              <label class="input-sublabel">Selecione o seu nome na equipe comercial:</label>
-              <div class="chips-grid" id="team-chips-grid">
-                <!-- Injetado dinamicamente via relatorio.js com base nos membros ativos -->
-                <button type="button" class="name-chip active" data-name="Tales">
-                  <span>Tales</span>
-                </button>
-                <button type="button" class="name-chip" data-name="José">
-                  <span>José</span>
-                </button>
-                <button type="button" class="name-chip" data-name="Elinaldo">
-                  <span>Elinaldo</span>
-                </button>
+            <!-- Campo de Digitação Direta do Nome -->
+            <div class="name-input-container" id="team-names-box">
+              <label for="input-member-name" class="input-sublabel">DIGITE O SEU NOME:</label>
+              <div class="apple-input-box" style="margin-top: 6px;">
+                <input 
+                  type="text" 
+                  id="input-member-name" 
+                  class="apple-input font-bold" 
+                  placeholder="Digite seu nome (Ex: Tales, José, Ana...)" 
+                  required 
+                  autocomplete="name"
+                  list="team-members-datalist"
+                >
               </div>
+              <datalist id="team-members-datalist">
+                <!-- Populado dinamicamente com sugestões de membros -->
+              </datalist>
+              <span class="field-hint">Informe seu nome para vincular este relatório aos seus resultados comerciais.</span>
             </div>
           </div>
 
@@ -375,7 +378,7 @@
 
         <div class="modal-card-body" style="padding-top: 10px;">
           <p style="font-size: 13.5px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;">
-            Atenção: Já existe(m) <strong id="duplicate-count-text" style="color: #ffffff;">1 relatório</strong> registrado por <strong id="duplicate-member-name" style="color: #ffffff;">Tales</strong> para a data de <strong id="duplicate-date-text" style="color: #a3e635;">23/09/2026</strong>.
+            Atenção: Já existe(m) <strong id="duplicate-count-text" style="color: #ffffff;">1 relatório</strong> registrado por <strong id="duplicate-member-name" style="color: #ffffff;">-</strong> para a data de <strong id="duplicate-date-text" style="color: #a3e635;">-</strong>.
           </p>
           <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 12px 14px; font-size: 12.5px; color: #fcd34d; line-height: 1.45;">
             ⚠️ <strong>Tem certeza de que deseja gerar um novo relatório para esta mesma data?</strong><br>
@@ -473,7 +476,7 @@
             <div class="card-member-row">
               <div class="member-info-block">
                 <span class="member-label">RESPONSÁVEL:</span>
-                <h3 class="member-name" id="card-member-name">TALES</h3>
+                <h3 class="member-name" id="card-member-name">-</h3>
               </div>
               <div class="member-role-badge" id="card-member-role-badge">EQUIPE DE VENDAS</div>
             </div>

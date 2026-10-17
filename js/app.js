@@ -875,22 +875,30 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!execRankingTableBody) return;
     execRankingTableBody.innerHTML = '';
 
-    // Membros Oficiais da Equipe Comercial (Tales, José, Elinaldo)
+    // Membros da Equipe Comercial (Cadastrados + Nomes dos Relatórios)
     const closerData = {};
-    closersList.forEach(c => {
-      closerData[c] = { name: c, role: 'Comercial', effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0 };
-    });
+    if (typeof getTeamMembers === 'function') {
+      const teamMembers = getTeamMembers();
+      teamMembers.forEach(c => {
+        if (c && c.name) {
+          closerData[c.name] = { name: c.name, role: 'Comercial', effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0 };
+        }
+      });
+    }
 
     if (Array.isArray(closerReports)) {
       closerReports.forEach(r => {
-        if (closerData[r.closer]) {
-          closerData[r.closer].effort += (parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0);
-          closerData[r.closer].scheduled += parseInt(r.meetingsScheduled, 10) || 0;
-          closerData[r.closer].held += parseInt(r.meetingsHeld, 10) || 0;
-          closerData[r.closer].sales += parseInt(r.sales, 10) || 0;
-          closerData[r.closer].contracts += parseMoneyToNumber(r.contractVal);
-          closerData[r.closer].cash += parseMoneyToNumber(r.cashCollected);
+        const cName = r.closer || r.member || r.name;
+        if (!cName) return;
+        if (!closerData[cName]) {
+          closerData[cName] = { name: cName, role: 'Comercial', effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0 };
         }
+        closerData[cName].effort += (parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0);
+        closerData[cName].scheduled += parseInt(r.meetingsScheduled || r.scheduled, 10) || 0;
+        closerData[cName].held += parseInt(r.meetingsHeld || r.held, 10) || 0;
+        closerData[cName].sales += parseInt(r.sales, 10) || 0;
+        closerData[cName].contracts += parseMoneyToNumber(r.contractVal || r.contracts);
+        closerData[cName].cash += parseMoneyToNumber(r.cashCollected || r.cash);
       });
     }
 
@@ -932,20 +940,22 @@ document.addEventListener('DOMContentLoaded', () => {
     btnExportExecCsv.addEventListener('click', () => {
       const closerReports = getStoredCloserReports();
       const closerData = {};
-      closersList.forEach(c => {
-        closerData[c] = { name: c, role: 'Comercial', effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0 };
-      });
 
-      closerReports.forEach(r => {
-        if (closerData[r.closer]) {
-          closerData[r.closer].effort += (parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0);
-          closerData[r.closer].scheduled += parseInt(r.meetingsScheduled, 10) || 0;
-          closerData[r.closer].held += parseInt(r.meetingsHeld, 10) || 0;
-          closerData[r.closer].sales += parseInt(r.sales, 10) || 0;
-          closerData[r.closer].contracts += parseMoneyToNumber(r.contractVal);
-          closerData[r.closer].cash += parseMoneyToNumber(r.cashCollected);
-        }
-      });
+      if (Array.isArray(closerReports)) {
+        closerReports.forEach(r => {
+          const cName = r.closer || r.member || r.name;
+          if (!cName) return;
+          if (!closerData[cName]) {
+            closerData[cName] = { name: cName, role: 'Comercial', effort: 0, scheduled: 0, held: 0, sales: 0, contracts: 0, cash: 0 };
+          }
+          closerData[cName].effort += (parseInt(r.followups, 10) || 0) + (parseInt(r.prospeccoes, 10) || 0);
+          closerData[cName].scheduled += parseInt(r.meetingsScheduled || r.scheduled, 10) || 0;
+          closerData[cName].held += parseInt(r.meetingsHeld || r.held, 10) || 0;
+          closerData[cName].sales += parseInt(r.sales, 10) || 0;
+          closerData[cName].contracts += parseMoneyToNumber(r.contractVal || r.contracts);
+          closerData[cName].cash += parseMoneyToNumber(r.cashCollected || r.cash);
+        });
+      }
 
       const members = Object.values(closerData);
       members.sort((a, b) => b.cash - a.cash || b.sales - a.sales || b.scheduled - a.scheduled);
@@ -1494,7 +1504,7 @@ document.addEventListener('DOMContentLoaded', () => {
       allEntries.push({
         id: r.id,
         date: r.date,
-        name: r.closer,
+        name: r.closer || r.member || r.name || 'Membro',
         role: 'Comercial',
         clientName: clientName,
         isPrimary: isPrimary,
@@ -1619,7 +1629,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="card-member-row">
         <div class="member-info-block">
           <span class="member-label">RESPONSÁVEL:</span>
-          <h3 class="member-name">${(report.closer || '').toUpperCase()}</h3>
+          <h3 class="member-name">${(report.closer || report.member || report.name || 'MEMBRO').toUpperCase()}</h3>
         </div>
         <div style="text-align: right;">
           <span class="member-label">PROJETO OU CLIENTE:</span>
@@ -1911,6 +1921,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateAllMemberDropdowns() {
     const members = getTeamMembers();
+    const existingNames = new Set(members.map(m => m.name.toLowerCase()));
+
+    // Inclui nomes que constem nos relatórios para poder filtrar por qualquer pessoa que tenha registrado
+    const allReports = getStoredCloserReports();
+    allReports.forEach(r => {
+      const n = (r.closer || r.sdr || r.member || r.name || '').trim();
+      if (n && !existingNames.has(n.toLowerCase())) {
+        existingNames.add(n.toLowerCase());
+        members.push({ name: n, status: 'active' });
+      }
+    });
 
     // 1. Dropdown na aba SDR Performance
     if (sdrFilterMember) {

@@ -9,11 +9,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const STORAGE_SDR_REPORTS = 'fa_prod_sdr_reports_v1';
   const STORAGE_TEAM_REPORTS = 'fa_prod_team_reports_v1';
 
-  // Estado do Membro Ativo
-  let currentName = 'Tales';
-
-  // Elementos do DOM: Seleção de Nome
+  // Elementos do DOM: Digitação de Nome
+  const inputMemberName = document.getElementById('input-member-name');
+  const teamMembersDatalist = document.getElementById('team-members-datalist');
   const teamNamesBox = document.getElementById('team-names-box');
+
+  // Estado do Membro (Recupera último nome digitado pelo usuário neste dispositivo)
+  let currentName = '';
+  try {
+    const savedName = localStorage.getItem('fa_last_reporter_name') || '';
+    if (savedName) {
+      currentName = savedName;
+      if (inputMemberName) inputMemberName.value = savedName;
+    }
+  } catch (e) {}
+
+  if (inputMemberName) {
+    inputMemberName.addEventListener('input', () => {
+      currentName = inputMemberName.value.trim();
+    });
+  }
 
   // Elementos de Data e Cliente
   const inputReportDate = document.getElementById('input-report-date');
@@ -287,52 +302,37 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
-  // SELEÇÃO DINÂMICA DE MEMBRO DA EQUIPE (APENAS ATIVOS)
+  // SUGESTÕES DINÂMICAS DE NOMES NO CAMPO DE DIGITAÇÃO (DATALIST)
   // ============================================================
   const STORAGE_MEMBERS_KEY = 'fa_prod_team_members_v1';
-  const teamChipsGrid = document.getElementById('team-chips-grid') || (teamNamesBox ? teamNamesBox.querySelector('.chips-grid') : null);
 
-  function renderDynamicTeamChips(members) {
-    if (!teamChipsGrid) return;
-    
-    if (!Array.isArray(members) || members.length === 0) {
-      members = [
-        { name: 'Tales', status: 'active' },
-        { name: 'José', status: 'active' },
-        { name: 'Elinaldo', status: 'active' }
-      ];
-    }
+  function populateTeamDatalist(members) {
+    if (!teamMembersDatalist) return;
 
-    // Filtra estritamente apenas membros com status ativo
-    const activeMembers = members.filter(m => m.status !== 'inactive');
+    const nameSet = new Set();
 
-    if (activeMembers.length === 0) {
-      teamChipsGrid.innerHTML = '<span style="font-size:12.5px; color:#f87171; padding:8px 0; display:block;">⚠️ Nenhum membro comercial ativo no momento. Ative um membro nas Configurações do painel.</span>';
-      return;
-    }
-
-    // Se o currentName atual não estiver entre os ativos, redefine para o primeiro ativo
-    const isCurrentActive = activeMembers.some(m => m.name.toLowerCase() === (currentName || '').toLowerCase());
-    if (!isCurrentActive && activeMembers.length > 0) {
-      currentName = activeMembers[0].name;
-    }
-
-    teamChipsGrid.innerHTML = '';
-    activeMembers.forEach(m => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      const isActive = (m.name.toLowerCase() === (currentName || '').toLowerCase());
-      btn.className = `name-chip ${isActive ? 'active' : ''}`;
-      btn.setAttribute('data-name', m.name);
-      btn.innerHTML = `<span>${m.name}</span>`;
-
-      btn.addEventListener('click', () => {
-        teamChipsGrid.querySelectorAll('.name-chip').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        currentName = m.name;
+    if (Array.isArray(members)) {
+      members.filter(m => m && m.status !== 'inactive').forEach(m => {
+        if (m.name && m.name.trim()) nameSet.add(m.name.trim());
       });
+    }
 
-      teamChipsGrid.appendChild(btn);
+    try {
+      const rawC = localStorage.getItem(STORAGE_CLOSER_REPORTS);
+      if (rawC) {
+        const reports = JSON.parse(rawC);
+        reports.forEach(r => {
+          const n = r ? (r.closer || r.member || r.name) : '';
+          if (n && n.trim()) nameSet.add(n.trim());
+        });
+      }
+    } catch (e) {}
+
+    teamMembersDatalist.innerHTML = '';
+    nameSet.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      teamMembersDatalist.appendChild(opt);
     });
   }
 
@@ -343,8 +343,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (raw) {
         const cached = JSON.parse(raw);
         if (Array.isArray(cached) && cached.length > 0) {
-          renderDynamicTeamChips(cached);
+          populateTeamDatalist(cached);
         }
+      } else {
+        populateTeamDatalist([]);
       }
     } catch (e) {}
 
@@ -353,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof dbFetchTeamMembers === 'function') {
         const remoteMembers = await dbFetchTeamMembers();
         if (Array.isArray(remoteMembers) && remoteMembers.length > 0) {
-          renderDynamicTeamChips(remoteMembers);
+          populateTeamDatalist(remoteMembers);
         }
       }
     } catch (err) {
@@ -363,12 +365,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loadTeamMembers();
 
-  // Ouve mudanças de ativação/desativação vindas do painel em tempo real
+  // Ouve mudanças de membros vindas do painel em tempo real
   window.addEventListener('storage', (e) => {
     if (e.key === STORAGE_MEMBERS_KEY) {
       try {
         const updated = JSON.parse(e.newValue || '[]');
-        renderDynamicTeamChips(updated);
+        populateTeamDatalist(updated);
       } catch (err) {}
     }
   });
@@ -380,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function gatherCurrentReportData() {
     const selectedDate = inputReportDate ? (inputReportDate.value || getTodayIso()) : getTodayIso();
-    const effectiveName = currentName || 'Tales';
+    const effectiveName = (inputMemberName ? inputMemberName.value.trim() : '') || currentName || 'Membro';
     let selectedClientId = selectClientId ? selectClientId.value : null;
     const primaryId = localStorage.getItem('fa_primary_project_id_v1');
     if (!selectedClientId && primaryId) {
@@ -475,6 +477,29 @@ document.addEventListener('DOMContentLoaded', () => {
   // MODAL DE CONFERÊNCIA ("CONFIRMAR SE TÁ TUDO CORRETO")
   // ============================================================
   function openReviewModal() {
+    const rawTyped = (inputMemberName ? inputMemberName.value.trim() : '') || currentName;
+    if (!rawTyped || rawTyped.length < 2) {
+      showToast('⚠️ Por favor, digite seu nome antes de continuar.');
+      if (inputMemberName) {
+        inputMemberName.focus();
+        const box = inputMemberName.closest('.apple-input-box');
+        if (box) {
+          box.style.borderColor = '#ef4444';
+          box.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)';
+          setTimeout(() => {
+            box.style.borderColor = '';
+            box.style.boxShadow = '';
+          }, 3000);
+        }
+      }
+      return;
+    }
+
+    currentName = rawTyped;
+    try {
+      localStorage.setItem('fa_last_reporter_name', currentName);
+    } catch (e) {}
+
     pendingReportData = gatherCurrentReportData();
 
     const existingCount = getExistingReportsCount(pendingReportData.name, pendingReportData.date);
@@ -676,13 +701,22 @@ document.addEventListener('DOMContentLoaded', () => {
   function populateExportCard(data) {
     if (!data) return;
 
-    cardMetaRole.textContent = 'RELATÓRIO COMERCIAL';
-    cardMetaRole.style.background = 'var(--accent-lime)';
-    cardMetaRole.style.color = '#0f1115';
-    cardMetaDate.textContent = formatDateBR(data.date);
-    cardMemberName.textContent = data.name.toUpperCase();
-    cardMemberRoleBadge.textContent = 'EQUIPE COMERCIAL';
-    cardTimestamp.textContent = `Salvo às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+    const formattedName = (data.name || 'MEMBRO').trim();
+
+    if (cardMetaRole) {
+      cardMetaRole.textContent = 'RELATÓRIO COMERCIAL';
+      cardMetaRole.style.background = 'var(--accent-lime)';
+      cardMetaRole.style.color = '#0f1115';
+    }
+    if (cardMetaDate) cardMetaDate.textContent = formatDateBR(data.date);
+    if (cardMemberName) {
+      cardMemberName.textContent = formattedName.toUpperCase();
+      cardMemberName.setAttribute('title', formattedName);
+    }
+    if (cardMemberRoleBadge) cardMemberRoleBadge.textContent = 'EQUIPE COMERCIAL';
+    if (cardTimestamp) {
+      cardTimestamp.textContent = `Salvo às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+    }
 
     let metricsHtml = `
       <!-- Métricas Operacionais (Esforço & Reuniões) -->
